@@ -2384,7 +2384,7 @@
     // Flatten for title lookup
     var allItems = [];
     groups.forEach(function(g) {
-      g.items.forEach(function(item) { allItems.push(item); });
+      if (g.items) g.items.forEach(function(item) { allItems.push(item); });
     });
 
     // Build dashboard HTML
