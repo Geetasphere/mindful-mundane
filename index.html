@@ -1914,8 +1914,8 @@
     looking_ahead: {
       title: 'Looking Ahead',
       questions: [
-        "What's one change you want to make next month?",
-        "What's one spending habit you're ready to let go of?"
+        "What's one habit you'd like to build?",
+        'Reflections'
       ]
     }
   };
@@ -2434,6 +2434,23 @@
         return html;
       }
 
+      var HABIT_CHIPS = [
+        'Wait 24 hours before buying', 'Plan meals each week', 'Have more $0 days',
+        'Reduce online shopping', 'Buy secondhand first', 'Use what I already own',
+        'Plan errands to reduce trips', 'Cancel subscriptions', 'Cook at home more', 'Other'
+      ];
+
+      function buildHabitChips(qKey) {
+        var current = store[qKey] || '';
+        var html = '<div class="trigger-chips" data-key="' + qKey + '" data-single="true">';
+        HABIT_CHIPS.forEach(function(chip) {
+          var isSel = current === chip;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
       var CHANGED_CHIPS = [
         'Fewer impulse purchases', 'Cooked at home more', 'Drove less',
         'Used what I already had', 'Repaired instead of replacing',
@@ -2498,6 +2515,13 @@
             html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
                     '<div class="field-sublabel">Select any that apply</div>' +
                     buildSurprisedChips(qKey);
+          } else if (rKey === 'looking_ahead' && qi === 0) {
+            html += '<div class="field-label sans">' + q + '</div>' +
+                    buildHabitChips(qKey);
+          } else if (rKey === 'looking_ahead' && qi === 1) {
+            var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
+                    '<textarea data-key="' + qKey + '" rows="3" placeholder="Write your reflection here…">' + qVal + '</textarea>';
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div>' +
@@ -2560,14 +2584,23 @@
       // Wire trigger chips
       section.querySelectorAll('.trigger-chips').forEach(function(container) {
         var qKey = container.getAttribute('data-key');
+        var isSingle = container.getAttribute('data-single') === 'true';
         container.querySelectorAll('.trigger-chip').forEach(function(chip) {
           chip.addEventListener('click', function() {
-            chip.classList.toggle('selected');
-            var selected = [];
-            container.querySelectorAll('.trigger-chip.selected').forEach(function(c) {
-              selected.push(c.getAttribute('data-value'));
-            });
-            store[qKey] = JSON.stringify(selected);
+            if (isSingle) {
+              // Radio-style: deselect all, select tapped (toggle off if already selected)
+              var wasSelected = chip.classList.contains('selected');
+              container.querySelectorAll('.trigger-chip').forEach(function(c) { c.classList.remove('selected'); });
+              if (!wasSelected) chip.classList.add('selected');
+              store[qKey] = chip.classList.contains('selected') ? chip.getAttribute('data-value') : '';
+            } else {
+              chip.classList.toggle('selected');
+              var selected = [];
+              container.querySelectorAll('.trigger-chip.selected').forEach(function(c) {
+                selected.push(c.getAttribute('data-value'));
+              });
+              store[qKey] = JSON.stringify(selected);
+            }
             debouncedSave();
           });
         });
