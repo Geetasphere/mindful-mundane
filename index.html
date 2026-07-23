@@ -1859,9 +1859,8 @@
   });
 
   function navigateAfterSignIn() {
-    var firstVisit = !localStorage.getItem('msj-visited');
-    localStorage.setItem('msj-visited', '1');
-    var targetId = firstVisit ? 'rules' : 'month-aug';
+    var isFirstLogin = Object.keys(store).length === 0;
+    var targetId = isFirstLogin ? 'rules' : 'month-aug';
     setTimeout(function() {
       var el = document.getElementById(targetId);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
