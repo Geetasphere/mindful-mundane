@@ -2441,6 +2441,25 @@
         'Planned ahead', 'Saved more than usual', 'Nothing noticeable yet'
       ];
 
+      var SURPRISED_CHIPS = [
+        'I spent less than I expected', 'I spent more than I realized',
+        "I didn't miss buying things", 'Planning ahead made a difference',
+        'Small purchases added up', 'Cooking at home saved more than expected',
+        'My triggers became clearer', 'Nothing surprised me', 'Other'
+      ];
+
+      function buildSurprisedChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        SURPRISED_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
       function buildChangedChips(qKey) {
         var selected = [];
         try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
@@ -2475,6 +2494,10 @@
             html += '<div class="field-label sans">' + q + '</div>' +
                     '<div class="field-sublabel">Select all that apply</div>' +
                     buildWorkedWellChips(qKey);
+          } else if (rKey === 'looking_back' && qi === 1) {
+            html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
+                    '<div class="field-sublabel">Select any that apply</div>' +
+                    buildSurprisedChips(qKey);
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div>' +
