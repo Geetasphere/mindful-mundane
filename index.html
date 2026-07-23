@@ -294,7 +294,7 @@
   .month-col-reflections { width: 100%; }
   @media (min-width: 860px) {
     .month-layout { flex-direction: row; gap: 48px; }
-    .month-col-calendar { flex: 0 0 38%; min-width: 0; }
+    .month-col-calendar { flex: 0 0 50%; min-width: 0; }
     .month-col-reflections { flex: 1 1 0; min-width: 0; position: sticky; top: 24px; }
   }
 
@@ -2409,7 +2409,7 @@
           '<div class="month-layout">' +
             '<div class="month-col-calendar">' +
               '<div class="month-title-row">' +
-                '<span class="save-note sans">Tap a day to mark if no money was spent. No purchases. No payments.</span>' +
+                '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
                 '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
               '</div>' +
               '<div class="weekday-row">' + weekdayCells + '</div>' +
