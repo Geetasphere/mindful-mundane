@@ -2097,6 +2097,12 @@
   var auth = firebase.auth();
   var db   = firebase.firestore();
 
+  // Track every page load (public + signed-in) — rules allow unauthenticated writes to _meta
+  db.collection('_meta').doc('authgate').set({
+    total: firebase.firestore.FieldValue.increment(1),
+    lastSeen: new Date().toISOString()
+  }, { merge: true }).catch(function() {});
+
   /* =====================================================================
      IN-MEMORY STORE + FIRESTORE SYNC
      ===================================================================== */

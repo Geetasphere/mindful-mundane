@@ -109,7 +109,10 @@
     margin-bottom: 48px;
   }
   @media (min-width: 600px) {
-    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(6, 1fr); }
   }
   .stat-card {
     background: var(--cream-deep);
@@ -286,10 +289,20 @@ service cloud.firestore {
 
   <!-- Stat cards -->
   <div class="stats-grid">
+    <div class="stat-card" id="statVisits">
+      <div class="stat-label">Landing page visits</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">public + signed-in</div>
+    </div>
     <div class="stat-card" id="statUsers">
       <div class="stat-label">Total sign-ups</div>
       <div class="stat-num">—</div>
       <div class="stat-sub">all time</div>
+    </div>
+    <div class="stat-card" id="statConversion">
+      <div class="stat-label">Conversion rate</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">visits → sign-ups</div>
     </div>
     <div class="stat-card" id="statActive">
       <div class="stat-label">Active users</div>
@@ -302,9 +315,9 @@ service cloud.firestore {
       <div class="stat-sub">total written</div>
     </div>
     <div class="stat-card" id="statViews">
-      <div class="stat-label">Page views</div>
+      <div class="stat-label">Logged-in sessions</div>
       <div class="stat-num">—</div>
-      <div class="stat-sub">logged-in sessions</div>
+      <div class="stat-sub">authenticated page loads</div>
     </div>
   </div>
 
@@ -420,15 +433,31 @@ service cloud.firestore {
     var note = document.getElementById('refreshNote');
     note.textContent = 'Loading\u2026';
 
-    // Load page views
-    db.collection('_meta').doc('pageviews').get()
+    // Load landing page visits (public) and logged-in sessions
+    var visitsPromise = db.collection('_meta').doc('authgate').get()
       .then(function(doc) {
-        var count = doc.exists ? (doc.data().total || 0) : 0;
-        setStatCard('statViews', count, 'logged-in sessions');
-      })
-      .catch(function() {
-        setStatCard('statViews', '—', 'update Firestore rules');
-      });
+        return doc.exists ? (doc.data().total || 0) : 0;
+      }).catch(function() { return null; });
+
+    var pageviewsPromise = db.collection('_meta').doc('pageviews').get()
+      .then(function(doc) {
+        return doc.exists ? (doc.data().total || 0) : 0;
+      }).catch(function() { return null; });
+
+    Promise.all([visitsPromise, pageviewsPromise]).then(function(results) {
+      var visits = results[0];
+      var pageviews = results[1];
+      if (visits !== null) {
+        setStatCard('statVisits', visits, 'public + signed-in');
+      } else {
+        setStatCard('statVisits', '—', 'check rules');
+      }
+      if (pageviews !== null) {
+        setStatCard('statViews', pageviews, 'authenticated page loads');
+      } else {
+        setStatCard('statViews', '—', 'check rules');
+      }
+    });
 
     // Load all user journals
     db.collection('journals').get()
@@ -444,9 +473,10 @@ service cloud.firestore {
       .catch(function(err) {
         note.textContent = 'Could not load — check Firestore rules below.';
         document.getElementById('rulesNote').style.display = 'block';
-        setStatCard('statUsers',  '—', 'update rules');
-        setStatCard('statActive', '—', 'update rules');
-        setStatCard('statEntries','—', 'update rules');
+        setStatCard('statUsers',      '—', 'update rules');
+        setStatCard('statConversion', '—', 'update rules');
+        setStatCard('statActive',     '—', 'update rules');
+        setStatCard('statEntries',    '—', 'update rules');
         document.getElementById('quoteTableBody').innerHTML =
           '<tr><td colspan="5" class="no-ratings">Firestore rules required — see note above.</td></tr>';
         document.getElementById('usersList').innerHTML =
@@ -479,6 +509,16 @@ service cloud.firestore {
     setStatCard('statUsers',   totalUsers,   'all time');
     setStatCard('statActive',  activeUsers,  'last 30 days');
     setStatCard('statEntries', totalEntries, 'total written');
+
+    // Conversion: sign-ups / landing visits
+    var visitsEl = document.getElementById('statVisits');
+    var visitsNum = parseInt(visitsEl.querySelector('.stat-num').textContent);
+    if (!isNaN(visitsNum) && visitsNum > 0) {
+      var pct = ((totalUsers / visitsNum) * 100).toFixed(1) + '%';
+      setStatCard('statConversion', pct, 'visits \u2192 sign-ups');
+    } else {
+      setStatCard('statConversion', '—', 'waiting for visit data');
+    }
 
     renderQuoteRatings(users);
     renderUsersList(users, thirtyDaysAgo);
