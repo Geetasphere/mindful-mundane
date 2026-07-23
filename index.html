@@ -2395,9 +2395,9 @@
       + '</div>'
       + '<div class="mobile-dash-dedication">'
       + '<div class="field-label">This journal belongs to</div>'
-      + '<div class="mobile-ded-value">' + (dedicationName || '&nbsp;') + '</div>'
+      + '<input type="text" data-key="field-belongs" placeholder="Your name" value="' + dedicationName.replace(/"/g, '&quot;') + '">'
       + '<div class="field-label" style="margin-top:18px;">Begun on</div>'
-      + '<div class="mobile-ded-value">' + (dedicationDate || '&nbsp;') + '</div>'
+      + '<input type="text" data-key="field-date" placeholder="Today\'s date" value="' + dedicationDate.replace(/"/g, '&quot;') + '">'
       + '<p class="italic center" style="margin-top:26px;font-size:15px;">You do not need to make more money to feel free.<br>Sometimes you just need to notice the money<br>you already have and where it\'s going.</p>'
       + '</div>';
     groups.forEach(function(g) {
@@ -2413,6 +2413,18 @@
       html += '</ul></div>';
     });
     dashboard.innerHTML = html;
+
+    // Wire up dedication inputs on dashboard
+    dashboard.querySelectorAll('input[data-key]').forEach(function(el) {
+      var key = el.getAttribute('data-key');
+      el.addEventListener('input', function() {
+        store[key] = el.value;
+        // keep desktop input in sync
+        var desktopEl = document.querySelector('main input[data-key="' + key + '"]');
+        if (desktopEl) desktopEl.value = el.value;
+        debouncedSave();
+      });
+    });
 
     // List item tap → open reader
     dashboard.querySelectorAll('.mobile-nav-item:not(.locked)').forEach(function(item) {
