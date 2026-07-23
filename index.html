@@ -2434,7 +2434,10 @@
       });
     });
 
+    var savedDashboardScroll = 0;
+
     function openReader(sectionId) {
+      savedDashboardScroll = window.scrollY;
       document.body.classList.add('reading');
       // Scroll to section after layout settles
       setTimeout(function() {
@@ -2448,6 +2451,9 @@
 
     function closeReader() {
       document.body.classList.remove('reading');
+      setTimeout(function() {
+        window.scrollTo(0, savedDashboardScroll);
+      }, 20);
     }
 
     backBtn.addEventListener('click', closeReader);
