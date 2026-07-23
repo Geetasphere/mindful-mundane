@@ -328,10 +328,13 @@
 
   /* ---------- Reflection ---------- */
   .reflection-group { margin-bottom: 26px; }
-  .reflection-row { display: flex; gap: 24px; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 32px; }
-  .reflection-row .reflection-group { flex: 1 1 0; min-width: 0; }
+  .reflection-row { display: flex; gap: 0; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 32px; }
+  .reflection-row .reflection-group { flex: 1 1 0; min-width: 0; padding-right: 24px; }
+  .reflection-row .reflection-group + .reflection-group { border-left: 1px solid var(--sage-line); padding-left: 24px; padding-right: 0; }
   @media (max-width: 768px) {
-    .reflection-row { flex-direction: column; gap: 0; }
+    .reflection-row { flex-direction: column; }
+    .reflection-row .reflection-group { padding-right: 0; }
+    .reflection-row .reflection-group + .reflection-group { border-left: none; border-top: 1px solid var(--sage-line); padding-left: 0; padding-top: 24px; margin-top: 24px; }
   }
   .save-note { font-size: 12px; color: var(--label); font-style: italic; }
   .field-sublabel { font-size: 12px; color: var(--label); font-style: italic; margin-top: 2px; margin-bottom: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
