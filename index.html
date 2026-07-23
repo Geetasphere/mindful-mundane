@@ -2544,9 +2544,7 @@
             inner = '<div class="field-label sans">' + q + '</div>' +
                     buildHabitChips(qKey);
           } else if (rKey === 'looking_ahead' && qi === 1) {
-            var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            inner = '<div class="field-label sans">' + q + '</div>' +
-                    '<textarea data-key="' + qKey + '" rows="3" placeholder="Write your reflection here…">' + qVal + '</textarea>';
+            inner = '<div class="journal-cta"><a href="#letter" class="journal-cta-link">Write a Journal Entry &rarr;</a></div>';
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             inner = '<div class="field-label sans">' + q + '</div>' +
