@@ -2046,7 +2046,16 @@
     if (menuBtn) menuBtn.addEventListener('click', function () { navOverlay.classList.add('open'); });
     if (closeBtn) closeBtn.addEventListener('click', function () { navOverlay.classList.remove('open'); });
     document.querySelectorAll('.nav-link').forEach(function (link) {
-      link.addEventListener('click', function () { navOverlay.classList.remove('open'); });
+      link.addEventListener('click', function (e) {
+        navOverlay.classList.remove('open');
+        // On mobile, open reader mode instead of anchor-scrolling hidden sections
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          var sectionId = link.getAttribute('href').replace('#', '');
+          var openReaderFn = window.__openReader;
+          if (openReaderFn) openReaderFn(sectionId);
+        }
+      });
     });
     var navSignOutBtn = document.getElementById('navSignOutBtn');
     if (navSignOutBtn) navSignOutBtn.addEventListener('click', function () {
@@ -2342,16 +2351,13 @@
       {
         label: 'Introduction',
         items: [
-          { id: 'why-exists',   eyebrow: 'Introduction', title: 'Why This Journal Exists' },
-          { id: 'why-matters',  eyebrow: 'Introduction', title: 'Why $0 Days Matter'      },
-          { id: 'how-to-use',   eyebrow: 'Introduction', title: 'How to Use'              }
+          { id: 'why-exists', eyebrow: 'Introduction', title: 'Introduction' }
         ]
       },
       {
         label: 'Rules',
         items: [
-          { id: 'rules',        eyebrow: 'Rules', title: 'What Counts'   },
-          { id: 'ask-yourself', eyebrow: 'Rules', title: 'The Mindset'   }
+          { id: 'rules', eyebrow: 'Rules', title: 'Rules' }
         ]
       },
       {
@@ -2436,6 +2442,7 @@
 
     var savedDashboardScroll = 0;
 
+    window.__openReader = openReader;
     function openReader(sectionId) {
       savedDashboardScroll = window.scrollY;
       document.body.classList.add('reading');
