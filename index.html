@@ -324,6 +324,20 @@
     color: #fff;
   }
 
+  /* ---------- Month cards ---------- */
+  .month-cards { display: flex; flex-direction: column; gap: 16px; }
+  .month-q-card {
+    border: 1px solid #fff;
+    border-radius: 12px;
+    padding: 20px 22px;
+    background: var(--cream);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .month-q-card-calendar {
+    background: #edf3ea;
+    border-color: #fff;
+  }
+
   /* ---------- Reflection ---------- */
   .reflection-group { margin-bottom: 26px; }
   .reflection-row { display: flex; gap: 24px; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 8px; }
@@ -2489,46 +2503,45 @@
         return html;
       }
 
-      /* Reflection textareas */
+      /* Reflection cards — one card per question */
       function buildReflectionGroup(rKey) {
         var r = REFLECTIONS[rKey];
-        var html = '<div class="reflection-group"><h3>' + r.title + '</h3>';
+        var html = '';
         r.questions.forEach(function (q, qi) {
           var qKey = mKey + '-' + rKey + '-' + qi;
+          var inner = '';
           if (rKey === 'patterns' && qi === 0) {
-            // Trigger chips
             var surpriseKey = mKey + '-patterns-trigger-surprise';
             var surpriseVal = (store[surpriseKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html += '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
+            inner = '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
                     buildTriggerChips(qKey) +
                     '<div class="field-label sans" style="margin-top:16px;">Anything surprising?</div>' +
                     '<textarea data-key="' + surpriseKey + '" rows="2">' + surpriseVal + '</textarea>';
           } else if (rKey === 'patterns' && qi === 1) {
-            // "What changed" chips
-            html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
+            inner = '<div class="field-label sans">' + q + '</div>' +
                     buildChangedChips(qKey);
           } else if (rKey === 'looking_back' && qi === 0) {
-            html += '<div class="field-label sans">' + q + '</div>' +
+            inner = '<div class="field-label sans">' + q + '</div>' +
                     '<div class="field-sublabel">Select all that apply</div>' +
                     buildWorkedWellChips(qKey);
           } else if (rKey === 'looking_back' && qi === 1) {
-            html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
+            inner = '<div class="field-label sans">' + q + '</div>' +
                     '<div class="field-sublabel">Select any that apply</div>' +
                     buildSurprisedChips(qKey);
           } else if (rKey === 'looking_ahead' && qi === 0) {
-            html += '<div class="field-label sans">' + q + '</div>' +
+            inner = '<div class="field-label sans">' + q + '</div>' +
                     buildHabitChips(qKey);
           } else if (rKey === 'looking_ahead' && qi === 1) {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
+            inner = '<div class="field-label sans">' + q + '</div>' +
                     '<textarea data-key="' + qKey + '" rows="3" placeholder="Write your reflection here…">' + qVal + '</textarea>';
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html += '<div class="field-label sans">' + q + '</div>' +
+            inner = '<div class="field-label sans">' + q + '</div>' +
                     '<textarea data-key="' + qKey + '" rows="2">' + qVal + '</textarea>';
           }
+          html += '<div class="month-q-card">' + inner + '</div>';
         });
-        html += '</div>';
         return html;
       }
 
@@ -2554,8 +2567,8 @@
         '</div>' +
         '<div class="month-body">' +
           '<hr class="rule">' +
-          '<div class="month-layout">' +
-            '<div class="month-col-calendar">' +
+          '<div class="month-cards">' +
+            '<div class="month-q-card month-q-card-calendar">' +
               '<div class="month-title-row">' +
                 '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
                 '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
@@ -2568,11 +2581,7 @@
                 '<span><span class="sw empty"></span>Not yet marked</span>' +
               '</div>' +
             '</div>' +
-            '<div class="month-col-reflections">' +
-              buildReflectionGroup('patterns') +
-            '</div>' +
-          '</div>' +
-          '<div class="reflection-row">' +
+            buildReflectionGroup('patterns') +
             buildReflectionGroup('looking_back') +
             buildReflectionGroup('looking_ahead') +
           '</div>' +
