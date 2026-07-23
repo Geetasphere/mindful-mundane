@@ -328,6 +328,8 @@
 
   /* ---------- Reflection ---------- */
   .reflection-group { margin-bottom: 26px; }
+  .q-block { margin-top: 24px; }
+  .q-block:first-child { margin-top: 0; }
   .reflection-row { display: flex; gap: 0; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 32px; }
   .reflection-row .reflection-group { flex: 1 1 0; min-width: 0; padding-right: 24px; }
   .reflection-row .reflection-group + .reflection-group { border-left: 1px solid var(--sage-line); padding-left: 24px; padding-right: 0; }
@@ -2509,8 +2511,8 @@
             var surpriseVal = (store[surpriseKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             inner = '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
                     buildTriggerChips(qKey) +
-                    '<div class="field-label sans" style="margin-top:16px;">Anything surprising?</div>' +
-                    '<textarea data-key="' + surpriseKey + '" rows="2">' + surpriseVal + '</textarea>';
+                    '<div class="q-block"><div class="field-label sans">Anything surprising?</div>' +
+                    '<textarea data-key="' + surpriseKey + '" rows="2">' + surpriseVal + '</textarea></div>';
           } else if (rKey === 'patterns' && qi === 1) {
             inner = '<div class="field-label sans">' + q + '</div>' +
                     buildChangedChips(qKey);
@@ -2534,7 +2536,7 @@
             inner = '<div class="field-label sans">' + q + '</div>' +
                     '<textarea data-key="' + qKey + '" rows="2">' + qVal + '</textarea>';
           }
-          html += inner;
+          html += '<div class="q-block">' + inner + '</div>';
         });
         html += '</div>';
         return html;
