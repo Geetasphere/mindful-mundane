@@ -325,6 +325,22 @@
     border-radius: 12px;
     padding: 20px 22px;
   }
+  .journal-cta {
+    margin-top: 24px;
+    text-align: center;
+  }
+  .journal-cta-link {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: var(--sage);
+    text-decoration: none;
+    border: 1px solid var(--sage-line);
+    border-radius: 20px;
+    padding: 9px 20px;
+    display: inline-block;
+    transition: background 0.15s, color 0.15s;
+  }
+  .journal-cta-link:hover { background: var(--sage); color: #fff; border-color: var(--sage); }
 
   /* ---------- Reflection ---------- */
   .reflection-group { margin-bottom: 26px; }
@@ -2564,29 +2580,21 @@
         '</div>' +
         '<div class="month-body">' +
           '<hr class="rule">' +
-          '<div class="month-layout">' +
-            '<div class="month-col-calendar">' +
-              '<div class="cal-card">' +
-                '<div class="month-title-row">' +
-                  '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
-                  '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
-                '</div>' +
-                '<div class="weekday-row">' + weekdayCells + '</div>' +
-                '<div class="cal-grid">' + dayCells + '</div>' +
-                '<div class="legend">' +
-                  '<span><span class="sw zero"></span>$0 Day</span>' +
-                  '<span><span class="sw spend"></span>Spending Day</span>' +
-                  '<span><span class="sw empty"></span>Not yet marked</span>' +
-                '</div>' +
-              '</div>' +
+          '<div class="cal-card">' +
+            '<div class="month-title-row">' +
+              '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
+              '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
             '</div>' +
-            '<div class="month-col-reflections">' +
-              buildReflectionGroup('patterns') +
+            '<div class="weekday-row">' + weekdayCells + '</div>' +
+            '<div class="cal-grid">' + dayCells + '</div>' +
+            '<div class="legend">' +
+              '<span><span class="sw zero"></span>$0 Day</span>' +
+              '<span><span class="sw spend"></span>Spending Day</span>' +
+              '<span><span class="sw empty"></span>Not yet marked</span>' +
             '</div>' +
           '</div>' +
-          '<div class="reflection-row">' +
-            buildReflectionGroup('looking_back') +
-            buildReflectionGroup('looking_ahead') +
+          '<div class="journal-cta">' +
+            '<a href="#letter" class="journal-cta-link">Write a Journal Entry &rarr;</a>' +
           '</div>' +
         '</div>';
 
