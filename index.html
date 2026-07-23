@@ -328,7 +328,7 @@
 
   /* ---------- Reflection ---------- */
   .reflection-group { margin-bottom: 26px; }
-  .reflection-row { display: flex; gap: 24px; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 8px; }
+  .reflection-row { display: flex; gap: 24px; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 32px; }
   .reflection-row .reflection-group { flex: 1 1 0; min-width: 0; }
   @media (max-width: 768px) {
     .reflection-row { flex-direction: column; gap: 0; }
@@ -2577,11 +2577,11 @@
             '</div>' +
             '<div class="month-col-reflections">' +
               buildReflectionGroup('patterns') +
-              '<div class="reflection-row">' +
-                buildReflectionGroup('looking_back') +
-                buildReflectionGroup('looking_ahead') +
-              '</div>' +
             '</div>' +
+          '</div>' +
+          '<div class="reflection-row">' +
+            buildReflectionGroup('looking_back') +
+            buildReflectionGroup('looking_ahead') +
           '</div>' +
         '</div>';
 
