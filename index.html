@@ -2584,21 +2584,29 @@
         '</div>' +
         '<div class="month-body">' +
           '<hr class="rule">' +
-          '<div class="cal-card">' +
-            '<div class="month-title-row">' +
-              '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
-              '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
+          '<div class="month-layout">' +
+            '<div class="month-col-calendar">' +
+              '<div class="cal-card">' +
+                '<div class="month-title-row">' +
+                  '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
+                  '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
+                '</div>' +
+                '<div class="weekday-row">' + weekdayCells + '</div>' +
+                '<div class="cal-grid">' + dayCells + '</div>' +
+                '<div class="legend">' +
+                  '<span><span class="sw zero"></span>$0 Day</span>' +
+                  '<span><span class="sw spend"></span>Spending Day</span>' +
+                  '<span><span class="sw empty"></span>Not yet marked</span>' +
+                '</div>' +
+              '</div>' +
             '</div>' +
-            '<div class="weekday-row">' + weekdayCells + '</div>' +
-            '<div class="cal-grid">' + dayCells + '</div>' +
-            '<div class="legend">' +
-              '<span><span class="sw zero"></span>$0 Day</span>' +
-              '<span><span class="sw spend"></span>Spending Day</span>' +
-              '<span><span class="sw empty"></span>Not yet marked</span>' +
+            '<div class="month-col-reflections">' +
+              buildReflectionGroup('patterns') +
             '</div>' +
           '</div>' +
-          '<div class="journal-cta">' +
-            '<a href="#letter" class="journal-cta-link">Write a Journal Entry &rarr;</a>' +
+          '<div class="reflection-row">' +
+            buildReflectionGroup('looking_back') +
+            buildReflectionGroup('looking_ahead') +
           '</div>' +
         '</div>';
 
