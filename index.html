@@ -1185,7 +1185,10 @@
       height: calc(100dvh - 116px);
       -webkit-overflow-scrolling: touch;
     }
-    body.reading #appContent > main .section {
+    /* Hide all sections in reader; JS shows only the active group */
+    body.reading #appContent > main .section { display: none; }
+    body.reading #appContent > main .section.reader-visible {
+      display: block;
       padding: 32px 20px 48px;
       border-bottom: 1px solid var(--sage-line);
       box-sizing: border-box;
@@ -2676,6 +2679,26 @@
       'letter': 'journal', 'closing': 'journal'
     };
 
+    // Group → which section IDs to show
+    var groupSectionsMap = {
+      intro:    ['why-exists', 'ask-yourself'],
+      calendar: ['month-jul', 'month-aug', 'month-sep', 'month-oct', 'month-nov', 'month-dec'],
+      journal:  ['letter', 'closing']
+    };
+
+    function showGroupSections(group) {
+      // Hide all
+      document.querySelectorAll('#appContent > main .section').forEach(function(s) {
+        s.classList.remove('reader-visible');
+      });
+      // Show only this group's sections
+      var ids = groupSectionsMap[group] || [];
+      ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('reader-visible');
+      });
+    }
+
     function setReaderNavActive(group) {
       document.querySelectorAll('.reader-nav-item').forEach(function(btn) {
         btn.classList.toggle('active', btn.getAttribute('data-section') === group);
@@ -2704,13 +2727,12 @@
     window.__openReader = openReader;
     function openReader(sectionId) {
       savedDashboardScroll = window.scrollY;
+      var group = sectionGroupMap[sectionId] || 'calendar';
       document.body.classList.add('reading');
-      setReaderNavActive(sectionGroupMap[sectionId] || 'calendar');
+      showGroupSections(group);
+      setReaderNavActive(group);
       setTimeout(function() {
-        var target = document.getElementById(sectionId);
-        if (target && mainEl) {
-          mainEl.scrollTop = target.offsetTop;
-        }
+        if (mainEl) mainEl.scrollTop = 0;
       }, 20);
     }
 
