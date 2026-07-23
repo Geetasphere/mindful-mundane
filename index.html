@@ -1191,7 +1191,47 @@
     #mobileBackBtn { display: none !important; }
     #mobilePageTitle { display: none !important; }
     #mobileDashboard { display: none !important; }
+    #mobileRulesOverlay { display: none !important; }
     #appContent > main { display: block !important; }
+  }
+
+  /* Rules overlay — mobile only */
+  #mobileRulesOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: var(--paper);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #mobileRulesOverlay.open { display: block; }
+  .rules-overlay-inner {
+    padding: 16px 20px 80px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .rules-overlay-close {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    padding: 10px 0 20px;
+    margin: 0;
+  }
+  #mobileRulesContent .section {
+    flex: none !important;
+    width: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    margin-bottom: 32px;
+    overflow: visible !important;
   }
 </style>
 </head>
@@ -1460,6 +1500,17 @@
 
 <!-- MOBILE DASHBOARD (card grid, shown on mobile before entering reader) -->
 <div id="mobileDashboard"></div>
+
+<!-- MOBILE RULES OVERLAY -->
+<div id="mobileRulesOverlay">
+  <div class="rules-overlay-inner">
+    <button id="mobileRulesCloseBtn" type="button" class="rules-overlay-close" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M12.5 5l-5 5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </button>
+    <div id="mobileRulesContent"></div>
+  </div>
+</div>
 
 <main>
 
@@ -1952,6 +2003,14 @@
   });
 
   function navigateAfterSignIn() {
+    if (window.innerWidth <= 768) {
+      // Mobile: go straight to calendar reader
+      setTimeout(function() {
+        if (window.__openReader) window.__openReader('month-jul');
+      }, 150);
+      return;
+    }
+    // Desktop: first login → rules, returning → july
     var isFirstLogin = Object.keys(store).length === 0;
     var targetId = isFirstLogin ? 'rules' : 'month-jul';
     setTimeout(function() {
@@ -2361,7 +2420,7 @@
 
     var groups = [
       { label: 'Introduction', direct: 'why-exists' },
-      { label: 'Rules',        direct: 'rules'      },
+      { label: 'Rules',        rulesOverlay: true   },
       {
         label: 'Calendar',
         items: [
@@ -2417,6 +2476,12 @@
           + g.label
           + '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
           + '</div>';
+      } else if (g.rulesOverlay) {
+        // Rules → opens overlay instead of reader
+        html += '<div class="mobile-group-label mobile-rules-overlay-link" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+          + g.label
+          + '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          + '</div>';
       } else {
         if (g.label) html += '<div class="mobile-group-label">' + g.label + '</div>';
         html += '<ul class="mobile-nav-list">';
@@ -2450,6 +2515,28 @@
         openReader(el.getAttribute('data-sid'));
       });
     });
+
+    // Rules overlay open
+    var rulesOverlay = document.getElementById('mobileRulesOverlay');
+    var rulesContent = document.getElementById('mobileRulesContent');
+    var rulesCloseBtn = document.getElementById('mobileRulesCloseBtn');
+    if (rulesContent && !rulesContent.hasChildNodes()) {
+      // Clone rules sections into overlay (rules + ask-yourself)
+      ['rules', 'ask-yourself'].forEach(function(id) {
+        var src = document.getElementById(id);
+        if (src) rulesContent.appendChild(src.cloneNode(true));
+      });
+    }
+    dashboard.querySelectorAll('.mobile-rules-overlay-link').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if (rulesOverlay) rulesOverlay.classList.add('open');
+      });
+    });
+    if (rulesCloseBtn && rulesOverlay) {
+      rulesCloseBtn.addEventListener('click', function() {
+        rulesOverlay.classList.remove('open');
+      });
+    }
 
     // List item tap → open reader
     dashboard.querySelectorAll('.mobile-nav-item:not(.locked)').forEach(function(item) {
