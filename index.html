@@ -411,7 +411,7 @@
     position: fixed; inset: 0; z-index: 200;
     background: rgba(30, 26, 20, 0.6); backdrop-filter: blur(6px);
     display: flex; align-items: center; justify-content: center;
-    padding: 24px 16px;
+    padding: 12px;
     display: none; opacity: 0;
     transition: opacity 0.25s ease;
   }
@@ -1614,7 +1614,7 @@
     <hr class="rule">
     <p>This journal ends here. Your reflection does not. Write yourself a letter. Let it answer questions like these:</p>
     <p style="margin-left:6px;">&mdash; When you started this journal, what did you expect?<br>&mdash; How has your relationship with spending changed?<br>&mdash; What do you value more now?<br>&mdash; What did you discover about yourself?<br>&mdash; What does &ldquo;enough&rdquo; mean to you today?</p>
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:20px; margin-bottom:10px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:20px; margin-bottom:10px;">
       <div class="field-label" style="margin:0;">Dear Me,</div>
       <div style="display:flex; gap:8px;">
         <button class="journal-add-btn journal-save-btn" id="journalAddBtn" type="button" style="margin-top:0;">
@@ -1628,6 +1628,7 @@
       </div>
     </div>
     <textarea data-key="letter" rows="12" placeholder="Start writing..."></textarea>
+    <p class="italic" style="margin-top:6px; margin-bottom:0;">With love,</p>
     <div class="save-note" id="letterSaveNote"></div>
     <div class="journal-entries-list" id="journalEntriesList" style="display:none;"></div>
   </section>
