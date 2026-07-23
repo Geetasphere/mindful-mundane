@@ -1212,11 +1212,17 @@
     }
     body.reading #appContent > footer { display: none; }
 
+    /* Brand text: short on mobile, full on desktop */
+    .brand-short { display: none; }
+    .brand-full  { display: inline; }
+
     /* Topbar in reader mode */
-    body.reading .topbar .brand { display: none; }
+    body.reading .topbar .brand { display: flex; }
     body.reading .topbar #userChip { display: block; }
     body.reading #mobileBackBtn { display: none; }
-    body.reading #mobilePageTitle { display: block; }
+    body.reading #mobilePageTitle { display: none; }
+    body.reading .brand-full  { display: none; }
+    body.reading .brand-short { display: inline; }
   }
 
 
@@ -1225,6 +1231,8 @@
     #mobilePageTitle { display: none !important; }
     #mobileDashboard { display: none !important; }
     #mobileRulesOverlay { display: none !important; }
+    .brand-short { display: none !important; }
+    .brand-full  { display: inline !important; }
     #appContent > main { display: block !important; }
   }
 
@@ -1469,7 +1477,8 @@
       <path d="M40 24 C50 20 54 28 46 32 C42 34 40 30 40 24 Z" fill="#eed9cd" stroke="#c69a82" stroke-width="1"/>
       <path d="M26 48 L54 48 L50 64 L30 64 Z" fill="#f1ddce" stroke="#d1a988" stroke-width="1.1"/>
     </svg>
-    <span>The Mindful Spending Journal</span>
+    <span class="brand-full">The Mindful Spending Journal</span>
+    <span class="brand-short">Mindful Spending</span>
   </div>
   <span id="mobilePageTitle"></span>
   <div class="topbar-right">
