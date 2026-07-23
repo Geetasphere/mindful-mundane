@@ -2544,7 +2544,8 @@
       });
 
       section.innerHTML =
-                '<div class="head-row">' +
+          buildQuoteBox(mKey) +
+          '<div class="head-row">' +
           '<div class="illus">' + MONTH_ICONS[m] + '</div>' +
           '<h2>' + info.name + ' ' + year + '</h2>' +
           '<button class="month-toggle" aria-expanded="true" aria-label="Toggle month">' +
@@ -2553,7 +2554,6 @@
         '</div>' +
         '<div class="month-body">' +
           '<hr class="rule">' +
-          buildQuoteBox(mKey) +
           '<div class="month-layout">' +
             '<div class="month-col-calendar">' +
               '<div class="month-title-row">' +
