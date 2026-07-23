@@ -1185,7 +1185,7 @@
       max-width: 100%;
       margin: 0;
       padding: 0;
-      height: calc(100dvh - 64px);
+      height: calc(100dvh - 104px);
     }
     /* months-root: remove from flex so month sections snap directly */
     body.reading #months-root { display: contents; }
@@ -1234,6 +1234,43 @@
     .brand-short { display: none !important; }
     .brand-full  { display: inline !important; }
     #appContent > main { display: block !important; }
+  }
+
+  /* Mobile reader sub-nav */
+  #mobileReaderNav {
+    display: none;
+    background: var(--paper);
+    border-bottom: 1px solid var(--sage-line);
+    padding: 0 4px;
+  }
+  body.reading #mobileReaderNav { display: flex; }
+  .reader-nav-item {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 10px 4px 9px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--label);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.15s;
+  }
+  .reader-nav-item.active {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .reader-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 16%; right: 16%;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  @media (min-width: 769px) {
+    #mobileReaderNav { display: none !important; }
   }
 
   /* Rules overlay — mobile only */
@@ -1503,6 +1540,14 @@
     <div class="topbar-divider"></div>
     <div class="user-chip" id="userChip"></div>
   </div>
+</div>
+
+<!-- MOBILE READER SUB-NAV -->
+<div id="mobileReaderNav">
+  <button class="reader-nav-item" data-section="intro">Intro</button>
+  <button class="reader-nav-item" data-section="rules">Rules</button>
+  <button class="reader-nav-item active" data-section="calendar">Calendar</button>
+  <button class="reader-nav-item" data-section="journal">Journal</button>
 </div>
 
 <nav class="nav-overlay" id="navOverlay">
@@ -2614,17 +2659,50 @@
     var savedDashboardScroll = 0;
 
 
+    // Sub-nav section → group mapping
+    var sectionGroupMap = {
+      'why-exists': 'intro', 'ask-yourself': 'intro', 'rules': 'rules',
+      'month-jul': 'calendar', 'month-aug': 'calendar', 'month-sep': 'calendar',
+      'month-oct': 'calendar', 'month-nov': 'calendar', 'month-dec': 'calendar',
+      'letter': 'journal', 'closing': 'journal'
+    };
+
+    function setReaderNavActive(group) {
+      document.querySelectorAll('.reader-nav-item').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-section') === group);
+      });
+    }
+
+    // Sub-nav tap handlers
+    var readerNavEl = document.getElementById('mobileReaderNav');
+    if (readerNavEl) {
+      readerNavEl.querySelectorAll('.reader-nav-item').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var section = btn.getAttribute('data-section');
+          if (section === 'rules') {
+            if (rulesOverlay) rulesOverlay.classList.add('open');
+            return;
+          }
+          var targetId = section === 'intro' ? 'why-exists'
+                       : section === 'calendar' ? 'month-jul'
+                       : section === 'journal'  ? 'letter'
+                       : null;
+          if (targetId) openReader(targetId);
+        });
+      });
+    }
+
     window.__openReader = openReader;
     function openReader(sectionId) {
       savedDashboardScroll = window.scrollY;
       document.body.classList.add('reading');
+      setReaderNavActive(sectionGroupMap[sectionId] || 'calendar');
       // Scroll to section after layout settles
       setTimeout(function() {
         var target = document.getElementById(sectionId);
         if (target && mainEl) {
           mainEl.scrollLeft = target.offsetLeft;
         }
-        updateTitle(sectionId);
       }, 20);
     }
 
@@ -2637,20 +2715,13 @@
 
     backBtn.addEventListener('click', closeReader);
 
-    function updateTitle(sectionId) {
-      var title = '';
-      allItems.forEach(function(item) {
-        if (item.id === sectionId) title = item.title;
-      });
-      if (pageTitle) pageTitle.textContent = title;
-    }
-
-    // Track current section as user swipes
+    // Track current section as user swipes → update sub-nav active
     if ('IntersectionObserver' in window) {
       var observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            updateTitle(entry.target.id);
+            var group = sectionGroupMap[entry.target.id];
+            if (group) setReaderNavActive(group);
           }
         });
       }, { root: mainEl, threshold: 0.5 });
