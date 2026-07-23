@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400&display=swap" rel="stylesheet">
 
+<script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -204,6 +205,7 @@
     border-radius: 16px; padding: 5px 14px; cursor: pointer;
   }
   .btn-refresh:hover { color: var(--ink); border-color: var(--sage); }
+  .btn-refresh.active { background: var(--sage); color: #fff; border-color: var(--sage); }
   .refresh-note { font-size: 12px; color: var(--label); }
 
   /* ---------- Rules note ---------- */
@@ -225,6 +227,53 @@
     font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
     font-size: 11px; line-height: 1.6; color: var(--ink-soft);
   }
+
+  /* ---------- Google Analytics section ---------- */
+  .ga-section { margin-bottom: 48px; }
+  .ga-connect-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 20px;
+    background: var(--cream-deep); border: 1px solid var(--sage-line);
+    border-radius: 14px; margin-bottom: 16px;
+  }
+  .ga-connect-row svg { flex-shrink: 0; }
+  .ga-connect-label { font-size: 13px; color: var(--ink); flex: 1; }
+  .ga-connect-label span { display: block; font-size: 12px; color: var(--label); margin-top: 2px; }
+  .btn-ga-connect {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px; color: #fff; background: #4285F4;
+    border: none; border-radius: 16px; padding: 7px 16px; cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-ga-connect:hover { background: #3367d6; }
+  .btn-ga-connect:disabled { background: var(--sage); cursor: default; }
+  .ga-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (min-width: 600px) { .ga-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px) { .ga-grid { grid-template-columns: repeat(6, 1fr); } }
+  .ga-card {
+    background: #f0f4ff; border: 1px solid #c5d0f0;
+    border-radius: 14px; padding: 18px 16px 16px;
+  }
+  .ga-card .stat-label { color: #5c6bc0; }
+  .ga-card .stat-num { font-size: 28px; color: var(--ink); }
+  .ga-card .stat-sub { color: #7986cb; }
+  .ga-error { font-size: 13px; color: var(--label); padding: 12px 0; }
+  .ga-setup-note {
+    background: #f0f4ff; border: 1px solid #c5d0f0;
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 16px;
+    font-size: 13px; color: var(--ink); line-height: 1.7;
+  }
+  .ga-setup-note ol { margin: 8px 0 0 16px; }
+  .ga-setup-note li { margin-bottom: 4px; }
+  .ga-setup-note code {
+    font-family: 'Menlo', 'Monaco', monospace; font-size: 12px;
+    background: rgba(66,133,244,0.1); padding: 1px 5px; border-radius: 4px;
+  }
+  .ga-setup-note a { color: #4285F4; }
 </style>
 </head>
 <body>
@@ -319,6 +368,50 @@ service cloud.firestore {
       <div class="stat-num">—</div>
       <div class="stat-sub">authenticated page loads</div>
     </div>
+  </div>
+
+  <!-- Google Analytics -->
+  <div class="section-heading">Google Analytics</div>
+  <div class="ga-section" id="gaSection">
+
+    <div class="ga-connect-row">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      <div class="ga-connect-label">
+        Google Analytics Data
+        <span id="gaConnectStatus">Connect to pull live metrics from GA4</span>
+      </div>
+      <button class="btn-ga-connect" id="gaConnectBtn" onclick="connectGA()">Connect Analytics</button>
+    </div>
+
+    <div id="gaSetupNote" style="display:none" class="ga-setup-note">
+      <strong>One-time setup required:</strong>
+      <ol>
+        <li>Go to <a href="https://console.cloud.google.com/apis/library/analyticsdata.googleapis.com" target="_blank">Google Cloud Console</a> and enable the <strong>Google Analytics Data API v1</strong></li>
+        <li>Under <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Credentials</a>, find your OAuth 2.0 Web Client ID and paste it as <code>GOOGLE_CLIENT_ID</code> in this file</li>
+        <li>Add <code>https://www.mindfulmundane.com</code> to Authorized JavaScript Origins on that client</li>
+        <li>Find your GA4 Property ID in <a href="https://analytics.google.com" target="_blank">GA4</a> → Admin → Property Settings and paste it as <code>GA4_PROPERTY_ID</code></li>
+      </ol>
+    </div>
+
+    <div id="gaCards" style="display:none">
+      <div style="display:flex;gap:24px;margin-bottom:10px;">
+        <div id="gaPeriodBtns" style="display:flex;gap:8px;">
+          <button class="btn-refresh ga-period active" data-period="7" onclick="switchGAPeriod(7)">Last 7 days</button>
+          <button class="btn-refresh ga-period" data-period="30" onclick="switchGAPeriod(30)">Last 30 days</button>
+        </div>
+      </div>
+      <div class="ga-grid">
+        <div class="ga-card"><div class="stat-label">Sessions</div><div class="stat-num" id="gaSessions">—</div><div class="stat-sub" id="gaSessionsSub"></div></div>
+        <div class="ga-card"><div class="stat-label">Page views</div><div class="stat-num" id="gaPageviews">—</div><div class="stat-sub" id="gaPageviewsSub"></div></div>
+        <div class="ga-card"><div class="stat-label">New users</div><div class="stat-num" id="gaNewUsers">—</div><div class="stat-sub" id="gaNewUsersSub"></div></div>
+        <div class="ga-card"><div class="stat-label">Active users</div><div class="stat-num" id="gaActiveUsers">—</div><div class="stat-sub" id="gaActiveUsersSub"></div></div>
+        <div class="ga-card"><div class="stat-label">Avg session</div><div class="stat-num" id="gaAvgSession">—</div><div class="stat-sub" id="gaAvgSessionSub"></div></div>
+        <div class="ga-card"><div class="stat-label">Bounce rate</div><div class="stat-num" id="gaBounce">—</div><div class="stat-sub" id="gaBounceSub"></div></div>
+      </div>
+    </div>
+
+    <div id="gaError" style="display:none" class="ga-error"></div>
+
   </div>
 
   <!-- Quote ratings -->
@@ -632,6 +725,139 @@ service cloud.firestore {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  /* =====================================================================
+     GOOGLE ANALYTICS DATA API
+     =====================================================================
+     Setup steps (one time):
+     1. Enable "Google Analytics Data API v1" at console.cloud.google.com
+     2. Under Credentials, find your OAuth 2.0 Web Client ID and paste below
+     3. Add https://www.mindfulmundane.com to Authorized JavaScript Origins
+     4. Find GA4 Property ID in GA4 → Admin → Property Settings → paste below
+     ===================================================================== */
+  var GA4_PROPERTY_ID  = 'YOUR_PROPERTY_ID';    // e.g. '381234567'
+  var GOOGLE_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+
+  var gaAccessToken   = null;
+  var gaCurrentPeriod = 7;
+  var gaTokenClient   = null;
+
+  // Init GIS token client once the library loads
+  function initGISClient() {
+    if (!window.google || !window.google.accounts) {
+      setTimeout(initGISClient, 200);
+      return;
+    }
+    if (GA4_PROPERTY_ID === 'YOUR_PROPERTY_ID' || GOOGLE_CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
+      document.getElementById('gaSetupNote').style.display = 'block';
+      document.getElementById('gaConnectBtn').disabled = true;
+      document.getElementById('gaConnectStatus').textContent = 'Fill in GA4_PROPERTY_ID and GOOGLE_CLIENT_ID in admin.html first';
+      return;
+    }
+    gaTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/analytics.readonly',
+      callback: function(response) {
+        if (response.error) {
+          showGAError('Authorization failed: ' + response.error);
+          return;
+        }
+        gaAccessToken = response.access_token;
+        document.getElementById('gaConnectBtn').textContent = 'Connected \u2713';
+        document.getElementById('gaConnectBtn').disabled = true;
+        document.getElementById('gaConnectStatus').textContent = 'Connected — fetching data\u2026';
+        loadGAData(gaCurrentPeriod);
+      }
+    });
+  }
+  initGISClient();
+
+  function connectGA() {
+    if (!gaTokenClient) return;
+    gaTokenClient.requestAccessToken({ prompt: '' });
+  }
+
+  function switchGAPeriod(days) {
+    gaCurrentPeriod = days;
+    document.querySelectorAll('.ga-period').forEach(function(btn) {
+      btn.classList.toggle('active', parseInt(btn.getAttribute('data-period')) === days);
+    });
+    if (gaAccessToken) loadGAData(days);
+  }
+
+  function loadGAData(days) {
+    if (!gaAccessToken) return;
+    var endDate   = new Date().toISOString().split('T')[0];
+    var startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    fetch('https://analyticsdata.googleapis.com/v1beta/properties/' + GA4_PROPERTY_ID + ':runReport', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + gaAccessToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: startDate, endDate: endDate }],
+        metrics: [
+          { name: 'sessions' },
+          { name: 'screenPageViews' },
+          { name: 'newUsers' },
+          { name: 'activeUsers' },
+          { name: 'averageSessionDuration' },
+          { name: 'bounceRate' }
+        ]
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) { showGAError(data.error.message); return; }
+      renderGAData(data, days);
+    })
+    .catch(function(err) { showGAError('Network error — check console.'); });
+  }
+
+  function renderGAData(data, days) {
+    var sub = 'last ' + days + ' days';
+    var row = (data.rows && data.rows[0]) ? data.rows[0].metricValues : null;
+
+    if (!row) {
+      showGAError('No data yet for this period.');
+      return;
+    }
+
+    var sessions  = parseInt(row[0].value);
+    var pageviews = parseInt(row[1].value);
+    var newUsers  = parseInt(row[2].value);
+    var active    = parseInt(row[3].value);
+    var avgSec    = parseFloat(row[4].value);
+    var bounce    = parseFloat(row[5].value);
+
+    var avgMin = Math.floor(avgSec / 60);
+    var avgS   = Math.round(avgSec % 60);
+    var avgStr = avgMin + 'm ' + (avgS < 10 ? '0' : '') + avgS + 's';
+
+    document.getElementById('gaSessions').textContent    = sessions.toLocaleString();
+    document.getElementById('gaPageviews').textContent   = pageviews.toLocaleString();
+    document.getElementById('gaNewUsers').textContent    = newUsers.toLocaleString();
+    document.getElementById('gaActiveUsers').textContent = active.toLocaleString();
+    document.getElementById('gaAvgSession').textContent  = avgStr;
+    document.getElementById('gaBounce').textContent      = (bounce * 100).toFixed(1) + '%';
+
+    ['Sessions','Pageviews','NewUsers','ActiveUsers','AvgSession','Bounce'].forEach(function(id) {
+      document.getElementById('ga' + id + 'Sub').textContent = sub;
+    });
+
+    document.getElementById('gaConnectStatus').textContent = 'Last ' + days + ' days — updated just now';
+    document.getElementById('gaCards').style.display = 'block';
+    document.getElementById('gaError').style.display = 'none';
+  }
+
+  function showGAError(msg) {
+    var el = document.getElementById('gaError');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('gaCards').style.display = 'none';
   }
 </script>
 </body>
