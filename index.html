@@ -281,7 +281,8 @@
   .day-cell:active { transform: scale(0.94); }
   .day-cell.empty { visibility: hidden; }
   .day-cell[data-state="zero"] { background: #b7c4a0; color: #fff; border-color: #9fae82; font-weight: bold; }
-  .day-cell[data-state="spend"] { background: var(--cream); border: 1.5px dashed var(--blush-line); color: var(--blush-line); }
+  .day-cell[data-state="spend"],
+  .day-cell.past-unmarked { background: #fdf0ec; border: 1.5px dashed #e8b49a; color: #c47a6a; }
   .legend {
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 12px; color: var(--ink-soft); margin-bottom: 26px; display: flex; gap: 16px; flex-wrap: wrap;
@@ -2727,6 +2728,20 @@
 
       /* Wire up calendar cells */
       var cells = section.querySelectorAll('.day-cell[data-key]');
+      var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      function isPastCell(cell) {
+        var parts = cell.getAttribute('data-key').split('-'); // 'cal-2026-07-01'
+        var cellDate = new Date(parseInt(parts[1]), parseInt(parts[2]) - 1, parseInt(parts[3]));
+        return cellDate < todayStart;
+      }
+      function refreshPastUnmarked(cell) {
+        cell.classList.toggle('past-unmarked', isPastCell(cell) && cell.getAttribute('data-state') === '');
+      }
+
+      // Apply on load
+      cells.forEach(function(cell) { refreshPastUnmarked(cell); });
+
       function updateProgress() {
         var count = 0;
         cells.forEach(function (c) { if (c.getAttribute('data-state') === 'zero') count++; });
@@ -2738,6 +2753,7 @@
           var cur  = cell.getAttribute('data-state');
           var next = cur === '' ? 'zero' : (cur === 'zero' ? 'spend' : '');
           cell.setAttribute('data-state', next);
+          refreshPastUnmarked(cell);
           store[cell.getAttribute('data-key')] = next;
           flushToFirestore(); // calendar taps save immediately
           updateProgress();
