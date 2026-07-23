@@ -2448,7 +2448,7 @@
             var surpriseVal = (store[surpriseKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
                     buildTriggerChips(qKey) +
-                    '<div class="field-sublabel" style="margin-top:16px;">Anything surprising?</div>' +
+                    '<div class="field-label sans" style="margin-top:16px;">Anything surprising?</div>' +
                     '<textarea data-key="' + surpriseKey + '" rows="2">' + surpriseVal + '</textarea>';
           } else if (rKey === 'patterns' && qi === 1) {
             // "What changed" chips
