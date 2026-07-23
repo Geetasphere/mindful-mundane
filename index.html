@@ -1217,7 +1217,6 @@
     #mobileBackBtn { display: none !important; }
     #mobilePageTitle { display: none !important; }
     #mobileDashboard { display: none !important; }
-    #mobileRulesOverlay { display: none !important; }
     .brand-short { display: none !important; }
     .brand-full  { display: inline !important; }
     #appContent > main { display: block !important; }
@@ -1273,44 +1272,6 @@
     #mobileReaderNav { display: none !important; }
   }
 
-  /* Rules overlay — mobile only */
-  #mobileRulesOverlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 300;
-    background: var(--paper);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #mobileRulesOverlay.open { display: block; }
-  .rules-overlay-inner {
-    padding: 16px 20px 80px;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  .rules-overlay-close {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    color: var(--ink-soft);
-    cursor: pointer;
-    padding: 10px 0 20px;
-    margin: 0;
-  }
-  #mobileRulesContent .section {
-    flex: none !important;
-    width: auto !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    margin-bottom: 32px;
-    overflow: visible !important;
-  }
 </style>
 </head>
 <body>
@@ -1599,16 +1560,6 @@
 <!-- MOBILE DASHBOARD (card grid, shown on mobile before entering reader) -->
 <div id="mobileDashboard"></div>
 
-<!-- MOBILE RULES OVERLAY -->
-<div id="mobileRulesOverlay">
-  <div class="rules-overlay-inner">
-    <button id="mobileRulesCloseBtn" type="button" class="rules-overlay-close" aria-label="Close">
-      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M12.5 5l-5 5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Back
-    </button>
-    <div id="mobileRulesContent"></div>
-  </div>
-</div>
 
 <main>
 
@@ -2639,27 +2590,12 @@
       });
     });
 
-    // Rules overlay open
-    var rulesOverlay = document.getElementById('mobileRulesOverlay');
-    var rulesContent = document.getElementById('mobileRulesContent');
-    var rulesCloseBtn = document.getElementById('mobileRulesCloseBtn');
-    if (rulesContent && !rulesContent.hasChildNodes()) {
-      // Clone rules sections into overlay (rules + ask-yourself)
-      ['rules', 'ask-yourself'].forEach(function(id) {
-        var src = document.getElementById(id);
-        if (src) rulesContent.appendChild(src.cloneNode(true));
-      });
-    }
+    // Rules dashboard row → open reader at rules
     dashboard.querySelectorAll('.mobile-rules-overlay-link').forEach(function(el) {
       el.addEventListener('click', function() {
-        if (rulesOverlay) rulesOverlay.classList.add('open');
+        openReader('rules');
       });
     });
-    if (rulesCloseBtn && rulesOverlay) {
-      rulesCloseBtn.addEventListener('click', function() {
-        rulesOverlay.classList.remove('open');
-      });
-    }
 
     // List item tap → open reader
     dashboard.querySelectorAll('.mobile-nav-item:not(.locked)').forEach(function(item) {
@@ -2673,7 +2609,8 @@
 
     // Sub-nav section → group mapping
     var sectionGroupMap = {
-      'why-exists': 'intro', 'ask-yourself': 'intro', 'rules': 'rules',
+      'why-exists': 'intro', 'why-matters': 'intro', 'how-to-use': 'intro',
+      'rules': 'rules', 'ask-yourself': 'rules',
       'month-jul': 'calendar', 'month-aug': 'calendar', 'month-sep': 'calendar',
       'month-oct': 'calendar', 'month-nov': 'calendar', 'month-dec': 'calendar',
       'letter': 'journal', 'closing': 'journal'
@@ -2681,7 +2618,8 @@
 
     // Group → which section IDs to show
     var groupSectionsMap = {
-      intro:    ['why-exists', 'ask-yourself'],
+      intro:    ['why-exists', 'why-matters', 'how-to-use'],
+      rules:    ['rules', 'ask-yourself'],
       calendar: ['month-jul', 'month-aug', 'month-sep', 'month-oct', 'month-nov', 'month-dec'],
       journal:  ['letter', 'closing']
     };
@@ -2711,13 +2649,10 @@
       readerNavEl.querySelectorAll('.reader-nav-item').forEach(function(btn) {
         btn.addEventListener('click', function() {
           var section = btn.getAttribute('data-section');
-          if (section === 'rules') {
-            if (rulesOverlay) rulesOverlay.classList.add('open');
-            return;
-          }
-          var targetId = section === 'intro' ? 'why-exists'
-                       : section === 'calendar' ? 'month-jul'
-                       : section === 'journal'  ? 'letter'
+          var targetId = section === 'intro'     ? 'why-exists'
+                       : section === 'rules'     ? 'rules'
+                       : section === 'calendar'  ? 'month-jul'
+                       : section === 'journal'   ? 'letter'
                        : null;
           if (targetId) openReader(targetId);
         });
