@@ -2448,9 +2448,8 @@
             var surpriseVal = (store[surpriseKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
                     buildTriggerChips(qKey) +
-                    '<p class="chips-optional-label">Then include one optional line:</p>' +
-                    '<blockquote class="chips-optional-quote">Anything surprising?</blockquote>' +
-                    '<textarea data-key="' + surpriseKey + '" rows="2" placeholder="Optional…">' + surpriseVal + '</textarea>';
+                    '<div class="field-sublabel" style="margin-top:16px;">Anything surprising?</div>' +
+                    '<textarea data-key="' + surpriseKey + '" rows="2">' + surpriseVal + '</textarea>';
           } else if (rKey === 'patterns' && qi === 1) {
             // "What changed" chips
             html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
