@@ -1910,9 +1910,7 @@
       title: 'Patterns &amp; Awareness',
       questions: [
         'What usually triggered spending?',
-        'What purchases were worth it?',
-        "Which purchases were not?",
-        'Did you notice fewer impulse buys, drive less, eat differently, or repair &amp; reuse something?'
+        'What changed because you were paying more attention?'
       ]
     },
     looking_ahead: {
@@ -2419,14 +2417,33 @@
         return html;
       }
 
+      var CHANGED_CHIPS = [
+        'Fewer impulse purchases', 'Cooked at home more', 'Drove less',
+        'Used what I already had', 'Repaired instead of replacing',
+        'Borrowed or shared', 'Delayed purchases', 'Cancelled subscriptions',
+        'Planned ahead', 'Saved more than usual', 'Nothing noticeable yet'
+      ];
+
+      function buildChangedChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        CHANGED_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
       /* Reflection textareas */
       function buildReflectionGroup(rKey) {
         var r = REFLECTIONS[rKey];
         var html = '<div class="reflection-group"><h3>' + r.title + '</h3>';
         r.questions.forEach(function (q, qi) {
           var qKey = mKey + '-' + rKey + '-' + qi;
-          // First patterns question → chips
           if (rKey === 'patterns' && qi === 0) {
+            // Trigger chips
             var surpriseKey = mKey + '-patterns-trigger-surprise';
             var surpriseVal = (store[surpriseKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
@@ -2434,6 +2451,11 @@
                     '<p class="chips-optional-label">Then include one optional line:</p>' +
                     '<blockquote class="chips-optional-quote">Anything surprising?</blockquote>' +
                     '<textarea data-key="' + surpriseKey + '" rows="2" placeholder="Optional…">' + surpriseVal + '</textarea>';
+          } else if (rKey === 'patterns' && qi === 1) {
+            // "What changed" chips
+            html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
+                    '<p class="chips-optional-label" style="margin-top:4px;">Then include checkboxes:</p>' +
+                    buildChangedChips(qKey);
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div>' +
