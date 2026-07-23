@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Mindful Spending Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+  :root {
+    --cream: #faf6ee;
+    --cream-deep: #f2ede0;
+    --ink: #3a352f;
+    --ink-soft: #5c6650;
+    --label: #7a8266;
+    --sage: #a9b596;
+    --sage-line: #c9d0b6;
+    --gold: #f1d6ab;
+    --gold-line: #cf9f5f;
+    --blush: #e9cfd6;
+    --blush-line: #c9a2ab;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 24px;
+    background: rgba(250,246,238,0.95);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--sage-line);
+  }
+  .topbar-back {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px; color: var(--label);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .topbar-back:hover { color: var(--ink); }
+  .topbar-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    margin-left: auto;
+  }
+  .topbar-user {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px; color: var(--label);
+  }
+
+  /* ---------- States ---------- */
+  .state-screen {
+    min-height: 80vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; text-align: center; padding: 40px;
+  }
+  .state-screen h2 {
+    font-size: 22px; font-weight: 400; color: var(--ink);
+  }
+  .state-screen p {
+    font-size: 14px; color: var(--label); max-width: 340px;
+  }
+  .btn-signin {
+    margin-top: 8px;
+    padding: 10px 24px;
+    background: var(--sage);
+    color: #fff;
+    border: none; border-radius: 20px;
+    font-family: inherit; font-size: 14px;
+    cursor: pointer;
+  }
+  .btn-signin:hover { background: var(--ink-soft); }
+
+  /* ---------- Main ---------- */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .admin-eyebrow {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--label); margin-bottom: 6px;
+  }
+  .admin-heading {
+    font-size: 28px; font-weight: 300; color: var(--ink); margin-bottom: 32px;
+  }
+
+  /* ---------- Stat cards ---------- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  @media (min-width: 600px) {
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  .stat-card {
+    background: var(--cream-deep);
+    border: 1px solid var(--sage-line);
+    border-radius: 14px;
+    padding: 22px 20px 20px;
+  }
+  .stat-label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--label); margin-bottom: 8px;
+  }
+  .stat-num {
+    font-size: 36px; font-weight: 300; color: var(--ink); line-height: 1;
+  }
+  .stat-sub {
+    font-size: 12px; color: var(--label); margin-top: 4px;
+  }
+
+  /* ---------- Section heading ---------- */
+  .section-heading {
+    font-size: 16px; font-weight: 400; color: var(--ink);
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--sage-line);
+  }
+
+  /* ---------- Quote ratings ---------- */
+  .quote-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 48px;
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--label); text-align: left;
+    padding: 8px 12px; border-bottom: 1px solid var(--sage-line);
+  }
+  tbody tr { border-bottom: 1px solid var(--cream-deep); }
+  tbody tr:hover { background: var(--cream-deep); }
+  tbody td {
+    padding: 10px 12px; vertical-align: top; color: var(--ink);
+    line-height: 1.4;
+  }
+  .qt-stars { color: var(--sage); font-size: 14px; }
+  .qt-avg { font-weight: 400; min-width: 48px; }
+  .qt-count { color: var(--label); min-width: 60px; }
+  .qt-source { color: var(--label); white-space: nowrap; }
+  .qt-quote { max-width: 420px; }
+  .no-ratings { color: var(--label); font-style: italic; }
+
+  /* ---------- Recent users ---------- */
+  .users-list { margin-bottom: 48px; }
+  .user-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 11px 14px; border-radius: 10px;
+    border-bottom: 1px solid var(--sage-line);
+  }
+  .user-row:last-child { border-bottom: none; }
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--sage); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 400; flex-shrink: 0;
+  }
+  .user-name { font-size: 13px; color: var(--ink); }
+  .user-meta { font-size: 12px; color: var(--label); }
+  .user-badge {
+    margin-left: auto; font-size: 11px;
+    padding: 3px 9px; border-radius: 10px;
+    background: var(--cream-deep); color: var(--label);
+    border: 1px solid var(--sage-line);
+    white-space: nowrap;
+  }
+  .user-badge.active { background: #e8f0e0; color: var(--ink-soft); border-color: var(--sage); }
+
+  /* ---------- Refresh ---------- */
+  .refresh-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 32px;
+  }
+  .btn-refresh {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px; color: var(--label);
+    background: none; border: 1px solid var(--sage-line);
+    border-radius: 16px; padding: 5px 14px; cursor: pointer;
+  }
+  .btn-refresh:hover { color: var(--ink); border-color: var(--sage); }
+  .refresh-note { font-size: 12px; color: var(--label); }
+
+  /* ---------- Rules note ---------- */
+  .rules-note {
+    background: #fdf8ee; border: 1px solid var(--gold-line);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 32px;
+    font-size: 13px; color: var(--ink); line-height: 1.6;
+  }
+  .rules-note strong { color: var(--ink); }
+  .rules-note code {
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 12px; background: rgba(0,0,0,0.05);
+    padding: 1px 5px; border-radius: 4px;
+  }
+  .rules-note pre {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.04); border-radius: 8px;
+    padding: 12px 14px; overflow-x: auto;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 11px; line-height: 1.6; color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <a href="/" class="topbar-back">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M12 5l-5 5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Journal
+  </a>
+  <div class="topbar-title">Admin Portal</div>
+  <div class="topbar-user" id="topbarUser"></div>
+</div>
+
+<!-- Loading -->
+<div class="state-screen" id="stateLoading">
+  <h2>Verifying access&hellip;</h2>
+</div>
+
+<!-- Not signed in -->
+<div class="state-screen" id="stateSignin" style="display:none">
+  <h2>Sign in required</h2>
+  <p>You need to sign in with your admin account to view this page.</p>
+  <button class="btn-signin" id="signinBtn">Sign in with Google</button>
+</div>
+
+<!-- Access denied -->
+<div class="state-screen" id="stateDenied" style="display:none">
+  <h2>Access denied</h2>
+  <p>Your account doesn't have admin access to this portal.</p>
+</div>
+
+<!-- Portal -->
+<main id="portal" style="display:none">
+
+  <div class="admin-eyebrow">Dashboard</div>
+  <div class="admin-heading">Mindful Spending Journal</div>
+
+  <div class="refresh-row">
+    <button class="btn-refresh" id="refreshBtn">Refresh data</button>
+    <span class="refresh-note" id="refreshNote"></span>
+  </div>
+
+  <!-- Firestore rules notice (hidden once data loads) -->
+  <div class="rules-note" id="rulesNote" style="display:none">
+    <strong>Firestore rules need updating</strong> — to read all user journals, add this rule in the
+    <a href="https://console.firebase.google.com" target="_blank" style="color:var(--gold-line)">Firebase Console</a>
+    under Firestore &rarr; Rules:
+    <pre>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /journals/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      allow read: if request.auth.token.email == 'sparakala@gmail.com';
+    }
+    match /_meta/{doc} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</pre>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stats-grid">
+    <div class="stat-card" id="statUsers">
+      <div class="stat-label">Total sign-ups</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">all time</div>
+    </div>
+    <div class="stat-card" id="statActive">
+      <div class="stat-label">Active users</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">last 30 days</div>
+    </div>
+    <div class="stat-card" id="statEntries">
+      <div class="stat-label">Journal entries</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">total written</div>
+    </div>
+    <div class="stat-card" id="statViews">
+      <div class="stat-label">Page views</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">logged-in sessions</div>
+    </div>
+  </div>
+
+  <!-- Quote ratings -->
+  <div class="section-heading">Quote ratings</div>
+  <div class="quote-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Quote</th>
+          <th>Author</th>
+          <th>Avg</th>
+          <th>Ratings</th>
+          <th>Stars</th>
+        </tr>
+      </thead>
+      <tbody id="quoteTableBody">
+        <tr><td colspan="5" class="no-ratings">Loading&hellip;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recent users -->
+  <div class="section-heading">Users</div>
+  <div class="users-list" id="usersList">
+    <div class="user-row"><div style="font-size:13px;color:var(--label)">Loading&hellip;</div></div>
+  </div>
+
+</main>
+
+<script>
+  /* =====================================================================
+     CONFIG — set your admin email here
+     ===================================================================== */
+  var ADMIN_EMAIL = 'sparakala@gmail.com';
+
+  var firebaseConfig = {
+    apiKey:            'AIzaSyBT_hMR2tpsvCVqoZogfjsDleOhE6qbtgk',
+    authDomain:        'mindfulmundane-ef7bd.firebaseapp.com',
+    projectId:         'mindfulmundane-ef7bd',
+    storageBucket:     'mindfulmundane-ef7bd.firebasestorage.app',
+    messagingSenderId: '577498747565',
+    appId:             '1:577498747565:web:df11001da977a13b66ac24'
+  };
+
+  var QUOTES = [
+    { id: 0,  text: 'Enough is a feast.',                                                                                       source: 'Buddhist Proverb' },
+    { id: 1,  text: 'Wealth consists not in having great possessions, but in having few wants.',                                source: 'Epictetus' },
+    { id: 2,  text: 'Too many people spend money they haven\u2019t earned, to buy things they don\u2019t want, to impress people they don\u2019t like.', source: 'Will Rogers' },
+    { id: 3,  text: 'Between stimulus and response there is a space. In that space is our power to choose.',                    source: 'Viktor Frankl' },
+    { id: 4,  text: 'When you realize there is nothing lacking, the whole world belongs to you.',                               source: 'Lao Tzu' },
+    { id: 5,  text: 'Do not save what is left after spending, but spend what is left after saving.',                            source: 'Warren Buffett' },
+    { id: 6,  text: 'Mindful spending is not about deprivation. It\u2019s about alignment.',                                    source: 'Headspace' },
+    { id: 7,  text: 'You can\u2019t get enough of what you don\u2019t really need.',                                            source: 'Anonymous' },
+    { id: 8,  text: 'Every time you spend money, you\u2019re casting a vote for the kind of world you want.',                   source: 'Anna Lapp\u00e9' },
+    { id: 9,  text: 'The art of being wise is knowing what to overlook.',                                                       source: 'William James' },
+    { id: 10, text: 'Frugality includes all the other virtues.',                                                                source: 'Cicero' },
+    { id: 11, text: 'Awareness is the greatest agent for change.',                                                              source: 'Eckhart Tolle' },
+    { id: 12, text: 'It is not the man who has too little, but the man who craves more, that is poor.',                         source: 'Seneca' },
+    { id: 13, text: 'The real measure of your wealth is how much you\u2019d be worth if you lost all your money.',              source: 'Anonymous' },
+    { id: 14, text: 'Mindfulness isn\u2019t about having no thoughts. It\u2019s about noticing which thoughts you act on.',     source: 'Tara Brach' },
+    { id: 15, text: 'Simplicity is the ultimate sophistication.',                                                               source: 'Leonardo da Vinci' },
+    { id: 16, text: 'Money is a tool. Used properly it makes something beautiful; used wrong, it makes a mess.',                source: 'Bradley Vinson' },
+    { id: 17, text: 'In the end, it\u2019s not the years in your life that count. It\u2019s the life in your years.',           source: 'Abraham Lincoln' }
+  ];
+
+  /* =====================================================================
+     INIT
+     ===================================================================== */
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+  var db   = firebase.firestore();
+
+  var stateLoading = document.getElementById('stateLoading');
+  var stateSignin  = document.getElementById('stateSignin');
+  var stateDenied  = document.getElementById('stateDenied');
+  var portal       = document.getElementById('portal');
+  var topbarUser   = document.getElementById('topbarUser');
+
+  function showOnly(el) {
+    [stateLoading, stateSignin, stateDenied, portal].forEach(function(e) {
+      e.style.display = 'none';
+    });
+    el.style.display = el === portal ? 'block' : 'flex';
+  }
+
+  document.getElementById('signinBtn').addEventListener('click', function() {
+    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  });
+
+  document.getElementById('refreshBtn').addEventListener('click', function() {
+    loadData();
+  });
+
+  auth.onAuthStateChanged(function(user) {
+    if (!user) {
+      showOnly(stateSignin);
+      return;
+    }
+    if (user.email === ADMIN_EMAIL) {
+      topbarUser.textContent = user.email;
+      showOnly(portal);
+      loadData();
+    } else {
+      showOnly(stateDenied);
+    }
+  });
+
+  /* =====================================================================
+     DATA LOADING
+     ===================================================================== */
+  function loadData() {
+    var note = document.getElementById('refreshNote');
+    note.textContent = 'Loading\u2026';
+
+    // Load page views
+    db.collection('_meta').doc('pageviews').get()
+      .then(function(doc) {
+        var count = doc.exists ? (doc.data().total || 0) : 0;
+        setStatCard('statViews', count, 'logged-in sessions');
+      })
+      .catch(function() {
+        setStatCard('statViews', '—', 'update Firestore rules');
+      });
+
+    // Load all user journals
+    db.collection('journals').get()
+      .then(function(snapshot) {
+        var users = [];
+        snapshot.forEach(function(doc) {
+          users.push({ uid: doc.id, data: doc.data() });
+        });
+        renderStats(users);
+        note.textContent = 'Last updated ' + new Date().toLocaleTimeString();
+        document.getElementById('rulesNote').style.display = 'none';
+      })
+      .catch(function(err) {
+        note.textContent = 'Could not load — check Firestore rules below.';
+        document.getElementById('rulesNote').style.display = 'block';
+        setStatCard('statUsers',  '—', 'update rules');
+        setStatCard('statActive', '—', 'update rules');
+        setStatCard('statEntries','—', 'update rules');
+        document.getElementById('quoteTableBody').innerHTML =
+          '<tr><td colspan="5" class="no-ratings">Firestore rules required — see note above.</td></tr>';
+        document.getElementById('usersList').innerHTML =
+          '<div class="user-row"><div style="font-size:13px;color:var(--label)">Firestore rules required — see note above.</div></div>';
+      });
+  }
+
+  function setStatCard(id, value, sub) {
+    var card = document.getElementById(id);
+    card.querySelector('.stat-num').textContent = value;
+    if (sub) card.querySelector('.stat-sub').textContent = sub;
+  }
+
+  function renderStats(users) {
+    var totalUsers = users.length;
+    var thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    var activeUsers = users.filter(function(u) {
+      return u.data._lastSaved && u.data._lastSaved > thirtyDaysAgo;
+    }).length;
+
+    var totalEntries = 0;
+    users.forEach(function(u) {
+      try {
+        var entries = JSON.parse(u.data['journal-free-entries'] || '[]');
+        totalEntries += entries.length;
+      } catch(e) {}
+    });
+
+    setStatCard('statUsers',   totalUsers,   'all time');
+    setStatCard('statActive',  activeUsers,  'last 30 days');
+    setStatCard('statEntries', totalEntries, 'total written');
+
+    renderQuoteRatings(users);
+    renderUsersList(users, thirtyDaysAgo);
+  }
+
+  function renderQuoteRatings(users) {
+    var quoteData = {};
+    QUOTES.forEach(function(q) {
+      quoteData[q.id] = { id: q.id, text: q.text, source: q.source, total: 0, count: 0 };
+    });
+    users.forEach(function(u) {
+      QUOTES.forEach(function(q) {
+        var rating = parseInt(u.data['quote-rating-' + q.id] || '0');
+        if (rating > 0) {
+          quoteData[q.id].total += rating;
+          quoteData[q.id].count++;
+        }
+      });
+    });
+
+    var sorted = QUOTES.map(function(q) {
+      var d = quoteData[q.id];
+      return {
+        text:   d.text,
+        source: d.source,
+        avg:    d.count ? (d.total / d.count).toFixed(1) : null,
+        count:  d.count
+      };
+    }).sort(function(a, b) {
+      return (b.count || 0) - (a.count || 0);
+    });
+
+    var tbody = document.getElementById('quoteTableBody');
+    if (sorted.every(function(q) { return !q.count; })) {
+      tbody.innerHTML = '<tr><td colspan="5" class="no-ratings">No ratings yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    sorted.forEach(function(q) {
+      var avg   = q.avg !== null ? q.avg : '—';
+      var stars = q.avg !== null ? renderStars(parseFloat(q.avg)) : '';
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="qt-quote">\u201c' + escHtml(q.text) + '\u201d</td>' +
+        '<td class="qt-source">' + escHtml(q.source) + '</td>' +
+        '<td class="qt-avg">' + avg + '</td>' +
+        '<td class="qt-count">' + (q.count || 0) + '</td>' +
+        '<td class="qt-stars">' + stars + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderStars(avg) {
+    var html = '';
+    for (var i = 1; i <= 5; i++) {
+      html += i <= Math.round(avg) ? '\u2605' : '\u2606';
+    }
+    return html;
+  }
+
+  function renderUsersList(users, thirtyDaysAgo) {
+    var sorted = users.slice().sort(function(a, b) {
+      var ta = a.data._lastSaved || '';
+      var tb = b.data._lastSaved || '';
+      return tb.localeCompare(ta);
+    });
+
+    var list = document.getElementById('usersList');
+    list.innerHTML = '';
+
+    if (!sorted.length) {
+      list.innerHTML = '<div class="user-row"><div style="font-size:13px;color:var(--label)">No users yet.</div></div>';
+      return;
+    }
+
+    sorted.forEach(function(u) {
+      var name = u.data['field-belongs'] || u.uid.slice(0, 8) + '\u2026';
+      var lastSaved = u.data._lastSaved ? formatRelative(u.data._lastSaved) : 'never';
+      var isActive  = u.data._lastSaved && u.data._lastSaved > thirtyDaysAgo;
+      var entriesCount = 0;
+      try { entriesCount = JSON.parse(u.data['journal-free-entries'] || '[]').length; } catch(e) {}
+
+      var row = document.createElement('div');
+      row.className = 'user-row';
+      row.innerHTML =
+        '<div class="user-avatar">' + escHtml(name.charAt(0).toUpperCase()) + '</div>' +
+        '<div>' +
+          '<div class="user-name">' + escHtml(name) + '</div>' +
+          '<div class="user-meta">Last active ' + lastSaved + ' &middot; ' + entriesCount + ' journal ' + (entriesCount === 1 ? 'entry' : 'entries') + '</div>' +
+        '</div>' +
+        '<div class="user-badge' + (isActive ? ' active' : '') + '">' + (isActive ? 'Active' : 'Inactive') + '</div>';
+      list.appendChild(row);
+    });
+  }
+
+  function formatRelative(iso) {
+    var diff = Date.now() - new Date(iso).getTime();
+    var mins = Math.floor(diff / 60000);
+    if (mins < 2)   return 'just now';
+    if (mins < 60)  return mins + 'm ago';
+    var hrs = Math.floor(mins / 60);
+    if (hrs < 24)   return hrs + 'h ago';
+    var days = Math.floor(hrs / 24);
+    if (days < 30)  return days + 'd ago';
+    return Math.floor(days / 30) + 'mo ago';
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+</body>
+</html>

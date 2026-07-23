@@ -735,6 +735,13 @@
     margin-bottom: 10px;
     overflow: hidden; text-overflow: ellipsis;
   }
+  .chip-admin {
+    display: block;
+    font-size: 12px; color: var(--label);
+    text-decoration: none; margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .chip-admin:hover { color: var(--ink); }
   .chip-signout {
     background: none; border: none;
     font-size: 12px; color: var(--label);
@@ -2094,6 +2101,7 @@
 
   function flushToFirestore() {
     if (!currentUid) return;
+    store._lastSaved = new Date().toISOString();
     db.collection('journals').doc(currentUid)
       .set(store, { merge: true })
       .catch(function (e) { console.warn('Firestore save error:', e); });
@@ -2109,9 +2117,15 @@
   /* =====================================================================
      AUTH STATE
      ===================================================================== */
+  var ADMIN_EMAIL = 'sparakala@gmail.com';
+
   auth.onAuthStateChanged(function (user) {
     if (user) {
       currentUid = user.uid;
+      // Track page view
+      db.collection('_meta').doc('pageviews')
+        .set({ total: firebase.firestore.FieldValue.increment(1), lastSeen: new Date().toISOString() }, { merge: true })
+        .catch(function() {});
       loadFromFirestore(user.uid)
         .then(function () { bootApp(user); })
         .catch(function () { bootApp(user); }); // still boot on error
@@ -2183,6 +2197,13 @@
     nameEl.className = 'chip-name';
     nameEl.textContent = user.displayName || user.email || 'You';
     dropdown.appendChild(nameEl);
+    if (user.email === ADMIN_EMAIL) {
+      var adminLink = document.createElement('a');
+      adminLink.href = '/admin.html';
+      adminLink.className = 'chip-admin';
+      adminLink.textContent = 'Admin portal';
+      dropdown.appendChild(adminLink);
+    }
     var signOutBtn = document.createElement('button');
     signOutBtn.type = 'button';
     signOutBtn.className = 'chip-signout';
