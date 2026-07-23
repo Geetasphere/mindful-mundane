@@ -1093,6 +1093,17 @@
     padding-bottom: 6px;
     border-bottom: 1px solid var(--sage-line);
   }
+  .mobile-group-toggle {
+    width: 100%; background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--label); padding: 0 0 6px; border-bottom: 1px solid var(--sage-line);
+    margin-bottom: 6px;
+  }
+  .mobile-group-toggle svg { transition: transform 0.22s ease; flex-shrink: 0; }
+  .mobile-section-group.collapsed .mobile-group-toggle svg { transform: rotate(-90deg); }
+  .mobile-section-group.collapsed .mobile-nav-list { display: none; }
   .mobile-nav-list {
     list-style: none;
     margin: 0;
@@ -2438,8 +2449,16 @@
       + '<p class="italic center" style="margin-top:26px;font-size:15px;">You do not need to make more money to feel free.<br>Sometimes you just need to notice the money<br>you already have and where it\'s going.</p>'
       + '</div>';
     groups.forEach(function(g) {
-      html += '<div class="mobile-section-group">';
-      if (g.label) html += '<div class="mobile-group-label">' + g.label + '</div>';
+      var collapsible = g.items.length > 1 && g.label;
+      html += '<div class="mobile-section-group' + (collapsible ? ' collapsed' : '') + '">';
+      if (g.label && collapsible) {
+        html += '<button class="mobile-group-toggle" type="button">'
+          + g.label
+          + '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          + '</button>';
+      } else if (g.label) {
+        html += '<div class="mobile-group-label">' + g.label + '</div>';
+      }
       html += '<ul class="mobile-nav-list">';
       g.items.forEach(function(item) {
         html += '<li class="mobile-nav-item' + (item.locked ? ' locked' : '') + '" data-sid="' + item.id + '">';
@@ -2460,6 +2479,13 @@
         var desktopEl = document.querySelector('main input[data-key="' + key + '"]');
         if (desktopEl) desktopEl.value = el.value;
         debouncedSave();
+      });
+    });
+
+    // Collapsible group toggles
+    dashboard.querySelectorAll('.mobile-group-toggle').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        btn.closest('.mobile-section-group').classList.toggle('collapsed');
       });
     });
 
