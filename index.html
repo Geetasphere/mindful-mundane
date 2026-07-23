@@ -298,6 +298,32 @@
     .month-col-reflections { flex: 1 1 0; min-width: 0; position: sticky; top: 24px; }
   }
 
+  /* ---------- Trigger chips ---------- */
+  .trigger-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .trigger-chip {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--sage-line);
+    background: var(--cream);
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background 0.13s, color 0.13s, border-color 0.13s;
+    white-space: nowrap;
+  }
+  .trigger-chip:hover { border-color: var(--sage); color: var(--ink); }
+  .trigger-chip.selected {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: #fff;
+  }
+
   /* ---------- Reflection ---------- */
   .reflection-group { margin-bottom: 26px; }
   .reflection-row { display: flex; gap: 24px; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 8px; }
@@ -306,6 +332,7 @@
     .reflection-row { flex-direction: column; gap: 0; }
   }
   .save-note { font-size: 12px; color: var(--label); font-style: italic; }
+  .field-sublabel { font-size: 12px; color: var(--label); font-style: italic; margin-top: 2px; margin-bottom: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 
   /* ---------- Locked month ---------- */
   .month-locked {
@@ -2370,15 +2397,41 @@
         });
       });
 
+      /* Trigger chips for "What usually triggered spending?" */
+      var TRIGGER_CHIPS = [
+        'Convenience', 'Stress', 'Boredom', 'Celebration', 'Social plans',
+        'Kids / Family', 'Work', 'Travel', 'Hunger', 'Forgot to plan',
+        'Sale / Discount', 'Online browsing', 'Subscription', 'Habit',
+        'Emergency', 'Home project', 'Self-care', 'Other'
+      ];
+
+      function buildTriggerChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        TRIGGER_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
       /* Reflection textareas */
       function buildReflectionGroup(rKey) {
         var r = REFLECTIONS[rKey];
         var html = '<div class="reflection-group"><h3>' + r.title + '</h3>';
         r.questions.forEach(function (q, qi) {
           var qKey = mKey + '-' + rKey + '-' + qi;
-          var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          html += '<div class="field-label sans">' + q + '</div>' +
-                  '<textarea data-key="' + qKey + '" rows="2">' + qVal + '</textarea>';
+          // First patterns question → chips
+          if (rKey === 'patterns' && qi === 0) {
+            html += '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
+                    buildTriggerChips(qKey);
+          } else {
+            var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html += '<div class="field-label sans">' + q + '</div>' +
+                    '<textarea data-key="' + qKey + '" rows="2">' + qVal + '</textarea>';
+          }
         });
         html += '</div>';
         return html;
@@ -2432,6 +2485,22 @@
 
       root.appendChild(section);
       wireQuoteStars(section, mKey);
+
+      // Wire trigger chips
+      section.querySelectorAll('.trigger-chips').forEach(function(container) {
+        var qKey = container.getAttribute('data-key');
+        container.querySelectorAll('.trigger-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            chip.classList.toggle('selected');
+            var selected = [];
+            container.querySelectorAll('.trigger-chip.selected').forEach(function(c) {
+              selected.push(c.getAttribute('data-value'));
+            });
+            store[qKey] = JSON.stringify(selected);
+            debouncedSave();
+          });
+        });
+      });
 
       var toggleBtn = section.querySelector('.month-toggle');
       var headRow = section.querySelector('.head-row');
