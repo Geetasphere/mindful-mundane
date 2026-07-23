@@ -2386,18 +2386,8 @@
     var pageTitle = document.getElementById('mobilePageTitle');
 
     var groups = [
-      {
-        label: '',
-        items: [
-          { id: 'why-exists', title: 'Introduction' }
-        ]
-      },
-      {
-        label: '',
-        items: [
-          { id: 'rules', title: 'Rules' }
-        ]
-      },
+      { label: 'Introduction', direct: 'why-exists' },
+      { label: 'Rules',        direct: 'rules'      },
       {
         label: 'Calendar',
         items: [
@@ -2446,24 +2436,25 @@
       + '<p class="italic center" style="margin-top:26px;font-size:15px;">You do not need to make more money to feel free.<br>Sometimes you just need to notice the money<br>you already have and where it\'s going.</p>'
       + '</div>';
     groups.forEach(function(g) {
-      var collapsible = g.items.length > 1 && g.label;
-      html += '<div class="mobile-section-group' + (collapsible ? ' collapsed' : '') + '">';
-      if (g.label && collapsible) {
-        html += '<button class="mobile-group-toggle" type="button">'
+      html += '<div class="mobile-section-group">';
+      if (g.direct) {
+        // Single clickable label row — same style as group labels
+        html += '<div class="mobile-group-label mobile-group-link" data-sid="' + g.direct + '" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
           + g.label
-          + '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-          + '</button>';
-      } else if (g.label) {
-        html += '<div class="mobile-group-label">' + g.label + '</div>';
+          + '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          + '</div>';
+      } else {
+        if (g.label) html += '<div class="mobile-group-label">' + g.label + '</div>';
+        html += '<ul class="mobile-nav-list">';
+        g.items.forEach(function(item) {
+          html += '<li class="mobile-nav-item' + (item.locked ? ' locked' : '') + '" data-sid="' + item.id + '">';
+          html += '<span class="mobile-nav-title">' + item.title + '</span>';
+          html += '<svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          html += '</li>';
+        });
+        html += '</ul>';
       }
-      html += '<ul class="mobile-nav-list">';
-      g.items.forEach(function(item) {
-        html += '<li class="mobile-nav-item' + (item.locked ? ' locked' : '') + '" data-sid="' + item.id + '">';
-        html += '<span class="mobile-nav-title">' + item.title + '</span>';
-        html += '<svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        html += '</li>';
-      });
-      html += '</ul></div>';
+      html += '</div>';
     });
     dashboard.innerHTML = html;
 
@@ -2479,10 +2470,10 @@
       });
     });
 
-    // Collapsible group toggles
-    dashboard.querySelectorAll('.mobile-group-toggle').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        btn.closest('.mobile-section-group').classList.toggle('collapsed');
+    // Direct group label taps → open reader
+    dashboard.querySelectorAll('.mobile-group-link').forEach(function(el) {
+      el.addEventListener('click', function() {
+        openReader(el.getAttribute('data-sid'));
       });
     });
 
