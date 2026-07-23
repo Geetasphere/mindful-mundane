@@ -330,27 +330,29 @@
   .get-started-btn {
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
-    color: #d4845a;
+    color: #fff;
+    background: #d4845a;
     text-decoration: none;
-    border: 1px solid #e8b49a;
+    border: 1px solid #d4845a;
     border-radius: 20px;
     padding: 9px 20px;
     display: inline-block;
     transition: background 0.15s, color 0.15s;
   }
-  .get-started-btn:hover { background: #d4845a; color: #fff; border-color: #d4845a; }
+  .get-started-btn:hover { background: #c47348; border-color: #c47348; }
   .journal-cta-link {
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
-    color: var(--sage);
+    color: #fff;
+    background: var(--sage);
     text-decoration: none;
-    border: 1px solid var(--sage-line);
+    border: 1px solid var(--sage);
     border-radius: 20px;
     padding: 9px 20px;
     display: inline-block;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, border-color 0.15s;
   }
-  .journal-cta-link:hover { background: var(--sage); color: #fff; border-color: var(--sage); }
+  .journal-cta-link:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
 
   /* ---------- Reflection ---------- */
   .reflection-group { margin-bottom: 26px; }
@@ -1795,7 +1797,7 @@
     <p style="margin-left:8px;">&mdash; What story was I telling myself?<br>&mdash; What need was I trying to meet?<br>&mdash; Would I make the same choice again?</p>
     <p class="italic">Every purchase has a reason. The more curious you become, the more intentional your choices will be.</p>
     <div class="get-started-cta">
-      <a href="#month-jul" class="get-started-btn">Get Started &rarr;</a>
+      <a href="#month-jul" class="get-started-btn" data-nav-section="month-jul">Get Started &rarr;</a>
     </div>
   </section>
 
@@ -2295,6 +2297,16 @@
         }
       });
     });
+    // Wire Get Started / Write a Journal Entry buttons for mobile reader mode
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-nav-section]');
+      if (!btn) return;
+      if (window.innerWidth <= 768 && window.__openReader) {
+        e.preventDefault();
+        window.__openReader(btn.getAttribute('data-nav-section'));
+      }
+    });
+
     var navSignOutBtn = document.getElementById('navSignOutBtn');
     if (navSignOutBtn) navSignOutBtn.addEventListener('click', function () {
       store = {};
@@ -2586,7 +2598,7 @@
             inner = '<div class="field-label sans">' + q + '</div>' +
                     buildHabitChips(qKey);
           } else if (rKey === 'looking_ahead' && qi === 1) {
-            inner = '<div class="journal-cta"><a href="#letter" class="journal-cta-link">Write a Journal Entry &rarr;</a></div>';
+            inner = '<div class="journal-cta"><a href="#letter" class="journal-cta-link" data-nav-section="letter">Write a Journal Entry &rarr;</a></div>';
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             inner = '<div class="field-label sans">' + q + '</div>' +
