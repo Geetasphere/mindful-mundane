@@ -333,6 +333,8 @@
   }
   .save-note { font-size: 12px; color: var(--label); font-style: italic; }
   .field-sublabel { font-size: 12px; color: var(--label); font-style: italic; margin-top: 2px; margin-bottom: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .chips-optional-label { font-size: 13px; color: var(--ink-soft); margin: 18px 0 6px; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .chips-optional-quote { border-left: 3px solid var(--sage-line); padding-left: 12px; margin: 0 0 10px; font-size: 15px; color: var(--ink); font-style: normal; }
 
   /* ---------- Locked month ---------- */
   .month-locked {
@@ -2425,8 +2427,13 @@
           var qKey = mKey + '-' + rKey + '-' + qi;
           // First patterns question → chips
           if (rKey === 'patterns' && qi === 0) {
+            var surpriseKey = mKey + '-patterns-trigger-surprise';
+            var surpriseVal = (store[surpriseKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
-                    buildTriggerChips(qKey);
+                    buildTriggerChips(qKey) +
+                    '<p class="chips-optional-label">Then include one optional line:</p>' +
+                    '<blockquote class="chips-optional-quote">Anything surprising?</blockquote>' +
+                    '<textarea data-key="' + surpriseKey + '" rows="2" placeholder="Optional…">' + surpriseVal + '</textarea>';
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div>' +
