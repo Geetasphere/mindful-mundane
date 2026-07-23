@@ -1900,6 +1900,7 @@
     looking_back: {
       title: 'Looking Back',
       questions: [
+        'What worked well this month?',
         'Which week felt easiest?',
         'Which week felt hardest?',
         'What surprised you?'
@@ -2416,6 +2417,25 @@
         return html;
       }
 
+      var WORKED_WELL_CHIPS = [
+        'Meal planned more often', 'Had more $0 days', 'Waited before buying',
+        'Used what I already had', 'Avoided impulse purchases', 'Stayed within my budget',
+        'Repaired or reused something', 'Planned errands better',
+        'Unsubscribed from something', 'Other'
+      ];
+
+      function buildWorkedWellChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        WORKED_WELL_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
       var CHANGED_CHIPS = [
         'Fewer impulse purchases', 'Cooked at home more', 'Drove less',
         'Used what I already had', 'Repaired instead of replacing',
@@ -2453,6 +2473,10 @@
             // "What changed" chips
             html += '<div class="field-label sans" style="margin-top:22px;">' + q + '</div>' +
                     buildChangedChips(qKey);
+          } else if (rKey === 'looking_back' && qi === 0) {
+            html += '<div class="field-label sans">' + q + '</div>' +
+                    '<div class="field-sublabel">Select all that apply</div>' +
+                    buildWorkedWellChips(qKey);
           } else {
             var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html += '<div class="field-label sans">' + q + '</div>' +
