@@ -1771,7 +1771,6 @@
   var WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var today = new Date();
   function isUnlocked(m) {
-    if (m === 8) return true;
     return today >= new Date(2026, m - 1, 1);
   }
   var QUOTES = [
