@@ -1241,17 +1241,18 @@
     display: none;
     background: var(--paper);
     border-bottom: 1px solid var(--sage-line);
-    padding: 0 4px;
+    padding: 0;
   }
   body.reading #mobileReaderNav { display: flex; }
   .reader-nav-item {
     flex: 1;
     background: none;
     border: none;
-    padding: 8px 4px 7px;
+    border-right: 1px solid var(--sage-line);
+    padding: 10px 4px 9px;
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 12px;
-    letter-spacing: 0.04em;
+    font-size: 14px;
+    letter-spacing: 0.01em;
     color: var(--label);
     cursor: pointer;
     position: relative;
@@ -1261,6 +1262,13 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
+  }
+  .reader-nav-item:last-child { border-right: none; }
+  .reader-nav-item svg { flex-shrink: 0; }
+  /* Hide icons if text won't fit (very narrow screens) */
+  @media (max-width: 380px) {
+    .reader-nav-item svg { display: none; }
+    .reader-nav-item { gap: 0; font-size: 12px; }
   }
   .reader-nav-item.active {
     color: var(--ink);
