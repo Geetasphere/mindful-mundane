@@ -283,21 +283,14 @@
   .legend .sw.empty { background: var(--cream); border: 1px solid var(--sage-line); }
   .tap-hint { font-size: 12px; color: var(--label); font-style: italic; margin: -6px 0 22px; }
 
-  /* ---------- Calendar card ---------- */
-  .month-q-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin-top: 24px;
-  }
+  /* ---------- Month two-column layout ---------- */
+  .month-layout { display: flex; flex-direction: column; gap: 32px; }
+  .month-col-calendar { width: 100%; }
+  .month-col-reflections { width: 100%; }
   @media (min-width: 860px) {
-    .month-q-grid { grid-template-columns: 1fr 1fr; }
-  }
-  .q-card {
-    background: var(--cream);
-    border-radius: 12px;
-    padding: 20px 22px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    .month-layout { flex-direction: row; align-items: flex-start; gap: 48px; }
+    .month-col-calendar { width: 50%; flex-shrink: 0; }
+    .month-col-reflections { flex: 1; min-width: 0; position: sticky; top: 24px; }
   }
 
   /* ---------- Trigger chips ---------- */
@@ -2501,10 +2494,10 @@
         return html;
       }
 
-      /* Reflection — one q-card per question */
+      /* Reflection group — questions stacked inside reflection-group */
       function buildReflectionGroup(rKey) {
         var r = REFLECTIONS[rKey];
-        var html = '';
+        var html = '<div class="reflection-group"><h3 class="group-title">' + r.title + '</h3>';
         r.questions.forEach(function (q, qi) {
           var qKey = mKey + '-' + rKey + '-' + qi;
           var inner = '';
@@ -2538,8 +2531,9 @@
             inner = '<div class="field-label sans">' + q + '</div>' +
                     '<textarea data-key="' + qKey + '" rows="2">' + qVal + '</textarea>';
           }
-          html += '<div class="q-card">' + inner + '</div>';
+          html += inner;
         });
+        html += '</div>';
         return html;
       }
 
@@ -2565,23 +2559,29 @@
         '</div>' +
         '<div class="month-body">' +
           '<hr class="rule">' +
-          '<div class="cal-card">' +
-            '<div class="month-title-row">' +
-              '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
-              '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
+          '<div class="month-layout">' +
+            '<div class="month-col-calendar">' +
+              '<div class="cal-card">' +
+                '<div class="month-title-row">' +
+                  '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
+                  '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
+                '</div>' +
+                '<div class="weekday-row">' + weekdayCells + '</div>' +
+                '<div class="cal-grid">' + dayCells + '</div>' +
+                '<div class="legend">' +
+                  '<span><span class="sw zero"></span>$0 Day</span>' +
+                  '<span><span class="sw spend"></span>Spending Day</span>' +
+                  '<span><span class="sw empty"></span>Not yet marked</span>' +
+                '</div>' +
+              '</div>' +
             '</div>' +
-            '<div class="weekday-row">' + weekdayCells + '</div>' +
-            '<div class="cal-grid">' + dayCells + '</div>' +
-            '<div class="legend">' +
-              '<span><span class="sw zero"></span>$0 Day</span>' +
-              '<span><span class="sw spend"></span>Spending Day</span>' +
-              '<span><span class="sw empty"></span>Not yet marked</span>' +
+            '<div class="month-col-reflections">' +
+              buildReflectionGroup('patterns') +
+              '<div class="reflection-row">' +
+                buildReflectionGroup('looking_back') +
+                buildReflectionGroup('looking_ahead') +
+              '</div>' +
             '</div>' +
-          '</div>' +
-          '<div class="month-q-grid">' +
-            buildReflectionGroup('patterns') +
-            buildReflectionGroup('looking_back') +
-            buildReflectionGroup('looking_ahead') +
           '</div>' +
         '</div>';
 
