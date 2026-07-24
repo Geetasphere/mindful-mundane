@@ -1359,6 +1359,86 @@
     #mobileReaderNav { display: none !important; }
   }
 
+  /* ---------- Share modal ---------- */
+  .share-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(40, 38, 34, 0.55);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .share-overlay.open { display: flex; }
+  .share-modal {
+    background: var(--cream);
+    border-radius: 18px;
+    padding: 24px 22px 20px;
+    max-width: 400px; width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.22);
+    position: relative;
+  }
+  .share-modal-label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--label); align-self: flex-start;
+  }
+  .share-canvas-wrap {
+    width: 100%; aspect-ratio: 1 / 1;
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--sage-line);
+    background: var(--cream-deep);
+  }
+  .share-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+  .share-actions { display: flex; gap: 8px; width: 100%; }
+  .share-action-btn {
+    flex: 1; padding: 11px 0; border-radius: 8px; border: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px; cursor: pointer; transition: opacity 0.13s;
+  }
+  .share-action-btn:hover { opacity: 0.82; }
+  .share-action-btn.primary { background: var(--sage); color: #fff; }
+  .share-action-btn.secondary {
+    background: var(--cream-deep); color: var(--ink-soft);
+    border: 1px solid var(--sage-line);
+  }
+  .share-close-btn {
+    position: absolute; top: 12px; right: 12px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--cream-deep); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--label);
+  }
+  .share-close-btn:hover { background: var(--sage-line); }
+  /* Share trigger on cal-card */
+  .cal-share-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-left: auto; flex-shrink: 0;
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--sage-line); background: var(--cream);
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px; color: var(--label); cursor: pointer;
+    transition: background 0.13s, color 0.13s;
+    white-space: nowrap;
+  }
+  .cal-share-btn:hover { background: var(--cream-deep); color: var(--ink-soft); }
+  /* Template picker */
+  .share-template-row {
+    display: flex; gap: 6px; width: 100%;
+    overflow-x: auto; padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .share-template-row::-webkit-scrollbar { display: none; }
+  .share-tmpl-btn {
+    flex-shrink: 0; padding: 5px 12px; border-radius: 20px;
+    border: 1px solid var(--sage-line); background: var(--cream);
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px; color: var(--label); cursor: pointer;
+    transition: background 0.13s, color 0.13s, border-color 0.13s;
+    white-space: nowrap;
+  }
+  .share-tmpl-btn:hover { background: var(--cream-deep); color: var(--ink-soft); }
+  .share-tmpl-btn.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
 </style>
 </head>
 <body>
@@ -1857,7 +1937,7 @@
     </div>
     <h2>This Is Just the Beginning</h2>
     <hr class="rule center">
-    <p>Five months from now, you'll look back at these pages and see not just what you didn't spend &mdash; but what you noticed, what you valued, and who you became along the way.</p>
+    <p>Months from now, you'll look back at these pages and see not just what you didn't spend &mdash; but what you noticed, what you valued, and who you became along the way.</p>
     <p class="italic">With love,</p>
   </section>
 
@@ -2347,6 +2427,7 @@
     initMobileLayout();
     initJournalEntries();
     initJournalDrawer();
+    initShareModal();
   }
 
   /* ---------- Text fields & textareas ---------- */
@@ -2435,6 +2516,509 @@
       weeks.push(week);
     }
     return weeks;
+  }
+
+  /* ============================================================
+     SHARE FEATURE
+     ============================================================ */
+
+  var PLANT_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="15" fill="#8fa377"/><path d="M16 22 L16 8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M16 16 C11 13 8 17 11 19 C13 20 16 18 16 16 Z" fill="#fff" stroke="#fff" stroke-width="1"/><path d="M16 12 C21 9 24 13 21 15 C19 16 16 14 16 12 Z" fill="#ffffffaa" stroke="#fff" stroke-width="1"/><path d="M10 22 L22 22 L21 27 L11 27 Z" fill="#ffffffcc" stroke="#fff" stroke-width="1"/></svg>';
+
+  var SHARE_MONTH_COLORS = {
+    7:  { accent: '#8fa377', light: '#d7e3ce' },
+    8:  { accent: '#c9a040', light: '#fbe9bb' },
+    9:  { accent: '#cf9f5f', light: '#f1d6ab' },
+    10: { accent: '#d99a6c', light: '#f3cbab' },
+    11: { accent: '#b88a94', light: '#e9cfd6' },
+    12: { accent: '#7aabcc', light: '#cfe0ea' }
+  };
+
+  function countAllZeroDays() {
+    var count = 0;
+    Object.keys(store).forEach(function(k) {
+      if (k.indexOf('cal-') === 0 && store[k] === 'zero') count++;
+    });
+    return count;
+  }
+
+  function svgToImg(svgStr, w, h) {
+    return new Promise(function(resolve) {
+      var scaled = svgStr
+        .replace(/width="\d+"/, 'width="' + w + '"')
+        .replace(/height="\d+"/, 'height="' + h + '"');
+      var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(scaled);
+      var img = new Image();
+      img.onload = function() { resolve(img); };
+      img.onerror = function() { resolve(null); };
+      img.src = url;
+    });
+  }
+
+  /* Level 2: monthly dot calendar card */
+  function buildMonthShareCanvas(m, year, weeks) {
+    var W = 1080, H = 1080;
+    var mc = SHARE_MONTH_COLORS[m] || { accent: '#a9b596', light: '#d7e3ce' };
+    var monthName = MONTH_LABELS[m] ? MONTH_LABELS[m].name : '';
+    var iconSvg = MONTH_ICONS[m] || '';
+
+    return Promise.all([svgToImg(iconSvg, 120, 120), svgToImg(PLANT_ICON_SVG, 32, 32)]).then(function(imgs) {
+      var iconImg = imgs[0]; var plantImg = imgs[1];
+      var canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+
+      /* Count zeros */
+      var zeroCount = 0;
+      weeks.forEach(function(week) {
+        week.forEach(function(d) {
+          if (!d) return;
+          var dk = 'cal-' + year + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          if (store[dk] === 'zero') zeroCount++;
+        });
+      });
+
+      /* Background */
+      ctx.fillStyle = '#faf6ee';
+      ctx.fillRect(0, 0, W, H);
+
+      /* Top accent bar */
+      ctx.fillStyle = mc.accent;
+      ctx.fillRect(0, 0, W, 14);
+
+      /* Month icon */
+      if (iconImg) ctx.drawImage(iconImg, (W - 120) / 2, 50, 120, 120);
+
+      /* Month name */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '500 64px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(monthName.toUpperCase(), W / 2, 215);
+
+      /* Year */
+      ctx.fillStyle = mc.accent;
+      ctx.font = '300 28px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(String(year), W / 2, 250);
+
+      /* Separator */
+      ctx.strokeStyle = '#c9d0b6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(80, 274); ctx.lineTo(W - 80, 274); ctx.stroke();
+
+      /* Weekday headers */
+      var WDAYS = ['S','M','T','W','T','F','S'];
+      var padX = 80;
+      var cellW = (W - 2 * padX) / 7;
+      ctx.fillStyle = mc.accent;
+      ctx.font = '400 26px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      WDAYS.forEach(function(d, i) {
+        ctx.fillText(d, padX + (i + 0.5) * cellW, 316);
+      });
+
+      /* Dot grid */
+      var dotR = 26;
+      var numRows = weeks.length;
+      var rowH = numRows <= 5 ? 100 : 85;
+      var gridTop = 344;
+
+      weeks.forEach(function(week, ri) {
+        week.forEach(function(d, ci) {
+          if (!d) return;
+          var cx = padX + (ci + 0.5) * cellW;
+          var cy = gridTop + ri * rowH + dotR;
+          var dk = 'cal-' + year + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          var state = store[dk] || '';
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
+          if (state === 'zero') {
+            ctx.fillStyle = mc.accent;
+            ctx.fill();
+          } else if (state === 'spend') {
+            ctx.fillStyle = '#faf6ee';
+            ctx.fill();
+            ctx.strokeStyle = '#e8b49a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = '#faf6ee';
+            ctx.fill();
+            ctx.strokeStyle = '#c9d0b6';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+        });
+      });
+
+      var gridBottom = gridTop + numRows * rowH;
+
+      /* Separator */
+      ctx.strokeStyle = '#c9d0b6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(80, gridBottom + 22); ctx.lineTo(W - 80, gridBottom + 22); ctx.stroke();
+
+      /* Zero count */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '600 78px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(String(zeroCount), W / 2, gridBottom + 104);
+
+      /* "$0 Days" label */
+      ctx.fillStyle = mc.accent;
+      ctx.font = '300 30px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('$0 Days', W / 2, gridBottom + 142);
+
+      /* Brand — plant icon centered, then name + url below */
+      var brandTop = gridBottom + 170;
+      if (plantImg) ctx.drawImage(plantImg, (W - 36) / 2, brandTop, 36, 36);
+      ctx.fillStyle = '#7a8266';
+      ctx.font = '400 22px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Mindful Spending Journal', W / 2, brandTop + 56);
+      ctx.fillStyle = '#a9b596';
+      ctx.font = '300 20px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('mindfulmundane.com', W / 2, brandTop + 84);
+
+      return canvas;
+    });
+  }
+
+  /* Level 1: first $0 day celebration card */
+  function buildFirstZeroDayCanvas(m, year, dateStr) {
+    var W = 1080, H = 1080;
+    var mc = SHARE_MONTH_COLORS[m] || { accent: '#a9b596', light: '#d7e3ce' };
+    var iconSvg = MONTH_ICONS[m] || '';
+
+    return Promise.all([svgToImg(iconSvg, 100, 100), svgToImg(PLANT_ICON_SVG, 32, 32)]).then(function(imgs) {
+      var iconImg = imgs[0]; var plantImg = imgs[1];
+      var canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+
+      /* Background */
+      ctx.fillStyle = '#faf6ee';
+      ctx.fillRect(0, 0, W, H);
+
+      /* Soft circle behind checkmark */
+      ctx.beginPath();
+      ctx.arc(W / 2, 390, 178, 0, Math.PI * 2);
+      ctx.fillStyle = mc.light;
+      ctx.fill();
+
+      /* Top accent bar */
+      ctx.fillStyle = mc.accent;
+      ctx.fillRect(0, 0, W, 14);
+
+      /* Month icon */
+      if (iconImg) ctx.drawImage(iconImg, (W - 100) / 2, 58, 100, 100);
+
+      /* Checkmark */
+      ctx.strokeStyle = mc.accent;
+      ctx.lineWidth = 22;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 72, 390);
+      ctx.lineTo(W / 2 - 16, 452);
+      ctx.lineTo(W / 2 + 88, 322);
+      ctx.stroke();
+
+      /* Main line */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3a352f';
+      ctx.font = 'italic 64px Georgia, "Times New Roman", serif';
+      ctx.fillText('Today was my first $0 Day.', W / 2, 582);
+
+      /* Separator */
+      ctx.strokeStyle = '#c9d0b6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(120, 626); ctx.lineTo(W - 120, 626); ctx.stroke();
+
+      /* Copy lines */
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '300 52px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Today I spent nothing.', W / 2, 710);
+
+      ctx.fillStyle = '#5c6650';
+      ctx.font = '300 44px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Not because I had to.', W / 2, 778);
+      ctx.fillText('Because I chose to.', W / 2, 832);
+
+      /* Date */
+      ctx.fillStyle = '#8a9270';
+      ctx.font = '300 32px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(dateStr, W / 2, 896);
+
+      /* Brand */
+      if (plantImg) ctx.drawImage(plantImg, (W - 32) / 2, H - 112, 32, 32);
+      ctx.fillStyle = '#8a9270';
+      ctx.font = '300 20px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Mindful Spending Journal', W / 2, H - 62);
+      ctx.fillStyle = '#c9d0b6';
+      ctx.font = '300 18px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('mindfulmundane.com', W / 2, H - 38);
+
+      return canvas;
+    });
+  }
+
+  /* ---- Quote card templates ---- */
+
+  var QUOTE_CARD_COLORS = {
+    sage: { accent: '#8fa377', border: '#8fa377' },
+    blue: { accent: '#9fb9c9', border: '#9fb9c9' },
+    gold: { accent: '#cf9f5f', border: '#cf9f5f' }
+  };
+
+  var QUOTE_TEMPLATES = [
+    {
+      id: 'pause', label: 'The pause', color: 'sage',
+      quote: '\u201cI paused before buying.\u201d',
+      subLines: ['That might be the biggest win.']
+    },
+    {
+      id: 'realization', label: 'The realization', color: 'blue',
+      quote: '\u201cI realized I wasn\u2019t buying because I needed it.\u201d',
+      subLines: ['That\u2019s a huge win.']
+    },
+    {
+      id: 'substitution', label: 'The substitution', color: 'gold',
+      quote: '\u201cI used what I already had.\u201d',
+      subLines: ['Instead of buying another notebook.', 'Instead of ordering takeout.', 'Instead of another kitchen gadget.']
+    },
+    {
+      id: 'pattern', label: 'The pattern', color: 'gold',
+      quote: '\u201cI noticed a pattern.\u201d',
+      subLines: ['Maybe:'],
+      bullets: ['I shop when I\u2019m bored.', 'I buy coffee when I\u2019m stressed.', 'I scroll Amazon when I\u2019m tired.'],
+      italic: 'Awareness is progress.'
+    }
+  ];
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    var words = text.split(' ');
+    var lines = [];
+    var line = '';
+    words.forEach(function(word) {
+      var test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawRoundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x,     y + h, r);
+    ctx.arcTo(x,     y + h, x,     y,     r);
+    ctx.arcTo(x,     y,     x + w, y,     r);
+    ctx.closePath();
+  }
+
+  function buildQuoteCardCanvas(template) {
+    var W = 1080, H = 1080;
+    var mc = QUOTE_CARD_COLORS[template.color] || QUOTE_CARD_COLORS.sage;
+
+    return svgToImg(PLANT_ICON_SVG, 30, 30).then(function(plantImg) {
+      var canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+
+      /* Background */
+      ctx.fillStyle = '#faf6ee';
+      ctx.fillRect(0, 0, W, H);
+
+      /* Border */
+      drawRoundedRect(ctx, 28, 28, W - 56, H - 56, 68);
+      ctx.strokeStyle = mc.border;
+      ctx.lineWidth = 7;
+      ctx.stroke();
+
+      /* Quote mark */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = mc.accent;
+      ctx.font = '400 108px Georgia, "Times New Roman", serif';
+      ctx.fillText('\u201c', W / 2, 168);
+
+      /* Short line */
+      ctx.strokeStyle = mc.accent;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(W/2 - 34, 196); ctx.lineTo(W/2 + 34, 196); ctx.stroke();
+
+      /* Quote text — bold serif, wraps at 860px */
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '700 66px Georgia, "Times New Roman", serif';
+      var quoteLines = wrapCanvasText(ctx, template.quote, 860);
+      var quoteY = 300;
+      var quoteLineH = 82;
+      quoteLines.forEach(function(line, i) {
+        ctx.fillText(line, W / 2, quoteY + i * quoteLineH);
+      });
+      var afterQuote = quoteY + quoteLines.length * quoteLineH + 52;
+
+      /* Sub lines */
+      ctx.fillStyle = '#5c6650';
+      ctx.font = '300 36px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      var subY = afterQuote;
+      (template.subLines || []).forEach(function(line) {
+        ctx.fillText(line, W / 2, subY);
+        subY += 50;
+      });
+
+      /* Bullet lines */
+      if (template.bullets && template.bullets.length) {
+        subY += 6;
+        ctx.font = '300 34px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+        template.bullets.forEach(function(b) {
+          ctx.fillText('\u2022 ' + b, W / 2, subY);
+          subY += 48;
+        });
+      }
+
+      /* Italic closing */
+      if (template.italic) {
+        subY += 10;
+        ctx.fillStyle = '#8a9270';
+        ctx.font = 'italic 300 32px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+        ctx.fillText(template.italic, W / 2, subY);
+      }
+
+      /* "MINDFUL SPENDING" bottom-left */
+      ctx.textAlign = 'left';
+      ctx.fillStyle = mc.accent;
+      ctx.font = '400 18px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('MINDFUL SPENDING', 80, H - 62);
+
+      /* Plant icon + URL bottom-right */
+      if (plantImg) ctx.drawImage(plantImg, W - 80 - 30, H - 80, 30, 30);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#c9d0b6';
+      ctx.font = '300 16px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('mindfulmundane.com', W - 80, H - 58);
+
+      return canvas;
+    });
+  }
+
+  /* ---- Template share modal (calendar + quote cards) ---- */
+  function showMonthShareModal(m, year, weeks) {
+    var templates = [{ id: 'calendar', label: 'My Month' }].concat(QUOTE_TEMPLATES);
+
+    function buildTemplate(tid) {
+      if (tid === 'calendar') return buildMonthShareCanvas(m, year, weeks);
+      var qt = null;
+      QUOTE_TEMPLATES.forEach(function(t) { if (t.id === tid) qt = t; });
+      return qt ? buildQuoteCardCanvas(qt) : buildMonthShareCanvas(m, year, weeks);
+    }
+
+    function getFilename(tid) {
+      return 'msj-' + tid + '-' + (MONTH_KEYS[m] || m) + '-' + year + '.png';
+    }
+
+    function selectTemplate(tid) {
+      document.querySelectorAll('.share-tmpl-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-tid') === tid);
+      });
+      _shareCanvasWrap.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--label);font-size:12px;font-family:system-ui">Generating…</div>';
+      buildTemplate(tid).then(function(canvas) {
+        _shareCanvasWrap.innerHTML = '';
+        _shareCanvasWrap.appendChild(canvas);
+        var fname = getFilename(tid);
+        _shareDownloadBtn.onclick = function() {
+          var a = document.createElement('a');
+          a.download = fname; a.href = canvas.toDataURL('image/png'); a.click();
+        };
+        _shareShareBtn.onclick = function() {
+          canvas.toBlob(function(blob) {
+            if (navigator.share && blob) {
+              var file = new File([blob], fname, { type: 'image/png' });
+              navigator.share({ files: [file], title: 'The Mindful Spending Journal' })
+                .catch(function() { triggerDownload(blob, fname); });
+            } else { triggerDownload(blob, fname); }
+          }, 'image/png');
+        };
+      });
+    }
+
+    /* Build template row */
+    var row = document.getElementById('shareTemplateRow');
+    row.innerHTML = '';
+    templates.forEach(function(t) {
+      var btn = document.createElement('button');
+      btn.className = 'share-tmpl-btn' + (t.id === 'calendar' ? ' active' : '');
+      btn.setAttribute('data-tid', t.id);
+      btn.textContent = t.label;
+      btn.onclick = function() { selectTemplate(t.id); };
+      row.appendChild(btn);
+    });
+
+    _shareLabel.textContent = MONTH_LABELS[m] ? MONTH_LABELS[m].name + ' ' + year : 'Share';
+    _shareCanvasWrap.innerHTML = '';
+    document.body.style.overflow = 'hidden';
+    _shareOverlay.classList.add('open');
+    selectTemplate('calendar');
+  }
+
+  /* ---- Share modal wiring ---- */
+  var _shareOverlay, _shareCanvasWrap, _shareLabel, _shareDownloadBtn, _shareShareBtn;
+
+  function initShareModal() {
+    _shareOverlay    = document.getElementById('shareOverlay');
+    _shareCanvasWrap = document.getElementById('shareCanvasWrap');
+    _shareLabel      = document.getElementById('shareModalLabel');
+    _shareDownloadBtn = document.getElementById('shareDownloadBtn');
+    _shareShareBtn    = document.getElementById('shareShareBtn');
+
+    document.getElementById('shareCloseBtn').addEventListener('click', closeShareModal);
+    _shareOverlay.addEventListener('click', function(e) {
+      if (e.target === _shareOverlay) closeShareModal();
+    });
+  }
+
+  function openShareModal(canvasEl, label, filename) {
+    _shareLabel.textContent = label || 'Share';
+    document.getElementById('shareTemplateRow').innerHTML = '';
+    _shareCanvasWrap.innerHTML = '';
+    _shareCanvasWrap.appendChild(canvasEl);
+    document.body.style.overflow = 'hidden';
+    _shareOverlay.classList.add('open');
+
+    _shareDownloadBtn.onclick = function() {
+      var a = document.createElement('a');
+      a.download = filename || 'mindful-spending.png';
+      a.href = canvasEl.toDataURL('image/png');
+      a.click();
+    };
+
+    _shareShareBtn.onclick = function() {
+      canvasEl.toBlob(function(blob) {
+        var fname = filename || 'mindful-spending.png';
+        if (navigator.share && blob) {
+          var file = new File([blob], fname, { type: 'image/png' });
+          navigator.share({ files: [file], title: 'The Mindful Spending Journal' })
+            .catch(function() { triggerDownload(blob, fname); });
+        } else {
+          triggerDownload(blob, fname);
+        }
+      }, 'image/png');
+    };
+  }
+
+  function triggerDownload(blob, fname) {
+    var a = document.createElement('a');
+    a.download = fname;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+  }
+
+  function closeShareModal() {
+    _shareOverlay.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
   function renderMonths() {
@@ -2665,6 +3249,10 @@
                   '<span><span class="sw zero"></span>$0 Day</span>' +
                   '<span><span class="sw spend"></span>Spending Day</span>' +
                   '<span><span class="sw empty"></span>Not yet marked</span>' +
+                  '<button class="cal-share-btn" id="share-btn-' + mKey + '" aria-label="Share ' + info.name + ' calendar">' +
+                    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>' +
+                    ' Share' +
+                  '</button>' +
                 '</div>' +
               '</div>' +
             '</div>' +
@@ -2757,8 +3345,26 @@
           store[cell.getAttribute('data-key')] = next;
           flushToFirestore(); // calendar taps save immediately
           updateProgress();
+
+          /* First $0 day celebration */
+          if (next === 'zero' && countAllZeroDays() === 1) {
+            var parts = cell.getAttribute('data-key').split('-'); // 'cal-2026-07-15'
+            var d0 = new Date(parseInt(parts[1]), parseInt(parts[2]) - 1, parseInt(parts[3]));
+            var dateStr = d0.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            buildFirstZeroDayCanvas(m, year, dateStr).then(function(canvas) {
+              openShareModal(canvas, 'Your First $0 Day', 'first-zero-day.png');
+            });
+          }
         });
       });
+
+      /* Wire share button */
+      var shareTrigger = section.querySelector('#share-btn-' + mKey);
+      if (shareTrigger) {
+        shareTrigger.addEventListener('click', function() {
+          showMonthShareModal(m, year, weeks);
+        });
+      }
 
       /* Wire up reflection textareas (already have values set via innerHTML) */
       section.querySelectorAll('textarea[data-key]').forEach(function (el) {
@@ -3192,5 +3798,22 @@
 
 })();
 </script>
+
+<!-- SHARE MODAL -->
+<div id="shareOverlay" class="share-overlay" role="dialog" aria-modal="true">
+  <div class="share-modal">
+    <button class="share-close-btn" id="shareCloseBtn" aria-label="Close">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <div class="share-modal-label" id="shareModalLabel">Share</div>
+    <div class="share-template-row" id="shareTemplateRow"></div>
+    <div class="share-canvas-wrap" id="shareCanvasWrap"></div>
+    <div class="share-actions">
+      <button class="share-action-btn secondary" id="shareDownloadBtn">Download</button>
+      <button class="share-action-btn primary" id="shareShareBtn">Share</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
