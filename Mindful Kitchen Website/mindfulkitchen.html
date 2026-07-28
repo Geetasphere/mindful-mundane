@@ -82,7 +82,9 @@
   @media (max-width:620px){
     section{ padding:40px 16px; }
     .hero{ padding:48px 20px 36px; }
-    .tmpl-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .tmpl-grid{ display:flex; flex-direction:row; overflow-x:auto; scroll-snap-type:x mandatory; gap:12px; padding-bottom:8px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .tmpl-grid::-webkit-scrollbar{ display:none; }
+    .tmpl-card{ flex:0 0 72vw; max-width:280px; scroll-snap-align:start; }
     .utility-bar{ padding:5px 14px; }
     .utility-links{ gap:12px; }
   }
@@ -850,7 +852,7 @@
     <div class="tmpl-card"><div class="tdot" style="background:var(--yellow-tint);"></div><h4>Bowl</h4><div class="tparts">Carb · Protein · Vegetable · Sauce</div></div>
     <div class="tmpl-card"><div class="tdot" style="background:var(--apricot-tint);"></div><h4>Curry</h4><div class="tparts">Protein · Vegetables · Curry base · Rice</div></div>
     <div class="tmpl-card"><div class="tdot" style="background:var(--sage-tint);"></div><h4>Stir Fry</h4><div class="tparts">Protein · Vegetables · Sauce · Rice or noodles</div></div>
-    <div class="tmpl-card"><div class="tdot" style="background:var(--blue-tint);"></div><h4>Pasta / Noodle / Rice</h4><div class="tparts">Pasta · Vegetables · Protein · Flavor</div></div>
+    <div class="tmpl-card"><div class="tdot" style="background:var(--blue-tint);"></div><h4>Pasta & Noodles</h4><div class="tparts">Pasta · Vegetables · Protein · Flavor</div></div>
     <div class="tmpl-card"><div class="tdot" style="background:var(--peach-tint);"></div><h4>Soup</h4><div class="tparts">Base · Protein · Vegetables · Grain</div></div>
   </div>
 </section>
