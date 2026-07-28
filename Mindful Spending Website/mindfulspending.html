@@ -1,0 +1,3905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Mindful Spending Journal</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 84 125'%3E%3Cpath d='M41.5732 77.9181V0' stroke='%238FA377' stroke-width='5.19591'/%3E%3Cpath d='M41.5734 27.8286C13.7455 16.6975 2.61431 38.9598 24.8766 50.091C36.0078 55.6565 41.5734 44.5254 41.5734 27.8286Z' fill='%23D7E3CE' stroke='%238FA377' stroke-width='3.71136'/%3E%3Cpath d='M41.5732 11.1314C69.4012 0.000208241 80.5323 22.2625 58.27 33.3937C47.1388 38.9593 41.5732 27.8281 41.5732 11.1314Z' fill='%23EED9CD' stroke='%23C69A82' stroke-width='3.71136'/%3E%3Cpath d='M45.6143 45.815C62.1903 39.1555 68.8207 52.4744 55.5599 59.1338C48.9295 62.4636 45.6143 55.8041 45.6143 45.815Z' fill='%23FFEDBE' stroke='%23EAC66B' stroke-width='3.71136'/%3E%3Cpath d='M2.61426 77.9175H80.5324L69.4012 122.442H13.7454L2.61426 77.9175Z' fill='%23CFE0EA' stroke='%239FB9C9' stroke-width='4.0825'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;1,200;1,300&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FJBDP03GGT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FJBDP03GGT');
+</script>
+
+<!-- Firebase SDKs (v10 compat — swap version number if you need a newer one) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+  :root {
+    --cream: #faf6ee;
+    --cream-deep: #f2ede0;
+    --ink: #3a352f;
+    --ink-soft: #5c6650;
+    --label: #7a8266;
+    --label-2: #8a9270;
+    --sage: #a9b596;
+    --sage-line: #c9d0b6;
+    --box-bg: #f2f0e4;
+    --box-border: #c9d0b6;
+    --line: #c4cab3;
+    --blush: #e9cfd6;
+    --blush-line: #c9a2ab;
+    --gold: #f1d6ab;
+    --gold-line: #cf9f5f;
+    --blue: #cfe0ea;
+    --blue-line: #9fb9c9;
+    --lav: #e1d7ee;
+    --lav-line: #b8a9d1;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  .hidden { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+  .sans {
+    font-family: 'Nunito', sans-serif;
+  }
+  a { color: inherit; }
+
+  /* ---------- Utility row ---------- */
+  .utility-bar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 18px;
+    background: rgba(217, 154, 108, 0.96);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(163, 137, 102, 0.25);
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .utility-bar a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .utility-links{ display:flex; gap:22px; align-items:center; }
+  .utility-links a{ font-family:'Nunito',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); text-decoration:none; }
+  .utility-links a:hover, .utility-links a.active{ color:var(--ink); font-weight:700; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky;
+    top: 42px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding: 12px 18px;
+    background: rgba(250,246,238,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--sage-line);
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin-left: auto;
+  }
+  .topbar-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--sage-line);
+    flex-shrink: 0;
+    margin: 0 8px;
+  }
+  .topbar-nav {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 2px;
+  }
+  .topbar-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 7px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: background 0.14s, color 0.14s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  .topbar-nav-btn:hover { background: var(--cream-deep); color: var(--ink); }
+  @media (max-width: 768px) {
+    .topbar-nav { display: none; }
+  }
+  .topbar .brand {
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .menu-btn {
+    display: none;
+    width: 36px; height: 36px;
+    border: 1px solid var(--sage-line);
+    border-radius: 8px;
+    background: var(--cream);
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .menu-btn span { display: block; width: 16px; height: 2px; background: var(--ink-soft); border-radius: 1px; }
+  @media (max-width: 768px) {
+    .menu-btn { display: flex; }
+  }
+
+  /* ---------- Nav overlay ---------- */
+  .nav-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--cream);
+    transform: translateY(-100%);
+    transition: transform 0.32s ease;
+    overflow-y: auto;
+    padding: 24px 20px 40px;
+  }
+  .nav-overlay.open { transform: translateY(0); }
+  .nav-overlay .close-btn {
+    width: 36px; height: 36px; margin-left: auto;
+    border: 1px solid var(--sage-line); border-radius: 8px; background: transparent;
+    font-size: 18px; color: var(--ink-soft); cursor: pointer; display: block;
+  }
+  .nav-list { list-style: none; margin: 30px 0 0; padding: 0; }
+  .nav-list li { border-bottom: 1px solid var(--sage-line); }
+  .nav-list a {
+    display: block; padding: 14px 4px;
+    text-decoration: none; font-size: 18px; color: var(--ink);
+  }
+  .nav-list-signout { margin-top: 0; }
+  .nav-signout-btn {
+    background: none; border: none; cursor: pointer; padding: 14px 4px;
+    font-size: 18px; color: var(--label); width: 100%; text-align: left;
+  }
+  .nav-list .nav-eyebrow {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--label);
+    margin: 22px 0 4px;
+  }
+
+  /* ---------- Sections ---------- */
+  main { max-width: 620px; margin: 0 auto; padding: 0 20px; }
+  .section { padding: 38px 0; border-bottom: 1px solid var(--sage-line); }
+  .section:last-child { border-bottom: none; }
+  .eyebrow {
+    font-family: 'Nunito', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px;
+    color: var(--label); margin: 0 0 8px 0;
+  }
+  h1, h2, h3 { font-weight: normal; color: var(--ink); margin: 0 0 12px 0; font-family: 'EB Garamond', serif; }
+  h1 { font-size: 30px; line-height: 1.3; }
+  h2 { font-size: 22px; }
+  h3 { font-size: 17px; color: #4a4030; }
+  p { font-size: 16px; margin: 0 0 14px 0; }
+  .rule { width: 40px; height: 2px; background: var(--sage); border: none; margin: 14px 0 22px; }
+  .rule.center { margin-left: auto; margin-right: auto; }
+  .italic { font-style: italic; color: var(--ink-soft); }
+  .center { text-align: center; }
+
+  .head-row { display: flex; align-items: center; justify-content: flex-start; gap: 16px; }
+  .head-row .illus { flex-shrink: 0; }
+  .illus svg { display: block; }
+
+  /* ---------- Cover ---------- */
+  .cover {
+    text-align: center;
+    padding: 50px 0 42px;
+  }
+  .cover .kicker {
+    font-family: 'Nunito', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; color: var(--label-2);
+    margin-bottom: 12px;
+  }
+  .cover .illus { margin: 0 auto 18px; width: fit-content; }
+  .cover .illus svg { width: auto; height: 110px; }
+  .cover h1 { font-size: 48px; }
+  .cover .sub { font-style: italic; color: var(--ink-soft); font-size: 17px; margin-top: 4px; }
+  .cover .tag {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; color: var(--label); margin-top: 12px;
+  }
+
+  /* ---------- Dedication ---------- */
+  .field-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--label-2);
+    margin: 0 0 6px 0;
+  }
+  input[type=text], input[type=email], textarea {
+    width: 100%;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    padding: 6px 2px 10px 2px;
+    margin-bottom: 18px;
+    outline: none;
+  }
+  input[type=text]:focus, input[type=email]:focus, textarea:focus { border-bottom-color: var(--ink-soft); }
+  textarea { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; resize: vertical; min-height: 70px; margin-bottom: 22px; }
+  textarea:focus { border-color: var(--ink-soft); }
+
+  /* ---------- Boxes ---------- */
+  .box {
+    border: 1px solid var(--box-border);
+    background: var(--box-bg);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 0 0 14px 0;
+  }
+  .box p { font-size: 15px; margin-bottom: 6px; }
+  .box p:last-child { margin-bottom: 0; }
+  .box .rule-heading { font-weight: bold; margin-bottom: 6px; }
+
+  /* ---------- Month header / progress ---------- */
+  .month-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .progress-pill {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; color: var(--ink-soft);
+    background: var(--box-bg); border: 1px solid var(--box-border);
+    border-radius: 999px; padding: 5px 12px; white-space: nowrap;
+  }
+
+  /* ---------- Calendar ---------- */
+  .weekday-row, .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  }
+  .weekday-row {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; color: var(--label); text-transform: uppercase; letter-spacing: 0.03em;
+    margin-bottom: 8px; text-align: center;
+  }
+  .cal-grid { margin-bottom: 12px; }
+  .day-cell {
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--sage-line);
+    border-radius: 8px;
+    background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; color: var(--ink-soft);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    user-select: none;
+  }
+  .day-cell:active { transform: scale(0.94); }
+  .day-cell.empty { visibility: hidden; }
+  .day-cell[data-state="zero"] { background: #b7c4a0; color: #fff; border-color: #9fae82; font-weight: bold; }
+  .day-cell[data-state="spend"],
+  .day-cell.past-unmarked { background: #fdf0ec; border: 1.5px dashed #e8b49a; color: #c47a6a; }
+  .legend {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; color: var(--ink-soft); margin-bottom: 26px; display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .legend .sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+  .legend .sw.zero { background: #b7c4a0; }
+  .legend .sw.spend { background: var(--cream); border: 1.5px dashed var(--blush-line); }
+  .legend .sw.empty { background: var(--cream); border: 1px solid var(--sage-line); }
+  .tap-hint { font-size: 12px; color: var(--label); font-style: italic; margin: -6px 0 22px; }
+
+  /* ---------- Month two-column layout ---------- */
+  .month-layout { display: grid; grid-template-columns: 1fr; gap: 32px; }
+  @media (min-width: 860px) {
+    .month-layout { grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  }
+
+  /* ---------- Trigger chips ---------- */
+  .trigger-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .trigger-chip {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--sage-line);
+    background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background 0.13s, color 0.13s, border-color 0.13s;
+    white-space: nowrap;
+  }
+  .trigger-chip:hover { border-color: var(--sage); color: var(--ink); }
+  .trigger-chip.selected {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: #fff;
+  }
+
+  /* ---------- Calendar card ---------- */
+  .cal-card {
+    background: #e2e7d9;
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .journal-cta, .get-started-cta {
+    margin-top: 48px;
+    margin-bottom: -8px;
+    text-align: center;
+  }
+  .get-started-cta { margin-bottom: 28px; }
+  .get-started-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: #fff;
+    background: #d4845a;
+    text-decoration: none;
+    border: 1px solid #d4845a;
+    border-radius: 20px;
+    padding: 9px 20px;
+    display: inline-block;
+    transition: background 0.15s, color 0.15s;
+  }
+  .get-started-btn:hover { background: #c47348; border-color: #c47348; }
+  .journal-cta-link {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: #fff;
+    background: var(--sage);
+    text-decoration: none;
+    border: 1px solid var(--sage);
+    border-radius: 20px;
+    padding: 9px 20px;
+    display: inline-block;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .journal-cta-link:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
+
+  /* ---------- Reflection ---------- */
+  .reflection-group { margin-bottom: 26px; }
+  .q-block { margin-top: 24px; }
+  .q-block:first-child { margin-top: 0; }
+  .reflection-row { display: flex; gap: 0; border-top: 1px solid var(--sage-line); padding-top: 28px; margin-top: 32px; }
+  .reflection-row .reflection-group { flex: 1 1 0; min-width: 0; padding-right: 24px; }
+  .reflection-row .reflection-group + .reflection-group { border-left: 1px solid var(--sage-line); padding-left: 24px; padding-right: 0; }
+  @media (max-width: 768px) {
+    .reflection-row { flex-direction: column; }
+    .reflection-row .reflection-group { padding-right: 0; }
+    .reflection-row .reflection-group + .reflection-group { border-left: none; border-top: 1px solid var(--sage-line); padding-left: 0; padding-top: 24px; margin-top: 24px; }
+  }
+  .save-note { font-size: 12px; color: var(--label); font-style: italic; }
+  .field-sublabel { font-size: 12px; color: var(--label); font-style: italic; margin-top: 2px; margin-bottom: 4px; font-family: 'Nunito', sans-serif; }
+  .chips-optional-label { font-size: 13px; color: var(--ink-soft); margin: 18px 0 6px; font-family: 'Nunito', sans-serif; }
+  .chips-optional-quote { border-left: 3px solid var(--sage-line); padding-left: 12px; margin: 0 0 10px; font-size: 15px; color: var(--ink); font-style: normal; }
+
+  /* ---------- Locked month ---------- */
+  .month-locked {
+    display: flex; align-items: center; gap: 7px;
+    margin-left: auto; color: var(--label);
+  }
+  .month-locked svg { opacity: 0.45; flex-shrink: 0; }
+  .month-locked p { margin: 0; font-size: 14px; font-style: italic; white-space: nowrap; }
+  .nav-link.locked { opacity: 0.38; pointer-events: none; }
+  .month-toggle {
+    margin-left: auto; flex-shrink: 0; background: none; border: none;
+    cursor: pointer; color: var(--label); padding: 4px; display: flex;
+    transition: transform 0.38s ease;
+  }
+  /* Share button above calendar */
+  .cal-share-above { text-align: right; margin-bottom: 10px; }
+  .cal-share-above .cal-share-btn { padding: 7px 18px; font-size: 13px; }
+  .month.collapsed .month-toggle { transform: rotate(-90deg); }
+  .month.collapsed { padding: 18px 0; }
+  .month-body {
+    max-height: 4000px; opacity: 1; overflow: hidden;
+    transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  }
+  .month.collapsed .month-body { max-height: 0; opacity: 0; }
+
+  /* ---------- Quote Box ---------- */
+  .quote-box {
+    background: #ffffff; border: 1px solid #b7c4a0;
+    border-radius: 12px; padding: 14px 20px 12px;
+    margin-bottom: 28px;
+  }
+  .quote-box-text {
+    font-family: 'EB Garamond', Garamond, serif;
+    font-size: 20px; font-weight: 400; font-style: italic; line-height: 1.2;
+    color: #2d4a2d; margin: 0 0 6px;
+  }
+  @media (min-width: 860px) {
+    .quote-box-text { font-size: 24px; line-height: 1.2; }
+  }
+  .quote-box-source-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .quote-box-source {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase;
+    color: #5a7a5a; margin: 0;
+  }
+  .quote-box-stars {
+    display: flex; align-items: center; gap: 3px; flex-shrink: 0;
+  }
+  .quote-star {
+    background: none; border: none; cursor: pointer; padding: 1px;
+    font-size: 13px; line-height: 1; color: #b7c4a0;
+    transition: color 0.12s, transform 0.1s;
+  }
+  .quote-star:hover, .quote-star.active { color: #9fae82; }
+  .quote-star:active { transform: scale(1.2); }
+  .quote-star-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; color: #8fa377; margin-left: 4px;
+  }
+
+  /* ---------- Free Journal Entries ---------- */
+  .journal-add-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    background: none; border: 1px solid var(--sage-line);
+    border-radius: 8px; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; color: var(--ink-soft);
+    transition: background 0.14s, color 0.14s, border-color 0.14s;
+  }
+  .journal-add-btn:hover { background: var(--cream-deep); color: var(--ink); border-color: var(--label); }
+  .journal-add-btn svg { flex-shrink: 0; }
+  #why-exists .rule { background: #9fb9c9; }
+  #why-exists .pull-quote-block { border-left-color: #9fb9c9; }
+  #why-matters .rule { background: #9fb9c9; }
+  #why-matters .spending-stories { border-left-color: #9fb9c9; background: rgba(207, 224, 234, 0.35); }
+  #why-matters .pull-quote-block { border-left-color: #9fb9c9; }
+  #how-to-use .rule { background: #9fb9c9; }
+  #how-to-use .step-item { border-color: #9fb9c9; }
+  #how-to-use .step-num { background: #9fb9c9; color: #fff; }
+  #rules .rule { background: #EEAB75; }
+  #rules .box { border-color: #EEAB75; background: #fdf3e7; }
+  #ask-yourself .rule { background: #EEAB75; }
+  #ask-yourself .pull-quote-block { border-left-color: #EEAB75; }
+  #letter { border-top: 1px solid #EAC66B !important; }
+  #letter .rule { background: #EAC66B; }
+  .journal-save-btn { background: #EAC66B; border-color: #EAC66B; color: #000; }
+  .journal-save-btn:hover { background: #d4a84b; border-color: #d4a84b; color: #000; }
+  .journal-entries-list { margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .journal-entry-card {
+    background: var(--cream); border: 1px solid var(--sage-line);
+    border-radius: 10px; padding: 18px 20px; position: relative;
+  }
+  .journal-entry-meta { font-size: 11px; color: var(--label); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .journal-entry-title { font-family: 'EB Garamond', Georgia, serif; font-size: 18px; color: var(--ink); margin: 0 0 6px; }
+  .journal-entry-body { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 300; color: var(--ink-soft); line-height: 1.7; white-space: pre-wrap; }
+  .journal-entry-delete {
+    position: absolute; top: 14px; right: 14px;
+    background: none; border: none; cursor: pointer;
+    color: var(--label); opacity: 0.5; padding: 4px;
+    transition: opacity 0.14s;
+  }
+  .journal-entry-delete:hover { opacity: 1; }
+
+  /* Overlay */
+  .journal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(30, 26, 20, 0.6); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px;
+    display: none; opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .journal-overlay.open { display: flex; opacity: 1; }
+  .journal-paper {
+    background: #f8f3ea;
+    border-radius: 18px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%; max-width: 640px; max-height: 90vh;
+    display: flex; flex-direction: column;
+    overflow: hidden; position: relative;
+  }
+  /* Botanical corner decorations */
+  .journal-paper::before, .journal-paper::after {
+    content: ''; position: absolute; pointer-events: none; z-index: 0;
+    width: 140px; height: 140px; background-size: contain; background-repeat: no-repeat; opacity: 0.22;
+  }
+  .journal-paper::before {
+    top: -8px; right: -8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cg stroke='%236b8c6e' fill='none' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M120 20 C90 30 70 55 80 90'/%3E%3Cpath d='M120 20 C100 45 95 70 105 95'/%3E%3Cpath d='M105 35 C90 32 78 40 75 55' fill='%236b8c6e' fill-opacity='0.3'/%3E%3Cpath d='M115 50 C100 44 86 50 82 65' fill='%236b8c6e' fill-opacity='0.3'/%3E%3Cpath d='M110 68 C96 60 84 64 80 78' fill='%236b8c6e' fill-opacity='0.3'/%3E%3Ccircle cx='118' cy='18' r='2.5' fill='%236b8c6e'/%3E%3Ccircle cx='128' cy='28' r='1.8' fill='%236b8c6e'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .journal-paper::after {
+    bottom: -8px; left: -8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cg stroke='%236b8c6e' fill='none' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M20 120 C50 110 70 85 60 50'/%3E%3Cpath d='M20 120 C40 95 45 70 35 45'/%3E%3Cpath d='M35 105 C50 108 62 100 65 85' fill='%236b8c6e' fill-opacity='0.3'/%3E%3Cpath d='M25 90 C40 96 54 90 58 75' fill='%236b8c6e' fill-opacity='0.3'/%3E%3Cpath d='M30 72 C44 80 56 76 60 62' fill='%236b8c6e' fill-opacity='0.3'/%3E%3Ccircle cx='18' cy='122' r='2.5' fill='%236b8c6e'/%3E%3Ccircle cx='10' cy='112' r='1.8' fill='%236b8c6e'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .journal-paper-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 28px 28px 20px;
+    flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .journal-paper-header-left { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .journal-paper-date {
+    font-family: 'Nunito', sans-serif;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #9a9080;
+  }
+  .journal-paper-close {
+    background: none; border: none; cursor: pointer; color: #b0a898;
+    padding: 4px; flex-shrink: 0; margin-top: 2px;
+    transition: color 0.14s;
+  }
+  .journal-paper-close:hover { color: var(--ink); }
+  .journal-paper-title-input {
+    width: 100%; border: none; border-bottom: 1px solid #ddd5c4;
+    background: transparent; outline: none;
+    font-family: 'EB Garamond', Georgia, serif; font-size: 24px; font-style: italic;
+    color: var(--ink); padding: 0 0 6px; margin: 0;
+    transition: border-color 0.14s;
+  }
+  .journal-paper-title-input:focus { border-bottom-color: #9a9080; }
+  .journal-paper-title-input::placeholder { color: #cdc4b4; font-style: italic; }
+  .journal-paper-divider {
+    height: 1px; background: linear-gradient(to right, transparent, #d8cfbf 20%, #d8cfbf 80%, transparent);
+    margin: 0 28px; flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .journal-paper-body { flex: 1; overflow-y: auto; padding: 22px 28px 8px; position: relative; z-index: 1; }
+  .journal-paper-textarea {
+    width: 100%; min-height: 260px; border: none; background: transparent;
+    outline: none; resize: none;
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 300;
+    color: var(--ink); line-height: 1.85;
+    padding: 0; box-sizing: border-box;
+  }
+  .journal-paper-textarea::placeholder { color: #cdc4b4; }
+  .journal-paper-footer {
+    display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+    padding: 16px 28px 22px; flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .journal-paper-save {
+    padding: 10px 24px; border-radius: 9px; border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 500;
+    background: #4a5e42; color: #f8f3ea;
+    transition: opacity 0.14s;
+  }
+  .journal-paper-save:hover { opacity: 0.85; }
+  .journal-paper-cancel {
+    padding: 10px 16px; border-radius: 9px; border: 1px solid #d8cfbf;
+    background: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; color: #9a9080;
+    transition: background 0.14s;
+  }
+  .journal-paper-cancel:hover { background: #ede8de; }
+
+  /* ---------- Journal Drawer ---------- */
+  .journal-drawer-backdrop {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(30, 26, 20, 0.32);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.34s ease;
+  }
+  .journal-drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  .journal-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 301;
+    width: 560px; max-width: 100vw;
+    background-color: #EAC66B;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    transform: translateX(110%);
+    transition: transform 0.4s cubic-bezier(0.32, 0, 0.15, 1);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    box-shadow: -6px 0 48px rgba(0,0,0,0.13);
+  }
+  .journal-drawer.open { transform: translateX(0); }
+  .journal-drawer-top {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 40px 24px 24px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    flex-shrink: 0; position: relative;
+  }
+  .journal-drawer-close {
+    position: absolute; top: 18px; right: 18px;
+    background: none; border: 1px solid rgba(0,0,0,0.18);
+    border-radius: 8px; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: rgba(0,0,0,0.45); font-size: 18px; line-height: 1;
+    transition: background 0.14s, color 0.14s;
+  }
+  .journal-drawer-close:hover { background: rgba(0,0,0,0.08); color: #2d3a20; }
+  .journal-drawer-heading {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 27px; color: #2d3a20; margin-top: 14px; letter-spacing: 0.01em;
+  }
+  .journal-drawer-count {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(0,0,0,0.4); margin-top: 5px;
+  }
+  .journal-drawer-list {
+    flex: 1; overflow-y: auto;
+    padding: 22px 20px 48px;
+  }
+  .journal-drawer-empty {
+    text-align: center; color: rgba(0,0,0,0.35);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 17px; font-style: italic;
+    padding: 52px 0;
+  }
+  .journal-drawer-card {
+    display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 14px 4px;
+  }
+  .journal-drawer-card.editing {
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 16px 4px;
+  }
+  .journal-drawer-row-main {
+    flex: 1; min-width: 0; background: none; border: none;
+    cursor: pointer; text-align: left; padding: 0;
+  }
+  .journal-drawer-row-main:hover .journal-drawer-row-title { color: #2d3a20; }
+  .journal-drawer-row-title {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px; color: rgba(0,0,0,0.75); display: block;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    transition: color 0.14s;
+  }
+  .journal-drawer-card-meta {
+    font-family: 'Nunito', sans-serif;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(0,0,0,0.38); white-space: nowrap; flex-shrink: 0;
+  }
+  .journal-drawer-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .jd-btn {
+    background: none; border: 1px solid rgba(0,0,0,0.18);
+    border-radius: 7px; padding: 5px 11px; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; color: rgba(0,0,0,0.5); letter-spacing: 0.04em;
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: background 0.14s, color 0.14s;
+  }
+  .jd-btn:hover { background: rgba(0,0,0,0.07); color: #2d3a20; }
+  .jd-btn.danger { color: #a05a48; border-color: rgba(160,80,60,0.25); }
+  .jd-btn.danger:hover { background: rgba(160,80,60,0.1); color: #8b3020; }
+  .jd-btn.primary { background: #2d3a20; color: #e8c96a; border-color: #2d3a20; }
+  .jd-btn.primary:hover { background: #3a4e2a; }
+  .journal-drawer-edit-title {
+    width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.2);
+    background: transparent; outline: none;
+    font-family: 'EB Garamond', Georgia, serif; font-size: 20px; font-style: italic;
+    color: #2d3a20; padding: 0 0 5px; margin-bottom: 10px; box-sizing: border-box;
+  }
+  .journal-drawer-edit-title::placeholder { color: rgba(0,0,0,0.25); }
+  .journal-drawer-edit-body {
+    width: 100%; min-height: 110px; border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 8px; background: rgba(255,255,255,0.35);
+    outline: none; resize: vertical;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 300;
+    color: #2d3a20; line-height: 1.7; padding: 10px 12px;
+    box-sizing: border-box; display: block;
+  }
+  .journal-drawer-edit-body::placeholder { color: rgba(0,0,0,0.25); }
+  .journal-drawer-edit-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+
+  /* ---------- Closing ---------- */
+  .closing { text-align: center; }
+  .closing .illus { margin: 0 auto 16px; width: fit-content; }
+  .back-cover-quote { font-style: italic; color: var(--ink-soft); font-size: 17px; line-height: 1.7; text-align: center; padding: 30px 0 60px; }
+  .get-started-link { text-align: center; margin: 0 0 12px; }
+  .get-started-link a { font-family: 'Nunito', sans-serif; font-size: 15px; color: #d4845a; text-decoration: none; }
+  .get-started-link a:hover { text-decoration: underline; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center; padding: 30px 20px 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; color: var(--label);
+  }
+
+  /* ---------- User chip (avatar + hover dropdown) ---------- */
+  .user-chip {
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+  }
+  .chip-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--sage-line);
+    background: var(--cream-deep);
+    overflow: hidden;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: border-color 0.15s;
+  }
+  .chip-avatar:hover { border-color: var(--label); }
+  .chip-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .chip-initials {
+    font-size: 13px;
+    font-family: 'EB Garamond', serif;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .chip-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--cream);
+    border: 1px solid var(--sage-line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    min-width: 160px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+    z-index: 400;
+    white-space: nowrap;
+  }
+  .user-chip:hover .chip-dropdown,
+  .user-chip.open .chip-dropdown { display: block; }
+  .chip-name {
+    font-size: 13px;
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    margin-bottom: 10px;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .chip-admin {
+    display: block;
+    font-size: 12px; color: var(--label);
+    text-decoration: none; margin-bottom: 8px;
+    font-family: 'Nunito', sans-serif;
+  }
+  .chip-admin:hover { color: var(--ink); }
+  .chip-signout {
+    background: none; border: none;
+    font-size: 12px; color: var(--label);
+    cursor: pointer; text-decoration: underline;
+    font-family: inherit; padding: 0;
+  }
+  .chip-signout:hover { color: var(--ink); }
+
+  /* ---------- Auth gate ---------- */
+  .auth-gate {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding: 42px 24px 60px;
+    background: var(--cream);
+  }
+  .auth-gate .illus svg { width: auto; height: 64px; }
+  .auth-gate h1 { margin: 10px 0 2px; font-size: 44px; line-height: 1.15; }
+  .auth-gate .sub { font-style: italic; color: var(--ink-soft); font-size: 16px; margin-bottom: 4px; }
+  .auth-gate .tag {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; color: var(--label); margin-top: 4px; white-space: nowrap;
+  }
+  .auth-gate .rule.center { margin: 20px auto; }
+
+  /* Auth gate intro teaser */
+  .auth-intro {
+    max-width: 640px;
+    width: 100%;
+    text-align: left;
+    margin: 28px 0 0;
+    padding: 28px 28px 24px;
+    background: var(--cream-deep);
+    border: 1px solid var(--sage-line);
+    border-radius: 12px;
+  }
+  .auth-intro .intro-eyebrow {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--label); margin: 0 0 14px;
+  }
+  .auth-intro p {
+    font-size: 15px; margin: 0 0 14px; color: var(--ink); line-height: 1.7;
+  }
+  .auth-intro p:last-child { margin-bottom: 0; }
+  .auth-intro .intro-italic {
+    font-style: italic; color: var(--ink-soft);
+  }
+  .auth-intro .stories-block {
+    border-left: 2px solid var(--blush-line);
+    margin: 16px 0;
+    padding: 10px 0 10px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .auth-intro .stories-block span {
+    font-style: italic; font-size: 14px; color: var(--ink-soft); display: block;
+  }
+  .auth-intro .pull-quote {
+    font-style: italic; color: var(--ink-soft); font-size: 15px;
+    border-top: 1px solid var(--sage-line);
+    margin-top: 16px; padding-top: 14px;
+  }
+
+  /* Auth gate accordion */
+  .auth-accordion {
+    width: 100%;
+    max-width: 640px;
+    margin: 32px auto 0;
+    text-align: left;
+  }
+  .accordion-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--sage-line);
+  }
+  .accordion-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    gap: 16px;
+  }
+  .accordion-btn-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+  .accordion-btn-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .accordion-eyebrow {
+    font-family: 'Nunito', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px;
+    color: var(--label); margin: 0 0 5px;
+  }
+  .accordion-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 22px;
+    font-weight: normal;
+    color: var(--ink);
+    margin: 0;
+  }
+  .accordion-btn:hover .accordion-title { color: var(--ink-soft); }
+  .accordion-chevron {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    color: var(--label);
+    transition: transform 0.22s ease;
+    margin-left: auto;
+  }
+  .accordion-item.open .accordion-chevron { transform: rotate(180deg); }
+  .accordion-rule {
+    display: none;
+    height: 2px; width: 36px;
+    border: none; margin: 16px 0 18px;
+    background: var(--sage-line);
+  }
+  .accordion-item.open .accordion-rule { display: block; }
+  .accordion-body {
+    display: none;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+  .accordion-body p { margin: 0 0 12px; }
+  .accordion-body p:last-child { margin-bottom: 0; }
+  .accordion-item.open .accordion-body { display: block; }
+
+  /* How to Use — step cards */
+  .steps-list {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin: 20px 0 24px;
+  }
+  .step-item {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--cream-deep);
+    border: 1px solid var(--sage-line);
+    border-radius: 12px;
+    padding: 18px 14px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .step-num {
+    width: 30px; height: 30px;
+    background: var(--sage-line);
+    color: var(--ink-soft);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* Why $0 section — spending stories */
+  .spending-stories {
+    border-left: 2px solid var(--blush-line);
+    background: var(--cream-deep);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 18px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .spending-stories span {
+    font-style: italic; font-size: 15px; color: var(--ink-soft); display: block;
+  }
+  .pull-quote-block {
+    border-left: 2px solid var(--sage);
+    padding: 4px 0 4px 18px;
+    margin: 16px 0;
+    font-style: italic; color: var(--ink-soft); font-size: 16px; line-height: 1.8;
+  }
+
+  /* Google button */
+  .google-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 280px;
+    padding: 11px 20px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.09);
+    margin-top: 0;
+    transition: background 0.15s;
+  }
+  .google-btn:hover { background: var(--cream-deep); }
+
+  /* Divider */
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 280px;
+    margin: 14px 0;
+    color: var(--label);
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* Email/password form */
+  .email-form {
+    width: 100%;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .email-form .form-input {
+    width: 100%;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    outline: none;
+    /* override general input styles */
+    border-bottom: 1px solid var(--line) !important;
+    text-align: left;
+  }
+  .email-form .form-input:focus {
+    border-color: var(--ink-soft) !important;
+  }
+  .auth-btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .btn-primary {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.82; }
+  .btn-secondary {
+    flex: 1;
+    padding: 10px 14px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-secondary:hover { background: var(--cream-deep); }
+  .auth-error {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    color: #b5392e;
+    min-height: 18px;
+    margin-top: 8px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .auth-foot-note {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11.5px;
+    color: var(--label);
+    max-width: 280px;
+    margin-top: 20px;
+    line-height: 1.5;
+  }
+  .auth-foot-note a { color: var(--ink-soft); }
+  .forgot-link {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    color: var(--label);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    margin-top: 8px;
+    align-self: center;
+  }
+  .auth-success {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* ---------- Loading overlay ---------- */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .loading-spinner {
+    width: 30px; height: 30px;
+    border: 2px solid var(--sage-line);
+    border-top-color: var(--ink-soft);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (min-width: 700px) {
+    main { max-width: 720px; }
+    .cover h1 { font-size: 62px; }
+    .cover .illus svg { width: auto; height: 130px; }
+    .cover .kicker { font-size: 14px; }
+    .cover .sub { font-size: 20px; }
+    .cover .tag { font-size: 15px; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 26px; }
+    p { font-size: 17px; }
+    .section { padding: 70px 0; }
+  }
+  @media (min-width: 1000px) {
+    main { max-width: 860px; }
+    .cover { padding: 100px 0 70px; }
+    .cover h1 { font-size: 76px; }
+    .cover .illus svg { width: auto; height: 150px; }
+    .cover .kicker { font-size: 16px; letter-spacing: 0.24em; }
+    .cover .sub { font-size: 24px; }
+    .cover .tag { font-size: 16px; }
+    h1 { font-size: 40px; }
+    h2 { font-size: 30px; }
+    .day-cell { font-size: 15px; }
+    .section { padding: 84px 0; }
+  }
+  @media (min-width: 1280px) {
+    main { max-width: 1280px; }
+  }
+
+  /* ========== MOBILE: steps-list column on small screens ========== */
+  @media (max-width: 600px) {
+    .steps-list { flex-direction: column; }
+  }
+
+  /* ========== MOBILE NAVIGATION ========== */
+
+  /* Back button — hidden by default */
+  #mobileBackBtn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    flex-shrink: 0;
+    border: 1px solid var(--sage-line);
+    border-radius: 8px;
+    background: var(--cream);
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  /* Page title in topbar — hidden by default */
+  #mobilePageTitle {
+    display: none;
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    color: var(--ink);
+    flex: 1;
+    text-align: center;
+    padding: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Dashboard — hidden by default (shown only on mobile non-reader) */
+  #mobileDashboard {
+    display: none;
+    padding: 24px 16px 80px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .mobile-dash-greeting {
+    font-family: 'EB Garamond', serif;
+    font-size: 26px;
+    color: var(--ink);
+    margin: 0 0 4px;
+  }
+  .mobile-dash-sub {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    color: var(--label);
+    margin: 0 0 28px;
+  }
+  .mobile-dash-dedication {
+    padding: 28px 0 32px;
+    border-bottom: 1px solid var(--sage-line);
+    margin-bottom: 32px;
+  }
+  .mobile-dash-dedication input[type=text] { font-size: 16px; }
+  .mobile-ded-value {
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink);
+    padding: 6px 2px 10px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px;
+    min-height: 38px;
+  }
+  .mobile-section-group { margin-bottom: 28px; }
+  .mobile-group-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--label);
+    margin: 0 0 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--sage-line);
+  }
+  .mobile-group-toggle {
+    width: 100%; background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Nunito', sans-serif;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--label); padding: 0 0 6px; border-bottom: 1px solid var(--sage-line);
+    margin-bottom: 6px;
+  }
+  .mobile-group-toggle svg { transition: transform 0.22s ease; flex-shrink: 0; }
+  .mobile-section-group.collapsed .mobile-group-toggle svg { transform: rotate(-90deg); }
+  .mobile-section-group.collapsed .mobile-nav-list { display: none; }
+  .mobile-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--sage-line);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    gap: 8px;
+  }
+  .mobile-nav-item:last-child { border-bottom: none; }
+  .mobile-nav-item:active .mobile-nav-title { color: var(--label); }
+  .mobile-nav-item.locked { opacity: 0.35; pointer-events: none; }
+  .mobile-nav-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 19px;
+    color: var(--ink);
+    line-height: 1.3;
+    flex: 1;
+  }
+  .mobile-nav-arrow {
+    color: var(--sage-line);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    /* Show dashboard; hide main when not in reader */
+    #mobileDashboard { display: block; }
+    body:not(.reading) #appContent > main { display: none; }
+
+    /* Reader mode */
+    body.reading #mobileDashboard { display: none; }
+    body.reading #appContent > main {
+      display: block;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+      height: calc(100dvh - 116px);
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Hide all sections in reader; JS shows only the active group */
+    body.reading #appContent > main .section { display: none; }
+    body.reading #appContent > main .section.reader-visible {
+      display: block;
+      padding: 32px 20px 48px;
+      border-bottom: 1px solid var(--sage-line);
+      box-sizing: border-box;
+    }
+    body.reading .back-cover-quote {
+      padding: 60px 24px;
+      box-sizing: border-box;
+    }
+    body.reading #appContent > footer { display: none; }
+
+    /* Brand text: short on mobile, full on desktop */
+    .brand-short { display: none; }
+    .brand-full  { display: inline; }
+
+    /* Topbar in reader mode */
+    body.reading .topbar .brand { display: flex; }
+    body.reading .topbar #userChip { display: block; }
+    body.reading #mobileBackBtn { display: none; }
+    body.reading #mobilePageTitle { display: none; }
+    body.reading .brand-full  { display: none; }
+    body.reading .brand-short { display: inline; }
+  }
+
+
+  @media (min-width: 769px) {
+    #mobileBackBtn { display: none !important; }
+    #mobilePageTitle { display: none !important; }
+    #mobileDashboard { display: none !important; }
+    .brand-short { display: none !important; }
+    .brand-full  { display: inline !important; }
+    #appContent > main { display: block !important; }
+  }
+
+  /* Mobile reader sub-nav */
+  #mobileReaderNav {
+    display: none;
+    background: var(--paper);
+    border-bottom: 1px solid var(--sage-line);
+    padding: 0;
+  }
+  body.reading #mobileReaderNav { display: flex; }
+  .reader-nav-item {
+    flex: 1;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--sage-line);
+    padding: 10px 4px 9px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    color: var(--label);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.15s;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .reader-nav-item:last-child { border-right: none; }
+  .reader-nav-item svg { flex-shrink: 0; }
+  /* Hide icons if text won't fit (very narrow screens) */
+  @media (max-width: 380px) {
+    .reader-nav-item svg { display: none; }
+    .reader-nav-item { gap: 0; font-size: 12px; }
+  }
+  .reader-nav-item.active {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .reader-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 16%; right: 16%;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  @media (min-width: 769px) {
+    #mobileReaderNav { display: none !important; }
+  }
+
+  /* ---------- Share modal ---------- */
+  .share-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(40, 38, 34, 0.55);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .share-overlay.open { display: flex; }
+  .share-modal {
+    background: var(--cream);
+    border-radius: 18px;
+    padding: 24px 22px 20px;
+    max-width: 400px; width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.22);
+    position: relative;
+  }
+  .share-modal-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--label); align-self: flex-start;
+  }
+  .share-canvas-wrap {
+    width: 100%; aspect-ratio: 1 / 1;
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--sage-line);
+    background: var(--cream-deep);
+  }
+  .share-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+  .share-actions { display: flex; gap: 8px; width: 100%; }
+  .share-action-btn {
+    flex: 1; padding: 11px 0; border-radius: 8px; border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; cursor: pointer; transition: opacity 0.13s;
+  }
+  .share-action-btn:hover { opacity: 0.82; }
+  .share-action-btn.primary { background: var(--sage); color: #fff; }
+  .share-action-btn.secondary {
+    background: var(--cream-deep); color: var(--ink-soft);
+    border: 1px solid var(--sage-line);
+  }
+  .share-close-btn {
+    position: absolute; top: 12px; right: 12px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--cream-deep); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--label);
+  }
+  .share-close-btn:hover { background: var(--sage-line); }
+  /* Share trigger on cal-card */
+  .cal-share-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--sage-line); background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; color: var(--label); cursor: pointer;
+    transition: background 0.13s, color 0.13s;
+    white-space: nowrap;
+  }
+  .cal-share-btn:hover { background: var(--cream-deep); color: var(--ink-soft); }
+
+  /* ---------- Feedback FAB + modal ---------- */
+  .feedback-fab {
+    position: fixed; bottom: 28px; right: 28px; z-index: 200;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--sage); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    transition: background 0.15s, transform 0.15s;
+    color: #fff;
+  }
+  .feedback-fab:hover { background: #8fa377; transform: scale(1.06); }
+  .feedback-overlay {
+    position: fixed; inset: 0; z-index: 250;
+    background: rgba(40,38,34,0.5);
+    display: none; align-items: flex-end; justify-content: flex-end;
+    padding: 0 28px 92px;
+  }
+  .feedback-overlay.open { display: flex; }
+  .feedback-modal {
+    background: var(--cream);
+    border-radius: 16px;
+    padding: 24px 22px 20px;
+    width: 320px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .feedback-modal-head { display: flex; align-items: flex-start; justify-content: space-between; }
+  .feedback-modal-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 500; color: var(--ink);
+  }
+  .feedback-modal-sub {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; color: var(--label); margin-top: 2px;
+  }
+  .feedback-close { background: none; border: none; cursor: pointer; color: var(--label); padding: 2px; }
+  .feedback-stars { display: flex; gap: 6px; }
+  .feedback-star {
+    font-size: 28px; line-height: 1; cursor: pointer;
+    color: #c9d0b6; transition: color 0.1s;
+    background: none; border: none; padding: 0;
+  }
+  .feedback-star.filled { color: #cf9f5f; }
+  .feedback-textarea {
+    width: 100%; min-height: 88px; resize: vertical;
+    border: 1px solid var(--sage-line); border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 300;
+    color: var(--ink); background: var(--cream); outline: none; line-height: 1.5;
+  }
+  .feedback-textarea:focus { border-color: var(--sage); }
+  .feedback-textarea::placeholder { color: var(--label); }
+  .feedback-submit {
+    padding: 10px 0; border-radius: 8px; border: none;
+    background: var(--sage); color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; cursor: pointer; transition: opacity 0.13s;
+  }
+  .feedback-submit:hover { opacity: 0.85; }
+  .feedback-submit:disabled { opacity: 0.5; cursor: default; }
+  .feedback-success {
+    text-align: center; padding: 6px 0 2px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; color: var(--ink-soft); display: none;
+  }
+
+  /* Template picker */
+  .share-template-row {
+    display: flex; gap: 6px; width: 100%;
+    overflow-x: auto; padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .share-template-row::-webkit-scrollbar { display: none; }
+  .share-tmpl-btn {
+    flex-shrink: 0; padding: 5px 12px; border-radius: 20px;
+    border: 1px solid var(--sage-line); background: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; color: var(--label); cursor: pointer;
+    transition: background 0.13s, color 0.13s, border-color 0.13s;
+    white-space: nowrap;
+  }
+  .share-tmpl-btn:hover { background: var(--cream-deep); color: var(--ink-soft); }
+  .share-tmpl-btn.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <a href="../index.html">The Mindful <span style="color:#fff;font-style:italic;">Mundane</span></a>
+  <nav class="utility-links">
+    <a href="mindfulspending.html" class="active">Mindful Spending</a>
+    <a href="../Mindful%20Kitchen%20Website/mindfulkitchen.html">Mindful Kitchen</a>
+    <a href="../Mindful%20Spaces%20Website/mindfulspaces.html">Mindful Spaces</a>
+  </nav>
+</div>
+
+<!-- LOADING OVERLAY (shown during Firebase init + data fetch) -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- AUTH GATE -->
+<div class="auth-gate" id="authGate" style="display:none;">
+  <div class="illus">
+    <svg viewBox="0 0 84 125" width="43" height="64">
+      <path d="M41.5732 77.9181V0" stroke="#8FA377" stroke-width="5.19591"/>
+      <path d="M41.5734 27.8286C13.7455 16.6975 2.61431 38.9598 24.8766 50.091C36.0078 55.6565 41.5734 44.5254 41.5734 27.8286Z" fill="#D7E3CE" stroke="#8FA377" stroke-width="3.71136"/>
+      <path d="M41.5732 11.1314C69.4012 0.000208241 80.5323 22.2625 58.27 33.3937C47.1388 38.9593 41.5732 27.8281 41.5732 11.1314Z" fill="#EED9CD" stroke="#C69A82" stroke-width="3.71136"/>
+      <path d="M45.6143 45.815C62.1903 39.1555 68.8207 52.4744 55.5599 59.1338C48.9295 62.4636 45.6143 55.8041 45.6143 45.815Z" fill="#FFEDBE" stroke="#EAC66B" stroke-width="3.71136"/>
+      <path d="M2.61426 77.9175H80.5324L69.4012 122.442H13.7454L2.61426 77.9175Z" fill="#CFE0EA" stroke="#9FB9C9" stroke-width="4.0825"/>
+    </svg>
+  </div>
+  <h1>The Mindful<br>Spending Journal</h1>
+  <div class="sub">A Practice to Spend with Intention</div>
+  <div style="display:flex;gap:10px;justify-content:center;margin:16px 0 10px;">
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--blush);display:inline-block;"></span>
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--sage-line);display:inline-block;"></span>
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--blue);display:inline-block;"></span>
+  </div>
+
+  <div class="auth-accordion" style="margin-top:10px;">
+    <div class="accordion-item">
+      <button class="accordion-btn" type="button">
+        <div class="accordion-btn-inner">
+          <div class="illus">
+            <svg viewBox="0 0 80 80" width="38" height="38">
+              <ellipse cx="40" cy="34" rx="15" ry="19" fill="#cfe0ea" fill-opacity="0.45" stroke="#9fb9c9" stroke-width="1.2"/>
+              <line x1="40" y1="53" x2="40" y2="62" stroke="#9fb9c9" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="34" y1="62" x2="46" y2="62" stroke="#9fb9c9" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="accordion-btn-text">
+            <div class="accordion-eyebrow">Introduction</div>
+            <div class="accordion-title">Why this journal exists</div>
+          </div>
+        </div>
+        <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none">
+          <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <hr class="accordion-rule">
+      <div class="accordion-body">
+        <div class="pull-quote-block">What is a $0 Day?</div>
+        <p>A $0 Day is a day with no financial transactions. If any money leaves you&mdash;whether by purchase, bill, subscription, or automatic payment&mdash;it isn&rsquo;t a $0 Day.</p>
+        <p>Most money advice starts with a budget.<br>This one starts with a question.</p>
+        <div class="pull-quote-block">What happens if, for just one day, you spend nothing at all?</div>
+        <p>Tracking dollars tells you where your money went. It rarely tells you why. It doesn't capture the coffee on the way to work, the quick stop at the store, the online purchase that seemed harmless, the extra item in your cart, or the takeout meal because you were too tired to cook.</p>
+        <p>This journal isn't about guilt or perfection. It's about honesty and awareness. Each $0 day is an opportunity to pause, reflect, and ask yourself a simple question:</p>
+        <div class="pull-quote-block">Did I really need to spend today?</div>
+        <p>Be curious. Challenge your habits. Step outside your comfort zone.</p>
+        <div class="pull-quote-block">Because awareness comes before change.</div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn" type="button">
+        <div class="accordion-btn-inner">
+          <div class="illus">
+            <svg viewBox="0 0 80 80" width="38" height="38">
+              <rect x="29" y="24" width="8" height="32" rx="2" fill="#cfe0ea" stroke="#9fb9c9" stroke-width="1"/>
+              <rect x="43" y="32" width="8" height="24" rx="2" fill="#f1d6ab" stroke="#cf9f5f" stroke-width="1"/>
+              <rect x="15" y="38" width="8" height="18" rx="2" fill="#eed9cd" stroke="#c69a82" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="accordion-btn-text">
+            <div class="accordion-eyebrow">Introduction</div>
+            <div class="accordion-title">What is this journal?</div>
+          </div>
+        </div>
+        <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none">
+          <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <hr class="accordion-rule">
+      <div class="accordion-body">
+        <p>A $0 day interrupts autopilot.</p>
+        <p>It asks you to pause before the tap of a card or the click of a button, and to notice that every purchase begins with a story.</p>
+        <div class="spending-stories">
+          <span>&ldquo;I deserve this.&rdquo;</span>
+          <span>&ldquo;It&rsquo;s only a few dollars.&rdquo;</span>
+          <span>&ldquo;I&rsquo;ll save tomorrow.&rdquo;</span>
+          <span>&ldquo;I need a little pick-me-up.&rdquo;</span>
+        </div>
+        <p>Sometimes those stories are true. Sometimes a warm cup of coffee is exactly what your soul needs.</p>
+        <p>But sometimes, we spend without ever asking why.</p>
+        <div class="pull-quote-block">A $0 day creates space for that question.</div>
+        <p>Over time, you&rsquo;ll discover that this journal isn&rsquo;t really about spending less. It&rsquo;s about becoming more aware of the stories you tell yourself, the habits you&rsquo;ve stopped noticing, and the choices that truly align with what you value.</p>
+        <div class="pull-quote-block">Because every dollar you spend is also a choice about where your attention, your energy, and your life are going.</div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn" type="button">
+        <div class="accordion-btn-inner">
+          <div class="illus">
+            <svg viewBox="0 0 80 80" width="38" height="38">
+              <path d="M40 26 C34 22 24 22 18 26 V56 C24 52 34 52 40 56 C46 52 56 52 62 56 V26 C56 22 46 22 40 26 Z" fill="#cfe0ea" fill-opacity="0.5" stroke="#9fb9c9" stroke-width="1.2"/>
+              <line x1="40" y1="26" x2="40" y2="56" stroke="#9fb9c9" stroke-width="1" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <div class="accordion-btn-text">
+            <div class="accordion-eyebrow">Introduction</div>
+            <div class="accordion-title">How to use it</div>
+          </div>
+        </div>
+        <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none">
+          <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <hr class="accordion-rule">
+      <div class="accordion-body">
+        <p>Each month follows the same simple rhythm:</p>
+        <div class="steps-list">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <div><strong>Color in a calendar</strong> &mdash; tap a day, all month long.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <div><strong>Reflect at month&rsquo;s end</strong> &mdash; a few honest questions about what you noticed.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <div><strong>After three months, write yourself a letter</strong> &mdash; not a summary of numbers, but of what changed.</div>
+          </div>
+        </div>
+        <p>There&rsquo;s no perfect way to do this. Some months will have more green squares than others. That&rsquo;s not failure &mdash; that&rsquo;s information. Just keep noticing.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule center" style="margin-top:28px;">
+  <div class="tag">Start your mindful spending journey&mdash;for free, in one easy step.</div>
+
+  <button class="google-btn" id="googleSignInBtn" type="button">
+    <svg width="18" height="18" viewBox="0 0 18 18">
+      <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62Z"/>
+      <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.95v2.33A9 9 0 0 0 9 18Z"/>
+      <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.66 9c0-.59.1-1.16.29-1.7V4.97H.95A9 9 0 0 0 0 9c0 1.45.35 2.83.95 4.03l3-2.33Z"/>
+      <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.42 0 9 0A9 9 0 0 0 .95 4.97l3 2.33C4.66 5.17 6.65 3.58 9 3.58Z"/>
+    </svg>
+    Continue with Google
+  </button>
+
+  <div class="auth-error" id="authError"></div>
+  <div class="auth-success hidden" id="authSuccess"></div>
+
+  <p class="auth-foot-note">Your journal is private and syncs across all your devices.<br>Your entries are encrypted and will never be shared or sold.</p>
+</div>
+
+<!-- APP CONTENT (shown after sign-in) -->
+<div id="appContent" style="display:none;">
+
+<div class="topbar">
+  <button id="mobileBackBtn" type="button" aria-label="Back to home">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M12.5 5l-5 5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="brand">
+    <svg viewBox="0 0 182 182" width="28" height="28" style="flex-shrink:0;">
+      <circle cx="91" cy="91" r="89.5" fill="#fff" stroke="#939392" stroke-width="3"/>
+      <path d="M90.959 102.918V25" stroke="#8FA377" stroke-width="5.19591"/>
+      <path d="M90.9591 52.8286C63.1312 41.6975 52.0001 63.9598 74.2624 75.091C85.3935 80.6565 90.9591 69.5254 90.9591 52.8286Z" fill="#D7E3CE" stroke="#8FA377" stroke-width="3.71136"/>
+      <path d="M90.959 36.1314C118.787 25.0002 129.918 47.2625 107.656 58.3937C96.5246 63.9593 90.959 52.8281 90.959 36.1314Z" fill="#EED9CD" stroke="#C69A82" stroke-width="3.71136"/>
+      <path d="M95 70.815C111.576 64.1555 118.206 77.4744 104.946 84.1338C98.3152 87.4636 95 80.8041 95 70.815Z" fill="#FFEDBE" stroke="#EAC66B" stroke-width="3.71136"/>
+      <path d="M52 102.917H129.918L118.787 147.442H63.1312L52 102.917Z" fill="#CFE0EA" stroke="#9FB9C9" stroke-width="4.0825"/>
+    </svg>
+    <span class="brand-full">The Mindful Spending Journal</span>
+    <span class="brand-short">Mindful Spending</span>
+  </div>
+  <span id="mobilePageTitle"></span>
+  <div class="topbar-right">
+    <nav class="topbar-nav">
+      <a href="#why-exists" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4 4h5v12H4zM11 4h5v12h-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Introduction
+      </a>
+      <a href="#rules" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Rules
+      </a>
+      <a href="#month-jul" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 2v3M13 2v3M3 9h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Calendar
+      </a>
+      <a href="#letter" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4 5h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4"/><path d="M6 8h8M6 11h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Journal
+      </a>
+    </nav>
+    <div class="topbar-divider"></div>
+    <div class="user-chip" id="userChip"></div>
+  </div>
+</div>
+
+<!-- MOBILE READER SUB-NAV -->
+<div id="mobileReaderNav">
+  <button class="reader-nav-item" data-section="intro">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 4h5v12H4zM11 4h5v12h-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    Intro
+  </button>
+  <button class="reader-nav-item" data-section="rules">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Rules
+  </button>
+  <button class="reader-nav-item active" data-section="calendar">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 2v3M13 2v3M3 9h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Calendar
+  </button>
+  <button class="reader-nav-item" data-section="journal">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 5h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4"/><path d="M6 8h8M6 11h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Journal
+  </button>
+</div>
+
+<nav class="nav-overlay" id="navOverlay">
+  <button class="close-btn" id="closeBtn" aria-label="Close menu">&times;</button>
+  <ul class="nav-list">
+    <li><a href="#why-exists" class="nav-link">Introduction</a></li>
+    <li><a href="#rules" class="nav-link">Rules</a></li>
+    <li><a href="#month-jul" class="nav-link">Calendar</a></li>
+    <li><a href="#letter" class="nav-link">Journal</a></li>
+  </ul>
+  <ul class="nav-list nav-list-signout">
+    <li><button id="navSignOutBtn" class="nav-signout-btn">Sign out</button></li>
+  </ul>
+</nav>
+
+<!-- JOURNAL ENTRIES DRAWER -->
+<div class="journal-drawer-backdrop" id="journalDrawerBackdrop"></div>
+<aside class="journal-drawer" id="journalDrawer">
+  <div class="journal-drawer-top">
+    <button class="journal-drawer-close" id="journalDrawerClose" aria-label="Close">&times;</button>
+    <svg viewBox="0 0 60 90" width="44" height="66">
+      <!-- Stem: slight diagonal -->
+      <path d="M32 84 C31 68 30 52 28 18" stroke="#4a6e3a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <!-- Bottom leaf (left) -->
+      <path d="M31 66 C18 62 12 48 22 44 C28 42 31 56 31 66 Z" fill="rgba(255,255,255,0.4)" stroke="#4a6e3a" stroke-width="1.2"/>
+      <!-- Middle leaf (right) -->
+      <path d="M29 46 C42 40 50 28 42 24 C37 22 30 34 29 46 Z" fill="rgba(255,255,255,0.4)" stroke="#4a6e3a" stroke-width="1.2"/>
+      <!-- Top leaf (left) -->
+      <path d="M28 28 C18 22 16 10 24 8 C29 7 29 18 28 28 Z" fill="rgba(255,255,255,0.4)" stroke="#4a6e3a" stroke-width="1.2"/>
+    </svg>
+    <div class="journal-drawer-heading">My Entries</div>
+    <div class="journal-drawer-count" id="journalDrawerCount"></div>
+  </div>
+  <div class="journal-drawer-list" id="journalDrawerList"></div>
+</aside>
+
+<!-- MOBILE DASHBOARD (card grid, shown on mobile before entering reader) -->
+<div id="mobileDashboard"></div>
+
+
+<main>
+
+  <!-- COVER -->
+  <section class="section cover" id="cover">
+    <div class="illus">
+      <svg viewBox="0 0 84 125" width="47" height="70">
+        <path d="M41.5732 77.9181V0" stroke="#8FA377" stroke-width="5.19591"/>
+        <path d="M41.5734 27.8286C13.7455 16.6975 2.61431 38.9598 24.8766 50.091C36.0078 55.6565 41.5734 44.5254 41.5734 27.8286Z" fill="#D7E3CE" stroke="#8FA377" stroke-width="3.71136"/>
+        <path d="M41.5732 11.1314C69.4012 0.000208241 80.5323 22.2625 58.27 33.3937C47.1388 38.9593 41.5732 27.8281 41.5732 11.1314Z" fill="#EED9CD" stroke="#C69A82" stroke-width="3.71136"/>
+        <path d="M45.6143 45.815C62.1903 39.1555 68.8207 52.4744 55.5599 59.1338C48.9295 62.4636 45.6143 55.8041 45.6143 45.815Z" fill="#FFEDBE" stroke="#EAC66B" stroke-width="3.71136"/>
+        <path d="M2.61426 77.9175H80.5324L69.4012 122.442H13.7454L2.61426 77.9175Z" fill="#CFE0EA" stroke="#9FB9C9" stroke-width="4.0825"/>
+      </svg>
+    </div>
+    <h1>The Mindful<br>Spending Journal</h1>
+    <div class="sub">A Practice to Spend with Intention</div>
+    <hr class="rule center">
+  </section>
+
+  <!-- DEDICATION -->
+  <section class="section" id="dedication">
+    <div class="field-label">This journal belongs to</div>
+    <input type="text" data-key="field-belongs" placeholder="Your name">
+<div class="field-label">Begun on</div>
+    <input type="text" data-key="field-date" placeholder="Today's date">
+    <p class="italic center" style="margin-top:26px;">You do not need to make more money to feel free.<br>Sometimes you just need to notice the money<br>you already have and where it's going.</p>
+  </section>
+
+  <!-- WHY THIS JOURNAL EXISTS -->
+  <section class="section" id="why-exists">
+    <div class="eyebrow">Introduction</div>
+    <div class="head-row">
+      <div class="illus">
+        <svg viewBox="0 0 80 80" width="42" height="42">
+          <ellipse cx="40" cy="34" rx="15" ry="19" fill="#cfe0ea" fill-opacity="0.45" stroke="#9fb9c9" stroke-width="1.2"/>
+          <line x1="40" y1="53" x2="40" y2="63" stroke="#9fb9c9" stroke-width="1.3"/>
+          <line x1="32" y1="63" x2="48" y2="63" stroke="#9fb9c9" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <h2>Why This Journal Exists</h2>
+    </div>
+    <hr class="rule">
+    <div class="pull-quote-block">What is a $0 Day?</div>
+    <p>A $0 Day is a day with no financial transactions. If any money leaves you&mdash;whether by purchase, bill, subscription, or automatic payment&mdash;it isn&rsquo;t a $0 Day.</p>
+    <p>Most money advice starts with a budget.<br>This one starts with a question.</p>
+    <div class="pull-quote-block">What happens if, for just one day, you spend nothing at all?</div>
+    <p>Tracking dollars tells you where your money went. It rarely tells you why. It doesn't capture the coffee on the way to work, the quick stop at the store, the online purchase that seemed harmless, the extra item in your cart, or the takeout meal because you were too tired to cook.</p>
+    <p>This journal isn't about guilt or perfection. It's about honesty and awareness. Each $0 day is an opportunity to pause, reflect, and ask yourself a simple question:</p>
+    <div class="pull-quote-block">Did I really need to spend today?</div>
+    <p>Be curious. Challenge your habits. Step outside your comfort zone.</p>
+    <div class="pull-quote-block">Because awareness comes before change.</div>
+  </section>
+
+  <!-- WHY $0 DAYS MATTER -->
+  <section class="section" id="why-matters">
+    <div class="eyebrow">Introduction</div>
+    <div class="head-row">
+      <div class="illus">
+        <svg viewBox="0 0 80 80" width="38" height="38">
+          <rect x="29" y="24" width="8" height="32" rx="2" fill="#cfe0ea" stroke="#9fb9c9" stroke-width="1"/>
+          <rect x="45" y="24" width="8" height="32" rx="2" fill="#cfe0ea" stroke="#9fb9c9" stroke-width="1"/>
+        </svg>
+      </div>
+      <h2>Why $0 Days Matter</h2>
+    </div>
+    <hr class="rule">
+    <p>A $0 day interrupts autopilot.</p>
+    <p>It asks you to pause before the tap of a card or the click of a button, and to notice that every purchase begins with a story.</p>
+    <div class="spending-stories">
+      <span>&ldquo;I deserve this.&rdquo;</span>
+      <span>&ldquo;It&rsquo;s only a few dollars.&rdquo;</span>
+      <span>&ldquo;I&rsquo;ll save tomorrow.&rdquo;</span>
+      <span>&ldquo;I need a little pick-me-up.&rdquo;</span>
+    </div>
+    <p>Sometimes those stories are true. Sometimes a warm cup of coffee is exactly what your soul needs.</p>
+    <p>But sometimes, we spend without ever asking why.</p>
+    <div class="pull-quote-block">A $0 day creates space for that question.</div>
+    <p>Over time, you&rsquo;ll discover that this journal isn&rsquo;t really about spending less. It&rsquo;s about becoming more aware of the stories you tell yourself, the habits you&rsquo;ve stopped noticing, and the choices that truly align with what you value.</p>
+    <div class="pull-quote-block">Because every dollar you spend is also a choice about where your attention, your energy, and your life are going.</div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section class="section" id="how-to-use">
+    <div class="eyebrow">Introduction</div>
+    <div class="head-row">
+      <div class="illus">
+        <svg viewBox="0 0 80 80" width="42" height="42">
+          <path d="M40 26 C34 22 24 22 18 26 V56 C24 52 34 52 40 56 C46 52 56 52 62 56 V26 C56 22 46 22 40 26 Z" fill="#cfe0ea" fill-opacity="0.5" stroke="#9fb9c9" stroke-width="1.2"/>
+          <line x1="40" y1="26" x2="40" y2="56" stroke="#9fb9c9" stroke-width="1"/>
+        </svg>
+      </div>
+      <h2>How to Use This Journal</h2>
+    </div>
+    <hr class="rule">
+    <p>Each month follows the same simple rhythm:</p>
+    <div class="steps-list">
+      <div class="step-item">
+        <span class="step-num">1</span>
+        <div><strong>Color in a calendar</strong> &mdash; tap a day, all month long.</div>
+      </div>
+      <div class="step-item">
+        <span class="step-num">2</span>
+        <div><strong>Reflect at month&rsquo;s end</strong> &mdash; a few honest questions about what you noticed.</div>
+      </div>
+      <div class="step-item">
+        <span class="step-num">3</span>
+        <div><strong>After three months, write yourself a letter</strong> &mdash; not a summary of numbers, but of what changed.</div>
+      </div>
+    </div>
+    <p>There&rsquo;s no perfect way to do this. Some months will have more green squares than others. That&rsquo;s not failure &mdash; that&rsquo;s information. Just keep noticing.</p>
+  </section>
+
+  <!-- RULES -->
+  <section class="section" id="rules">
+    <div class="eyebrow">Rules</div>
+    <div class="head-row">
+      <div class="illus">
+        <svg viewBox="0 0 80 80" width="38" height="38">
+          <circle cx="40" cy="40" r="17" fill="#f1d6ab" fill-opacity="0.5" stroke="#cf9f5f" stroke-width="1.2"/>
+          <path d="M32 40 L38 47 L50 32" fill="none" stroke="#cf9f5f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>What Counts</h2>
+    </div>
+    <hr class="rule">
+    <div class="box">
+      <p class="rule-heading">A $0 Day means exactly what it says.</p>
+      <p>No money was spent today. No purchases. No payments. No exceptions.</p>
+    </div>
+    <div class="box">
+      <p>There are no categories. No loopholes. No negotiations.</p>
+    </div>
+    <div class="box">
+      <p>This journal doesn't separate spending into good or bad, essential or non-essential. A dollar spent is a dollar spent.</p>
+    </div>
+    <p class="italic">This isn't about perfection. It's about paying attention.</p>
+  </section>
+
+  <!-- ASK YOURSELF -->
+  <section class="section" id="ask-yourself">
+    <div class="eyebrow">Rules</div>
+    <div class="head-row">
+      <div class="illus">
+        <svg viewBox="0 0 80 80" width="38" height="38">
+          <circle cx="35" cy="35" r="16" fill="#f1d6ab" fill-opacity="0.4" stroke="#cf9f5f" stroke-width="1.3"/>
+          <line x1="46" y1="46" x2="60" y2="60" stroke="#cf9f5f" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>The Mindset</h2>
+    </div>
+    <hr class="rule">
+    <p>The goal isn't to collect the most $0 days. The goal is to notice how often spending has become the default &mdash; and to discover that it doesn't always have to be.</p>
+    <p class="italic">Stay curious.</p>
+    <p>This journal isn't here to judge you. It's here to help you understand yourself.</p>
+    <p>When you spend, ask yourself:</p>
+    <p style="margin-left:8px;">&mdash; What story was I telling myself?<br>&mdash; What need was I trying to meet?<br>&mdash; Would I make the same choice again?</p>
+    <p class="italic">Every purchase has a reason. The more curious you become, the more intentional your choices will be.</p>
+    <div class="get-started-cta">
+      <a href="#month-jul" class="get-started-btn" data-nav-section="month-jul">Get Started &rarr;</a>
+    </div>
+  </section>
+
+  <!-- MONTH TEMPLATE CONTAINER (populated by JS) -->
+  <div id="months-root"></div>
+
+  <!-- LETTER -->
+  <section class="section" id="letter">
+    <div class="eyebrow">Journal</div>
+    <h2>Write it Out</h2>
+    <p style="margin:0 0 0; font-size:15px; color:var(--ink-soft);">Use this space to write out your thoughts and review them &mdash; or write a letter to yourself.</p>
+    <hr class="rule">
+    <p>This journal ends here. Your reflection does not. Write yourself a letter. Let it answer questions like these:</p>
+    <p style="margin-left:6px;">&mdash; When you started this journal, what did you expect?<br>&mdash; How has your relationship with spending changed?<br>&mdash; What do you value more now?<br>&mdash; What did you discover about yourself?<br>&mdash; What does &ldquo;enough&rdquo; mean to you today?</p>
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:20px; margin-bottom:10px;">
+      <div class="field-label" style="margin:0;">Dear Me,</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="journalSaveToast" style="font-size:12px;color:var(--ink-soft);font-style:italic;opacity:0;transition:opacity 0.3s;"></span>
+        <button class="journal-add-btn journal-save-btn" id="journalAddBtn" type="button" style="margin-top:0;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Save
+        </button>
+        <button class="journal-add-btn" id="journalMyEntriesBtn" type="button" style="margin-top:0;">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M5 3h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.4"/><path d="M7 7h6M7 10h6M7 13h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          My entries
+        </button>
+      </div>
+    </div>
+    <textarea data-key="letter" rows="12" placeholder="Start writing..."></textarea>
+    <div class="save-note" id="letterSaveNote" style="margin-top:4px; text-align:right;"></div>
+    <p class="italic" style="margin-top:14px; margin-bottom:4px;">With love,</p>
+    <p class="italic" style="margin:0; color:var(--label); font-size:14px;">This is just the beginning.</p>
+    <div class="journal-entries-list" id="journalEntriesList" style="display:none;"></div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="section closing" id="closing">
+    <div class="illus">
+      <svg viewBox="0 0 80 80" width="52" height="52">
+        <path d="M50 20 C38 22 30 32 30 44 C30 56 38 66 50 68 C40 64 34 54 34 44 C34 34 40 24 50 20 Z" fill="#e1d7ee" stroke="#b8a9d1" stroke-width="1"/>
+        <circle cx="60" cy="26" r="1.6" fill="#b8a9d1"/>
+        <circle cx="66" cy="38" r="1.2" fill="#b8a9d1"/>
+      </svg>
+    </div>
+    <h2>This Is Just the Beginning</h2>
+    <hr class="rule center">
+    <p>Months from now, you'll look back at these pages and see not just what you didn't spend &mdash; but what you noticed, what you valued, and who you became along the way.</p>
+    <p class="italic">With love,</p>
+  </section>
+
+  <p class="back-cover-quote">&ldquo;Enough is not a number.<br>It's a feeling you get to define.&rdquo;</p>
+
+</main>
+
+<!-- JOURNAL ENTRY OVERLAY -->
+<div class="journal-overlay" id="journalOverlay" role="dialog" aria-modal="true">
+  <div class="journal-paper" id="journalPaper">
+    <div class="journal-paper-header">
+      <div class="journal-paper-header-left">
+        <div class="journal-paper-date" id="journalPaperDate"></div>
+        <input class="journal-paper-title-input" id="journalTitleInput" type="text" placeholder="Title (optional)&hellip;" maxlength="80">
+      </div>
+      <button class="journal-paper-close" id="journalCloseBtn" type="button" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="4" y1="4" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="4" x2="4" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="journal-paper-divider"></div>
+    <div class="journal-paper-body">
+      <textarea class="journal-paper-textarea" id="journalBodyInput" placeholder="Write freely&hellip;" rows="12"></textarea>
+    </div>
+    <div class="journal-paper-footer">
+      <button class="journal-paper-cancel" id="journalCancelBtn" type="button">Cancel</button>
+      <button class="journal-paper-save" id="journalSaveBtn" type="button">Save entry</button>
+    </div>
+  </div>
+</div>
+
+<footer>Your entries save automatically and sync across your devices.</footer>
+
+</div>
+<!-- END APP CONTENT -->
+
+<script>
+(function () {
+  'use strict';
+
+  /* Firebase config — mindfulmundane-ef7bd */
+  var firebaseConfig = {
+    apiKey:            'AIzaSyBT_hMR2tpsvCVqoZogfjsDleOhE6qbtgk',
+    authDomain:        'mindfulmundane-ef7bd.firebaseapp.com',
+    projectId:         'mindfulmundane-ef7bd',
+    storageBucket:     'mindfulmundane-ef7bd.firebasestorage.app',
+    messagingSenderId: '577498747565',
+    appId:             '1:577498747565:web:df11001da977a13b66ac24',
+    measurementId:     'G-FJBDP03GGT'
+  };
+
+  var loadingOverlay = document.getElementById('loadingOverlay');
+  var authGate       = document.getElementById('authGate');
+  var appContent     = document.getElementById('appContent');
+
+  function show(el)  { el.style.display = ''; }
+  function hide(el)  { el.style.display = 'none'; }
+
+  /* =====================================================================
+     SHARED STATE & CONSTANTS (available in both demo and Firebase mode)
+     ===================================================================== */
+  var store      = {};
+  var saveTimer  = null;
+  var currentUid = null;
+  var appBooted    = false;
+  var isFirstVisit = false;
+
+  var MONTH_LABELS = {
+    7:  { tag: 'Month One',   name: 'July'      },
+    8:  { tag: 'Month Two',   name: 'August'    },
+    9:  { tag: 'Month Three', name: 'September' },
+    10: { tag: 'Month Four',  name: 'October'   },
+    11: { tag: 'Month Five',  name: 'November'  },
+    12: { tag: 'Month Six',   name: 'December'  }
+  };
+  var MONTH_KEYS  = { 7: 'jul', 8: 'aug', 9: 'sep', 10: 'oct', 11: 'nov', 12: 'dec' };
+  var MONTH_ICONS = {
+    7:  '<svg viewBox="0 0 80 80" width="34" height="34"><path d="M40 18 C50 24 56 34 54 46 C52 58 44 64 40 66 C36 64 28 58 26 46 C24 34 30 24 40 18 Z" fill="#d7e3ce" fill-opacity="0.6" stroke="#8fa377" stroke-width="1.2"/><path d="M32 36 C36 32 44 32 48 36" stroke="#8fa377" stroke-width="1" fill="none"/><path d="M34 44 C37 48 43 48 46 44" stroke="#8fa377" stroke-width="1" fill="none"/></svg>',
+    8:  '<svg viewBox="0 0 80 80" width="34" height="34"><circle cx="40" cy="40" r="13" fill="#fbe9bb" stroke="#e3c377" stroke-width="1.2"/><g stroke="#e3c377" stroke-width="1.2"><line x1="40" y1="12" x2="40" y2="19"/><line x1="40" y1="61" x2="40" y2="68"/><line x1="12" y1="40" x2="19" y2="40"/><line x1="61" y1="40" x2="68" y2="40"/><line x1="20" y1="20" x2="25" y2="25"/><line x1="55" y1="55" x2="60" y2="60"/><line x1="60" y1="20" x2="55" y2="25"/><line x1="25" y1="55" x2="20" y2="60"/></g></svg>',
+    9:  '<svg viewBox="0 0 80 80" width="34" height="34"><path d="M40 12 C58 22 60 46 40 68 C20 46 22 22 40 12 Z" fill="#f1d6ab" stroke="#cf9f5f" stroke-width="1.2"/><line x1="40" y1="18" x2="40" y2="62" stroke="#cf9f5f" stroke-width="1"/></svg>',
+    10: '<svg viewBox="0 0 80 80" width="34" height="34"><path d="M40 24 C46 18 52 22 48 28" stroke="#8fa377" stroke-width="1.2" fill="none"/><ellipse cx="40" cy="46" rx="22" ry="18" fill="#f3cbab" stroke="#d99a6c" stroke-width="1.2"/><path d="M28 30 C24 38 24 54 28 62" stroke="#d99a6c" stroke-width="1" fill="none"/><path d="M40 28 C40 38 40 54 40 64" stroke="#d99a6c" stroke-width="1" fill="none"/><path d="M52 30 C56 38 56 54 52 62" stroke="#d99a6c" stroke-width="1" fill="none"/></svg>',
+    11: '<svg viewBox="0 0 80 80" width="34" height="34"><path d="M12 42 C28 32 32 48 48 38 C56 34 60 40 64 36" stroke="#c9b9a8" stroke-width="1.3" fill="none"/><ellipse cx="52" cy="24" rx="5" ry="3" fill="#e9cfd6" stroke="#c9a2ab" stroke-width="0.8" transform="rotate(20 52 24)"/><ellipse cx="18" cy="48" rx="5" ry="3" fill="#e9cfd6" stroke="#c9a2ab" stroke-width="0.8" transform="rotate(-10 18 48)"/></svg>',
+    12: '<svg viewBox="0 0 80 80" width="34" height="34"><g stroke="#bcd3e0" stroke-width="1.3"><line x1="40" y1="14" x2="40" y2="66"/><line x1="14" y1="40" x2="66" y2="40"/><line x1="21" y1="21" x2="59" y2="59"/><line x1="59" y1="21" x2="21" y2="59"/></g></svg>'
+  };
+  var REFLECTIONS = {
+    looking_back: {
+      title: 'Looking Back',
+      questions: [
+        'What worked well this month?',
+        'What surprised you?'
+      ]
+    },
+    patterns: {
+      title: 'Patterns &amp; Awareness',
+      questions: [
+        'What usually triggered spending?',
+        'What changed because you were paying more attention?'
+      ]
+    },
+    looking_ahead: {
+      title: 'Looking Ahead',
+      questions: [
+        "What's one habit you'd like to build?",
+        'Reflections'
+      ]
+    }
+  };
+  var MONTHS_ORDER = [7, 8, 9, 10, 11, 12];
+  var WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  var today = new Date();
+  function isUnlocked(m) {
+    return today >= new Date(2026, m - 1, 1);
+  }
+  var QUOTES = [
+    { id: 0,  text: 'Enough is a feast.',                                                                                     source: 'Buddhist Proverb' },
+    { id: 1,  text: 'Wealth consists not in having great possessions, but in having few wants.',                              source: 'Epictetus' },
+    { id: 2,  text: 'Too many people spend money they haven\u2019t earned, to buy things they don\u2019t want, to impress people they don\u2019t like.', source: 'Will Rogers' },
+    { id: 3,  text: 'Between stimulus and response there is a space. In that space is our power to choose.',                  source: 'Viktor Frankl' },
+    { id: 4,  text: 'When you realize there is nothing lacking, the whole world belongs to you.',                             source: 'Lao Tzu' },
+    { id: 5,  text: 'Do not save what is left after spending, but spend what is left after saving.',                          source: 'Warren Buffett' },
+    { id: 6,  text: 'Mindful spending is not about deprivation. It\u2019s about alignment.',                                  source: 'Headspace' },
+    { id: 7,  text: 'You can\u2019t get enough of what you don\u2019t really need.',                                          source: 'Anonymous' },
+    { id: 8,  text: 'Every time you spend money, you\u2019re casting a vote for the kind of world you want.',                 source: 'Anna Lapp\u00e9' },
+    { id: 9,  text: 'The art of being wise is knowing what to overlook.',                                                     source: 'William James' },
+    { id: 10, text: 'Frugality includes all the other virtues.',                                                              source: 'Cicero' },
+    { id: 11, text: 'Awareness is the greatest agent for change.',                                                            source: 'Eckhart Tolle' },
+    { id: 12, text: 'It is not the man who has too little, but the man who craves more, that is poor.',                       source: 'Seneca' },
+    { id: 13, text: 'The real measure of your wealth is how much you\u2019d be worth if you lost all your money.',            source: 'Anonymous' },
+    { id: 14, text: 'Mindfulness isn\u2019t about having no thoughts. It\u2019s about noticing which thoughts you act on.',   source: 'Tara Brach' },
+    { id: 15, text: 'Simplicity is the ultimate sophistication.',                                                             source: 'Leonardo da Vinci' },
+    { id: 16, text: 'Money is a tool. Used properly it makes something beautiful; used wrong, it makes a mess.',              source: 'Bradley Vinson' },
+    { id: 17, text: 'In the end, it\u2019s not the years in your life that count. It\u2019s the life in your years.',         source: 'Abraham Lincoln' }
+  ];
+
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+  var db   = firebase.firestore();
+
+  // Track every page load (public + signed-in) — rules allow unauthenticated writes to _meta
+  db.collection('_meta').doc('authgate').set({
+    total: firebase.firestore.FieldValue.increment(1),
+    lastSeen: new Date().toISOString()
+  }, { merge: true }).catch(function() {});
+
+  /* =====================================================================
+     IN-MEMORY STORE + FIRESTORE SYNC
+     ===================================================================== */
+  function debouncedSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(flushToFirestore, 1500);
+  }
+
+  function flushToFirestore() {
+    if (!currentUid) return;
+    store._lastSaved = new Date().toISOString();
+    db.collection('journals').doc(currentUid)
+      .set(store, { merge: true })
+      .catch(function (e) { console.warn('Firestore save error:', e); });
+  }
+
+  function loadFromFirestore(uid) {
+    return db.collection('journals').doc(uid).get()
+      .then(function (doc) {
+        isFirstVisit = !doc.exists;
+        store = doc.exists ? (doc.data() || {}) : {};
+      });
+  }
+
+  /* =====================================================================
+     AUTH STATE
+     ===================================================================== */
+  var ADMIN_EMAIL = 'sparakala@gmail.com';
+
+  auth.onAuthStateChanged(function (user) {
+    if (user) {
+      currentUid = user.uid;
+      // Track page view
+      db.collection('_meta').doc('pageviews')
+        .set({ total: firebase.firestore.FieldValue.increment(1), lastSeen: new Date().toISOString() }, { merge: true })
+        .catch(function() {});
+      loadFromFirestore(user.uid)
+        .then(function () { bootApp(user); })
+        .catch(function () { bootApp(user); }); // still boot on error
+    } else {
+      currentUid = null;
+      hide(appContent);
+      hide(loadingOverlay);
+      show(authGate);
+    }
+  });
+
+  function navigateAfterSignIn() {
+    if (window.innerWidth <= 768) {
+      var mobileTarget = isFirstVisit ? 'rules' : 'month-jul';
+      setTimeout(function() {
+        if (window.__openReader) window.__openReader(mobileTarget);
+      }, 150);
+      return;
+    }
+    // Desktop: first login → rules, returning → july
+    var targetId = isFirstVisit ? 'rules' : 'month-jul';
+    setTimeout(function() {
+      var el = document.getElementById(targetId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
+
+  function bootApp(user) {
+    renderUserChip(user);
+    initApp();
+    prefillDedication(user);
+    hide(loadingOverlay);
+    hide(authGate);
+    show(appContent);
+    navigateAfterSignIn();
+  }
+
+  /* =====================================================================
+     USER CHIP
+     ===================================================================== */
+  function renderUserChip(user) {
+    var chip = document.getElementById('userChip');
+    chip.innerHTML = '';
+
+    // Avatar button
+    var avatarBtn = document.createElement('button');
+    avatarBtn.type = 'button';
+    avatarBtn.className = 'chip-avatar';
+    avatarBtn.setAttribute('aria-label', 'Account');
+    if (user.photoURL) {
+      var img = document.createElement('img');
+      img.src = user.photoURL;
+      img.alt = '';
+      avatarBtn.appendChild(img);
+    } else {
+      var initials = document.createElement('span');
+      initials.className = 'chip-initials';
+      var name = user.displayName || user.email || 'You';
+      initials.textContent = name.charAt(0).toUpperCase();
+      avatarBtn.appendChild(initials);
+    }
+    chip.appendChild(avatarBtn);
+
+    // Dropdown
+    var dropdown = document.createElement('div');
+    dropdown.className = 'chip-dropdown';
+    var nameEl = document.createElement('div');
+    nameEl.className = 'chip-name';
+    nameEl.textContent = user.displayName || user.email || 'You';
+    dropdown.appendChild(nameEl);
+    if (user.email === ADMIN_EMAIL) {
+      var adminLink = document.createElement('a');
+      adminLink.href = '/admin.html';
+      adminLink.className = 'chip-admin';
+      adminLink.textContent = 'Admin portal';
+      dropdown.appendChild(adminLink);
+    }
+    var signOutBtn = document.createElement('button');
+    signOutBtn.type = 'button';
+    signOutBtn.className = 'chip-signout';
+    signOutBtn.textContent = 'Sign out';
+    signOutBtn.addEventListener('click', function () {
+      store = {};
+      auth.signOut().then(function () { window.location.reload(); });
+    });
+    dropdown.appendChild(signOutBtn);
+    chip.appendChild(dropdown);
+
+    // Mobile tap-toggle (hover works on desktop)
+    avatarBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      chip.classList.toggle('open');
+    });
+    document.addEventListener('click', function () {
+      chip.classList.remove('open');
+    });
+  }
+
+  /* =====================================================================
+     AUTH UI HANDLERS
+     ===================================================================== */
+  var authErrorEl = document.getElementById('authError');
+  var authSuccessEl  = document.getElementById('authSuccess');
+
+  function setError(msg) {
+    authErrorEl.textContent = msg || '';
+    authSuccessEl.classList.add('hidden');
+  }
+  function setSuccess(msg) {
+    authSuccessEl.textContent = msg || '';
+    authSuccessEl.classList.remove('hidden');
+    authErrorEl.textContent = '';
+  }
+  function friendlyError(code) {
+    var map = {
+      'auth/email-already-in-use':   'That email is already registered. Try signing in.',
+      'auth/invalid-email':           'Please enter a valid email address.',
+      'auth/weak-password':           'Password must be at least 6 characters.',
+      'auth/user-not-found':          'No account found with that email.',
+      'auth/wrong-password':          'Incorrect password. Try again.',
+      'auth/invalid-credential':      'Incorrect email or password.',
+      'auth/too-many-requests':       'Too many attempts. Please try again later.',
+      'auth/popup-blocked':           'Pop-up blocked. Please allow pop-ups for this site.',
+      'auth/popup-closed-by-user':    '',
+      'auth/network-request-failed':  'Network error. Check your connection and try again.'
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+  }
+
+  document.querySelectorAll('.accordion-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = btn.closest('.accordion-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.accordion-item').forEach(function(i) { i.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  document.getElementById('googleSignInBtn').addEventListener('click', function () {
+    setError('');
+    show(loadingOverlay);
+    var provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(function (err) {
+      hide(loadingOverlay);
+      setError(friendlyError(err.code));
+    });
+  });
+
+
+  /* =====================================================================
+     NAV OVERLAY
+     ===================================================================== */
+  function initNav() {
+    var closeBtn   = document.getElementById('closeBtn');
+    var navOverlay = document.getElementById('navOverlay');
+    if (closeBtn) closeBtn.addEventListener('click', function () { navOverlay.classList.remove('open'); });
+    document.querySelectorAll('.nav-link').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        navOverlay.classList.remove('open');
+        // On mobile, open reader mode instead of anchor-scrolling hidden sections
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          var sectionId = link.getAttribute('href').replace('#', '');
+          var openReaderFn = window.__openReader;
+          if (openReaderFn) openReaderFn(sectionId);
+        }
+      });
+    });
+    // Wire Get Started / Write a Journal Entry buttons for mobile reader mode
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-nav-section]');
+      if (!btn) return;
+      if (window.innerWidth <= 768 && window.__openReader) {
+        e.preventDefault();
+        window.__openReader(btn.getAttribute('data-nav-section'));
+      }
+    });
+
+    var navSignOutBtn = document.getElementById('navSignOutBtn');
+    if (navSignOutBtn) navSignOutBtn.addEventListener('click', function () {
+      store = {};
+      auth.signOut().then(function () { window.location.reload(); });
+    });
+  }
+
+  /* =====================================================================
+     APP INIT (runs once after sign-in + data load)
+     ===================================================================== */
+  function initApp() {
+    if (appBooted) return;
+    appBooted = true;
+
+    initNav();
+    initTextFields();
+    renderMonths();
+    initMobileLayout();
+    initJournalEntries();
+    initJournalDrawer();
+    initShareModal();
+    initFeedback();
+  }
+
+  /* =====================================================================
+     FEEDBACK
+     ===================================================================== */
+  function initFeedback() {
+    var fab      = document.getElementById('feedbackFab');
+    var overlay  = document.getElementById('feedbackOverlay');
+    var closeBtn = document.getElementById('feedbackClose');
+    var starsEl  = document.getElementById('feedbackStars');
+    var textEl   = document.getElementById('feedbackText');
+    var submitBtn= document.getElementById('feedbackSubmit');
+    var successEl= document.getElementById('feedbackSuccess');
+    var stars    = Array.prototype.slice.call(starsEl.querySelectorAll('.feedback-star'));
+    var rating   = 0;
+
+    function setStars(n, permanent) {
+      stars.forEach(function(s, i) {
+        s.classList.toggle('filled', i < n);
+      });
+      if (permanent) rating = n;
+    }
+
+    stars.forEach(function(s, i) {
+      s.addEventListener('mouseenter', function() { setStars(i + 1, false); });
+      s.addEventListener('mouseleave', function() { setStars(rating, false); });
+      s.addEventListener('click',      function() { setStars(i + 1, true);  });
+    });
+
+    fab.addEventListener('click', function() { overlay.classList.add('open'); });
+    closeBtn.addEventListener('click', closeFeedback);
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeFeedback();
+    });
+
+    function closeFeedback() {
+      overlay.classList.remove('open');
+    }
+
+    function resetForm() {
+      rating = 0;
+      setStars(0, false);
+      textEl.value = '';
+      submitBtn.style.display = '';
+      submitBtn.disabled = false;
+      successEl.style.display = 'none';
+    }
+
+    submitBtn.addEventListener('click', function() {
+      var msg = textEl.value.trim();
+      if (!rating && !msg) return;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending\u2026';
+
+      db.collection('feedback').add({
+        uid:       currentUid || 'anonymous',
+        rating:    rating,
+        message:   msg,
+        createdAt: new Date().toISOString()
+      }).then(function() {
+        submitBtn.style.display = 'none';
+        successEl.style.display = 'block';
+        setTimeout(function() { closeFeedback(); setTimeout(resetForm, 400); }, 2200);
+      }).catch(function() {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send feedback';
+      });
+    });
+  }
+
+  /* ---------- Text fields & textareas ---------- */
+  function initTextFields() {
+    document.querySelectorAll('input[data-key], textarea[data-key]').forEach(function (el) {
+      var key = el.getAttribute('data-key');
+      if (store[key]) el.value = store[key];
+      el.addEventListener('input', function () {
+        store[key] = el.value;
+        debouncedSave();
+      });
+    });
+  }
+
+  /* =====================================================================
+     MINDFULNESS QUOTES
+     ===================================================================== */
+  function buildQuoteBox(monthKey) {
+    var q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    var ratingKey = 'quote-rating-' + q.id;
+    var saved = parseInt(store[ratingKey] || '0');
+    var stars = '';
+    for (var s = 1; s <= 5; s++) {
+      stars += '<button class="quote-star' + (s <= saved ? ' active' : '') + '" data-star="' + s + '" data-key="' + ratingKey + '" aria-label="' + s + ' star">\u2605</button>';
+    }
+    var label = saved ? saved + ' / 5' : '';
+    return '<div class="quote-box" id="qbox-' + monthKey + '">' +
+      '<p class="quote-box-text">\u201c' + q.text + '\u201d</p>' +
+      '<div class="quote-box-source-row"><p class="quote-box-source">\u2014 ' + q.source + '</p><div class="quote-box-stars">' + stars + '<span class="quote-star-label" id="qlabel-' + monthKey + '">' + label + '</span></div></div>' +
+    '</div>';
+  }
+
+  function wireQuoteStars(section, monthKey) {
+    section.querySelectorAll('.quote-star').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var val = parseInt(btn.getAttribute('data-star'));
+        var key = btn.getAttribute('data-key');
+        store[key] = String(val);
+        debouncedSave();
+        section.querySelectorAll('.quote-star').forEach(function(b) {
+          b.classList.toggle('active', parseInt(b.getAttribute('data-star')) <= val);
+        });
+        var lbl = document.getElementById('qlabel-' + monthKey);
+        if (lbl) lbl.textContent = val + ' / 5';
+      });
+    });
+  }
+
+  /* =====================================================================
+     MONTH RENDERING
+     ===================================================================== */
+  function prefillDedication(user) {
+    var nameEl = document.querySelector('input[data-key="field-belongs"]');
+    var dateEl = document.querySelector('input[data-key="field-date"]');
+    if (nameEl && !store['field-belongs']) {
+      var name = (user.displayName || user.email || '').split('@')[0];
+      if (name) {
+        nameEl.value = name;
+        store['field-belongs'] = name;
+        debouncedSave();
+      }
+    }
+    if (dateEl && !store['field-date']) {
+      var d = new Date();
+      var months = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+      var dateStr = months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+      dateEl.value = dateStr;
+      store['field-date'] = dateStr;
+      debouncedSave();
+    }
+  }
+
+  function buildWeeks(year, month1to12) {
+    var jsMonth    = month1to12 - 1;
+    var daysInMonth = new Date(year, jsMonth + 1, 0).getDate();
+    var startDow    = new Date(year, jsMonth, 1).getDay();
+    var weeks = [];
+    var week  = new Array(startDow).fill(0);
+    for (var d = 1; d <= daysInMonth; d++) {
+      week.push(d);
+      if (week.length === 7) { weeks.push(week); week = []; }
+    }
+    if (week.length) {
+      while (week.length < 7) week.push(0);
+      weeks.push(week);
+    }
+    return weeks;
+  }
+
+  /* =====================================================================
+     SHARE FEATURE
+     ===================================================================== */
+
+  var PLANT_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 125" width="84" height="125"><path d="M41.5732 77.9181V0" stroke="#8FA377" stroke-width="5.19591"/><path d="M41.5734 27.8286C13.7455 16.6975 2.61431 38.9598 24.8766 50.091C36.0078 55.6565 41.5734 44.5254 41.5734 27.8286Z" fill="#D7E3CE" stroke="#8FA377" stroke-width="3.71136"/><path d="M41.5732 11.1314C69.4012 0.000208241 80.5323 22.2625 58.27 33.3937C47.1388 38.9593 41.5732 27.8281 41.5732 11.1314Z" fill="#EED9CD" stroke="#C69A82" stroke-width="3.71136"/><path d="M45.6143 45.815C62.1903 39.1555 68.8207 52.4744 55.5599 59.1338C48.9295 62.4636 45.6143 55.8041 45.6143 45.815Z" fill="#FFEDBE" stroke="#EAC66B" stroke-width="3.71136"/><path d="M2.61426 77.9175H80.5324L69.4012 122.442H13.7454L2.61426 77.9175Z" fill="#CFE0EA" stroke="#9FB9C9" stroke-width="4.0825"/></svg>';
+
+  var SHARE_MONTH_COLORS = {
+    7:  { accent: '#8fa377', light: '#d7e3ce' },
+    8:  { accent: '#c9a040', light: '#fbe9bb' },
+    9:  { accent: '#cf9f5f', light: '#f1d6ab' },
+    10: { accent: '#d99a6c', light: '#f3cbab' },
+    11: { accent: '#b88a94', light: '#e9cfd6' },
+    12: { accent: '#7aabcc', light: '#cfe0ea' }
+  };
+
+  function countAllZeroDays() {
+    var count = 0;
+    Object.keys(store).forEach(function(k) {
+      if (k.indexOf('cal-') === 0 && store[k] === 'zero') count++;
+    });
+    return count;
+  }
+
+  function svgToImg(svgStr, w, h) {
+    return new Promise(function(resolve) {
+      var scaled = svgStr
+        .replace(/width="\d+"/, 'width="' + w + '"')
+        .replace(/height="\d+"/, 'height="' + h + '"');
+      var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(scaled);
+      var img = new Image();
+      img.onload = function() { resolve(img); };
+      img.onerror = function() { resolve(null); };
+      img.src = url;
+    });
+  }
+
+  /* Level 2: monthly dot calendar card */
+  function buildMonthShareCanvas(m, year, weeks) {
+    var W = 1080, H = 1080;
+    var mc = SHARE_MONTH_COLORS[m] || { accent: '#a9b596', light: '#d7e3ce' };
+    var monthName = MONTH_LABELS[m] ? MONTH_LABELS[m].name : '';
+    var iconSvg = MONTH_ICONS[m] || '';
+
+    return Promise.all([svgToImg(iconSvg, 120, 120), svgToImg(PLANT_ICON_SVG, 32, 32)]).then(function(imgs) {
+      var iconImg = imgs[0]; var plantImg = imgs[1];
+      var canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+
+      /* Count zeros */
+      var zeroCount = 0;
+      weeks.forEach(function(week) {
+        week.forEach(function(d) {
+          if (!d) return;
+          var dk = 'cal-' + year + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          if (store[dk] === 'zero') zeroCount++;
+        });
+      });
+
+      /* Background */
+      ctx.fillStyle = '#faf6ee';
+      ctx.fillRect(0, 0, W, H);
+
+      /* Top accent bar */
+      ctx.fillStyle = mc.accent;
+      ctx.fillRect(0, 0, W, 14);
+
+      /* Month icon */
+      if (iconImg) ctx.drawImage(iconImg, (W - 120) / 2, 50, 120, 120);
+
+      /* Month name */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '500 64px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(monthName.toUpperCase(), W / 2, 215);
+
+      /* Year */
+      ctx.fillStyle = mc.accent;
+      ctx.font = '300 28px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(String(year), W / 2, 250);
+
+      /* Separator */
+      ctx.strokeStyle = '#c9d0b6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(80, 274); ctx.lineTo(W - 80, 274); ctx.stroke();
+
+      /* Weekday headers */
+      var WDAYS = ['S','M','T','W','T','F','S'];
+      var padX = 80;
+      var cellW = (W - 2 * padX) / 7;
+      ctx.fillStyle = mc.accent;
+      ctx.font = '400 26px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      WDAYS.forEach(function(d, i) {
+        ctx.fillText(d, padX + (i + 0.5) * cellW, 316);
+      });
+
+      /* Dot grid */
+      var dotR = 26;
+      var numRows = weeks.length;
+      var rowH = numRows <= 5 ? 100 : 85;
+      var gridTop = 344;
+
+      weeks.forEach(function(week, ri) {
+        week.forEach(function(d, ci) {
+          if (!d) return;
+          var cx = padX + (ci + 0.5) * cellW;
+          var cy = gridTop + ri * rowH + dotR;
+          var dk = 'cal-' + year + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          var state = store[dk] || '';
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
+          if (state === 'zero') {
+            ctx.fillStyle = mc.accent;
+            ctx.fill();
+          } else if (state === 'spend') {
+            ctx.fillStyle = '#faf6ee';
+            ctx.fill();
+            ctx.strokeStyle = '#e8b49a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = '#faf6ee';
+            ctx.fill();
+            ctx.strokeStyle = '#c9d0b6';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+        });
+      });
+
+      var gridBottom = gridTop + numRows * rowH;
+
+      /* Separator */
+      ctx.strokeStyle = '#c9d0b6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(80, gridBottom + 22); ctx.lineTo(W - 80, gridBottom + 22); ctx.stroke();
+
+      /* Zero count */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '600 78px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(String(zeroCount), W / 2, gridBottom + 104);
+
+      /* "$0 Days" label */
+      ctx.fillStyle = mc.accent;
+      ctx.font = '300 30px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('$0 Days', W / 2, gridBottom + 142);
+
+      /* Brand — plant icon centered, then name + url below */
+      var brandTop = gridBottom + 170;
+      if (plantImg) ctx.drawImage(plantImg, (W - 36) / 2, brandTop, 36, 36);
+      ctx.fillStyle = '#7a8266';
+      ctx.font = '400 22px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Mindful Spending Journal', W / 2, brandTop + 56);
+      ctx.fillStyle = '#a9b596';
+      ctx.font = '300 20px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('mindfulmundane.com', W / 2, brandTop + 84);
+
+      return canvas;
+    });
+  }
+
+  /* Level 1: first $0 day celebration card */
+  function buildFirstZeroDayCanvas(m, year, dateStr) {
+    var W = 1080, H = 1080;
+    var mc = SHARE_MONTH_COLORS[m] || { accent: '#a9b596', light: '#d7e3ce' };
+    var iconSvg = MONTH_ICONS[m] || '';
+
+    return Promise.all([svgToImg(iconSvg, 100, 100), svgToImg(PLANT_ICON_SVG, 32, 32)]).then(function(imgs) {
+      var iconImg = imgs[0]; var plantImg = imgs[1];
+      var canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+
+      /* Background */
+      ctx.fillStyle = '#faf6ee';
+      ctx.fillRect(0, 0, W, H);
+
+      /* Soft circle behind checkmark */
+      ctx.beginPath();
+      ctx.arc(W / 2, 390, 178, 0, Math.PI * 2);
+      ctx.fillStyle = mc.light;
+      ctx.fill();
+
+      /* Top accent bar */
+      ctx.fillStyle = mc.accent;
+      ctx.fillRect(0, 0, W, 14);
+
+      /* Month icon */
+      if (iconImg) ctx.drawImage(iconImg, (W - 100) / 2, 58, 100, 100);
+
+      /* Checkmark */
+      ctx.strokeStyle = mc.accent;
+      ctx.lineWidth = 22;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 72, 390);
+      ctx.lineTo(W / 2 - 16, 452);
+      ctx.lineTo(W / 2 + 88, 322);
+      ctx.stroke();
+
+      /* Main line */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3a352f';
+      ctx.font = 'italic 64px Georgia, "Times New Roman", serif';
+      ctx.fillText('Today was my first $0 Day.', W / 2, 582);
+
+      /* Separator */
+      ctx.strokeStyle = '#c9d0b6';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(120, 626); ctx.lineTo(W - 120, 626); ctx.stroke();
+
+      /* Copy lines */
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '300 52px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Today I spent nothing.', W / 2, 710);
+
+      ctx.fillStyle = '#5c6650';
+      ctx.font = '300 44px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Not because I had to.', W / 2, 778);
+      ctx.fillText('Because I chose to.', W / 2, 832);
+
+      /* Date */
+      ctx.fillStyle = '#8a9270';
+      ctx.font = '300 32px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText(dateStr, W / 2, 896);
+
+      /* Brand */
+      if (plantImg) ctx.drawImage(plantImg, (W - 32) / 2, H - 112, 32, 32);
+      ctx.fillStyle = '#8a9270';
+      ctx.font = '300 20px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('Mindful Spending Journal', W / 2, H - 62);
+      ctx.fillStyle = '#c9d0b6';
+      ctx.font = '300 18px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('mindfulmundane.com', W / 2, H - 38);
+
+      return canvas;
+    });
+  }
+
+  /* ---- Quote card templates ---- */
+
+  var QUOTE_CARD_COLORS = {
+    sage: { accent: '#8fa377', border: '#8fa377' },
+    blue: { accent: '#9fb9c9', border: '#9fb9c9' },
+    gold: { accent: '#cf9f5f', border: '#cf9f5f' }
+  };
+
+  var QUOTE_TEMPLATES = [
+    {
+      id: 'pause', label: 'The pause', color: 'sage',
+      quote: '\u201cI paused before buying.\u201d',
+      subLines: ['That might be the biggest win.']
+    },
+    {
+      id: 'realization', label: 'The realization', color: 'blue',
+      quote: '\u201cI realized I wasn\u2019t buying because I needed it.\u201d',
+      subLines: ['That\u2019s a huge win.']
+    },
+    {
+      id: 'substitution', label: 'The substitution', color: 'gold',
+      quote: '\u201cI used what I already had.\u201d',
+      subLines: ['Instead of buying another notebook.', 'Instead of ordering takeout.', 'Instead of another kitchen gadget.']
+    },
+    {
+      id: 'pattern', label: 'The pattern', color: 'gold',
+      quote: '\u201cI noticed a pattern.\u201d',
+      subLines: ['Maybe:'],
+      bullets: ['I shop when I\u2019m bored.', 'I buy coffee when I\u2019m stressed.', 'I scroll Amazon when I\u2019m tired.'],
+      italic: 'Awareness is progress.'
+    }
+  ];
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    var words = text.split(' ');
+    var lines = [];
+    var line = '';
+    words.forEach(function(word) {
+      var test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawRoundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x,     y + h, r);
+    ctx.arcTo(x,     y + h, x,     y,     r);
+    ctx.arcTo(x,     y,     x + w, y,     r);
+    ctx.closePath();
+  }
+
+  function buildQuoteCardCanvas(template) {
+    var W = 1080, H = 1080;
+    var mc = QUOTE_CARD_COLORS[template.color] || QUOTE_CARD_COLORS.sage;
+
+    return svgToImg(PLANT_ICON_SVG, 30, 30).then(function(plantImg) {
+      var canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+
+      /* Background */
+      ctx.fillStyle = '#faf6ee';
+      ctx.fillRect(0, 0, W, H);
+
+      /* Border */
+      drawRoundedRect(ctx, 28, 28, W - 56, H - 56, 68);
+      ctx.strokeStyle = mc.border;
+      ctx.lineWidth = 7;
+      ctx.stroke();
+
+      /* Quote mark */
+      ctx.textAlign = 'center';
+      ctx.fillStyle = mc.accent;
+      ctx.font = '400 108px Georgia, "Times New Roman", serif';
+      ctx.fillText('\u201c', W / 2, 168);
+
+      /* Short line */
+      ctx.strokeStyle = mc.accent;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(W/2 - 34, 196); ctx.lineTo(W/2 + 34, 196); ctx.stroke();
+
+      /* Quote text — bold serif, wraps at 860px */
+      ctx.fillStyle = '#3a352f';
+      ctx.font = '700 66px Georgia, "Times New Roman", serif';
+      var quoteLines = wrapCanvasText(ctx, template.quote, 860);
+      var quoteY = 300;
+      var quoteLineH = 82;
+      quoteLines.forEach(function(line, i) {
+        ctx.fillText(line, W / 2, quoteY + i * quoteLineH);
+      });
+      var afterQuote = quoteY + quoteLines.length * quoteLineH + 52;
+
+      /* Sub lines */
+      ctx.fillStyle = '#5c6650';
+      ctx.font = '300 36px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      var subY = afterQuote;
+      (template.subLines || []).forEach(function(line) {
+        ctx.fillText(line, W / 2, subY);
+        subY += 50;
+      });
+
+      /* Bullet lines */
+      if (template.bullets && template.bullets.length) {
+        subY += 6;
+        ctx.font = '300 34px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+        template.bullets.forEach(function(b) {
+          ctx.fillText('\u2022 ' + b, W / 2, subY);
+          subY += 48;
+        });
+      }
+
+      /* Italic closing */
+      if (template.italic) {
+        subY += 10;
+        ctx.fillStyle = '#8a9270';
+        ctx.font = 'italic 300 32px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+        ctx.fillText(template.italic, W / 2, subY);
+      }
+
+      /* "MINDFUL SPENDING" bottom-left */
+      ctx.textAlign = 'left';
+      ctx.fillStyle = mc.accent;
+      ctx.font = '400 18px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('MINDFUL SPENDING', 80, H - 62);
+
+      /* Plant icon + URL bottom-right */
+      if (plantImg) ctx.drawImage(plantImg, W - 80 - 30, H - 80, 30, 30);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#c9d0b6';
+      ctx.font = '300 16px system-ui, -apple-system, Helvetica, Arial, sans-serif';
+      ctx.fillText('mindfulmundane.com', W - 80, H - 58);
+
+      return canvas;
+    });
+  }
+
+  /* ---- Template share modal (calendar + quote cards) ---- */
+  function showMonthShareModal(m, year, weeks) {
+    var templates = [{ id: 'calendar', label: 'My Month' }].concat(QUOTE_TEMPLATES);
+
+    function buildTemplate(tid) {
+      if (tid === 'calendar') return buildMonthShareCanvas(m, year, weeks);
+      var qt = null;
+      QUOTE_TEMPLATES.forEach(function(t) { if (t.id === tid) qt = t; });
+      return qt ? buildQuoteCardCanvas(qt) : buildMonthShareCanvas(m, year, weeks);
+    }
+
+    function getFilename(tid) {
+      return 'msj-' + tid + '-' + (MONTH_KEYS[m] || m) + '-' + year + '.png';
+    }
+
+    function selectTemplate(tid) {
+      document.querySelectorAll('.share-tmpl-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-tid') === tid);
+      });
+      _shareCanvasWrap.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--label);font-size:12px;font-family:system-ui">Generating…</div>';
+      buildTemplate(tid).then(function(canvas) {
+        _shareCanvasWrap.innerHTML = '';
+        _shareCanvasWrap.appendChild(canvas);
+        var fname = getFilename(tid);
+        _shareDownloadBtn.onclick = function() {
+          var a = document.createElement('a');
+          a.download = fname; a.href = canvas.toDataURL('image/png'); a.click();
+        };
+        _shareShareBtn.onclick = function() {
+          canvas.toBlob(function(blob) {
+            if (navigator.share && blob) {
+              var file = new File([blob], fname, { type: 'image/png' });
+              navigator.share({ files: [file], title: 'The Mindful Spending Journal' })
+                .catch(function() { triggerDownload(blob, fname); });
+            } else { triggerDownload(blob, fname); }
+          }, 'image/png');
+        };
+      });
+    }
+
+    /* Build template row */
+    var row = document.getElementById('shareTemplateRow');
+    row.innerHTML = '';
+    templates.forEach(function(t) {
+      var btn = document.createElement('button');
+      btn.className = 'share-tmpl-btn' + (t.id === 'calendar' ? ' active' : '');
+      btn.setAttribute('data-tid', t.id);
+      btn.textContent = t.label;
+      btn.onclick = function() { selectTemplate(t.id); };
+      row.appendChild(btn);
+    });
+
+    _shareLabel.textContent = MONTH_LABELS[m] ? MONTH_LABELS[m].name + ' ' + year : 'Share';
+    _shareCanvasWrap.innerHTML = '';
+    document.body.style.overflow = 'hidden';
+    _shareOverlay.classList.add('open');
+    selectTemplate('calendar');
+  }
+
+  /* ---- Share modal wiring ---- */
+  var _shareOverlay, _shareCanvasWrap, _shareLabel, _shareDownloadBtn, _shareShareBtn;
+
+  function initShareModal() {
+    _shareOverlay    = document.getElementById('shareOverlay');
+    _shareCanvasWrap = document.getElementById('shareCanvasWrap');
+    _shareLabel      = document.getElementById('shareModalLabel');
+    _shareDownloadBtn = document.getElementById('shareDownloadBtn');
+    _shareShareBtn    = document.getElementById('shareShareBtn');
+
+    document.getElementById('shareCloseBtn').addEventListener('click', closeShareModal);
+    _shareOverlay.addEventListener('click', function(e) {
+      if (e.target === _shareOverlay) closeShareModal();
+    });
+  }
+
+  function openShareModal(canvasEl, label, filename) {
+    _shareLabel.textContent = label || 'Share';
+    document.getElementById('shareTemplateRow').innerHTML = '';
+    _shareCanvasWrap.innerHTML = '';
+    _shareCanvasWrap.appendChild(canvasEl);
+    document.body.style.overflow = 'hidden';
+    _shareOverlay.classList.add('open');
+
+    _shareDownloadBtn.onclick = function() {
+      var a = document.createElement('a');
+      a.download = filename || 'mindful-spending.png';
+      a.href = canvasEl.toDataURL('image/png');
+      a.click();
+    };
+
+    _shareShareBtn.onclick = function() {
+      canvasEl.toBlob(function(blob) {
+        var fname = filename || 'mindful-spending.png';
+        if (navigator.share && blob) {
+          var file = new File([blob], fname, { type: 'image/png' });
+          navigator.share({ files: [file], title: 'The Mindful Spending Journal' })
+            .catch(function() { triggerDownload(blob, fname); });
+        } else {
+          triggerDownload(blob, fname);
+        }
+      }, 'image/png');
+    };
+  }
+
+  function triggerDownload(blob, fname) {
+    var a = document.createElement('a');
+    a.download = fname;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+  }
+
+  function closeShareModal() {
+    _shareOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function renderMonths() {
+    var root = document.getElementById('months-root');
+    root.innerHTML = '';
+
+    /* Mark locked nav links */
+    MONTHS_ORDER.forEach(function(m) {
+      if (!isUnlocked(m)) {
+        var link = document.querySelector('a[href="#month-' + MONTH_KEYS[m] + '"]');
+        if (link) link.classList.add('locked');
+      }
+    });
+
+    MONTHS_ORDER.forEach(function (m, idx) {
+      var info  = MONTH_LABELS[m];
+      var mKey  = MONTH_KEYS[m];
+      var year  = 2026;
+
+      var section = document.createElement('section');
+      section.className = 'section month';
+      section.id = 'month-' + mKey;
+
+      /* Locked placeholder */
+      if (!isUnlocked(m)) {
+        section.classList.add('collapsed');
+        section.innerHTML =
+                    '<div class="head-row">' +
+            '<div class="illus">' + MONTH_ICONS[m] + '</div>' +
+            '<h2>' + info.name + ' ' + year + '</h2>' +
+            '<div class="month-locked">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+                '<rect x="3" y="11" width="18" height="11" rx="2"/>' +
+                '<path d="M7 11V7a5 5 0 0 1 10 0v4"/>' +
+              '</svg>' +
+              '<p>Unlocks on ' + info.name + ' 1, ' + year + '.</p>' +
+            '</div>' +
+          '</div>';
+        root.appendChild(section);
+        return;
+      }
+
+      var weeks = buildWeeks(year, m);
+
+      var weekdayCells = WEEKDAYS.map(function (w) { return '<div>' + w + '</div>'; }).join('');
+      var dayCells = '';
+      var totalDays = 0;
+      weeks.forEach(function (week) {
+        week.forEach(function (d) {
+          if (d === 0) {
+            dayCells += '<div class="day-cell empty"></div>';
+          } else {
+            totalDays++;
+            var dateKey = 'cal-' + year + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+            var savedState = store[dateKey] || '';
+            dayCells += '<div class="day-cell" data-key="' + dateKey + '" data-state="' + savedState + '">' + d + '</div>';
+          }
+        });
+      });
+
+      /* Trigger chips for "What usually triggered spending?" */
+      var TRIGGER_CHIPS = [
+        'Convenience', 'Stress', 'Boredom', 'Celebration', 'Social plans',
+        'Kids / Family', 'Work', 'Travel', 'Hunger', 'Forgot to plan',
+        'Sale / Discount', 'Online browsing', 'Subscription', 'Habit',
+        'Emergency', 'Home project', 'Self-care', 'Other'
+      ];
+
+      function buildTriggerChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        TRIGGER_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
+      var WORKED_WELL_CHIPS = [
+        'Meal planned more often', 'Had more $0 days', 'Waited before buying',
+        'Used what I already had', 'Avoided impulse purchases', 'Stayed within my budget',
+        'Repaired or reused something', 'Planned errands better',
+        'Unsubscribed from something', 'Other'
+      ];
+
+      function buildWorkedWellChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        WORKED_WELL_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
+      var HABIT_CHIPS = [
+        'Wait 24 hours before buying', 'Plan meals each week', 'Have more $0 days',
+        'Reduce online shopping', 'Buy secondhand first', 'Use what I already own',
+        'Plan errands to reduce trips', 'Cancel subscriptions', 'Cook at home more', 'Other'
+      ];
+
+      function buildHabitChips(qKey) {
+        var current = store[qKey] || '';
+        var html = '<div class="trigger-chips" data-key="' + qKey + '" data-single="true">';
+        HABIT_CHIPS.forEach(function(chip) {
+          var isSel = current === chip;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
+      var CHANGED_CHIPS = [
+        'Fewer impulse purchases', 'Cooked at home more', 'Drove less',
+        'Used what I already had', 'Repaired instead of replacing',
+        'Borrowed or shared', 'Delayed purchases', 'Cancelled subscriptions',
+        'Planned ahead', 'Saved more than usual', 'Nothing noticeable yet'
+      ];
+
+      var SURPRISED_CHIPS = [
+        'I spent less than I expected', 'I spent more than I realized',
+        "I didn't miss buying things", 'Planning ahead made a difference',
+        'Small purchases added up', 'Cooking at home saved more than expected',
+        'My triggers became clearer', 'Nothing surprised me', 'Other'
+      ];
+
+      function buildSurprisedChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        SURPRISED_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
+      function buildChangedChips(qKey) {
+        var selected = [];
+        try { selected = JSON.parse(store[qKey] || '[]'); } catch(e) {}
+        var html = '<div class="trigger-chips" data-key="' + qKey + '">';
+        CHANGED_CHIPS.forEach(function(chip) {
+          var isSel = selected.indexOf(chip) > -1;
+          html += '<button type="button" class="trigger-chip' + (isSel ? ' selected' : '') + '" data-value="' + chip + '">' + chip + '</button>';
+        });
+        html += '</div>';
+        return html;
+      }
+
+      /* Reflection group — questions stacked inside reflection-group */
+      function buildReflectionGroup(rKey) {
+        var r = REFLECTIONS[rKey];
+        var html = '<div class="reflection-group"><h3 class="group-title">' + r.title + '</h3>';
+        r.questions.forEach(function (q, qi) {
+          var qKey = mKey + '-' + rKey + '-' + qi;
+          var inner = '';
+          if (rKey === 'patterns' && qi === 0) {
+            var surpriseKey = mKey + '-patterns-trigger-surprise';
+            var surpriseVal = (store[surpriseKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            inner = '<div class="field-label sans">' + q + '</div><div class="field-sublabel">Select all that apply</div>' +
+                    buildTriggerChips(qKey) +
+                    '<div class="q-block"><div class="field-label sans">Anything surprising?</div>' +
+                    '<textarea data-key="' + surpriseKey + '" rows="2">' + surpriseVal + '</textarea></div>';
+          } else if (rKey === 'patterns' && qi === 1) {
+            inner = '<div class="field-label sans">' + q + '</div>' +
+                    buildChangedChips(qKey);
+          } else if (rKey === 'looking_back' && qi === 0) {
+            inner = '<div class="field-label sans">' + q + '</div>' +
+                    '<div class="field-sublabel">Select all that apply</div>' +
+                    buildWorkedWellChips(qKey);
+          } else if (rKey === 'looking_back' && qi === 1) {
+            inner = '<div class="field-label sans">' + q + '</div>' +
+                    '<div class="field-sublabel">Select any that apply</div>' +
+                    buildSurprisedChips(qKey);
+          } else if (rKey === 'looking_ahead' && qi === 0) {
+            inner = '<div class="field-label sans">' + q + '</div>' +
+                    buildHabitChips(qKey);
+          } else if (rKey === 'looking_ahead' && qi === 1) {
+            inner = '<div class="journal-cta"><a href="#letter" class="journal-cta-link" data-nav-section="letter">Write a Journal Entry &rarr;</a></div>';
+          } else {
+            var qVal = (store[qKey] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            inner = '<div class="field-label sans">' + q + '</div>' +
+                    '<textarea data-key="' + qKey + '" rows="2">' + qVal + '</textarea>';
+          }
+          html += '<div class="q-block">' + inner + '</div>';
+        });
+        html += '</div>';
+        return html;
+      }
+
+
+      /* Count $0 days for progress pill */
+      var zeroCount = 0;
+      weeks.forEach(function (week) {
+        week.forEach(function (d) {
+          if (d === 0) return;
+          var dk = 'cal-' + year + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+          if (store[dk] === 'zero') zeroCount++;
+        });
+      });
+
+      section.innerHTML =
+          buildQuoteBox(mKey) +
+          '<div class="head-row">' +
+          '<div class="illus">' + MONTH_ICONS[m] + '</div>' +
+          '<h2>' + info.name + ' ' + year + '</h2>' +
+          '<button class="month-toggle" aria-expanded="true" aria-label="Toggle month">' +
+            '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="month-body">' +
+          '<hr class="rule">' +
+          '<div class="month-layout">' +
+            '<div class="month-col-calendar">' +
+              '<div class="cal-share-above">' +
+                '<button class="cal-share-btn" id="share-btn-' + mKey + '" aria-label="Share ' + info.name + ' calendar">' +
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>' +
+                  ' Share' +
+                '</button>' +
+              '</div>' +
+              '<div class="cal-card">' +
+                '<div class="month-title-row">' +
+                  '<span class="save-note sans"><strong>Tap a day</strong> to mark if no money was spent. No purchases. No payments.</span>' +
+                  '<span class="progress-pill" id="progress-' + mKey + '">' + zeroCount + ' of ' + totalDays + ' $0 days</span>' +
+                '</div>' +
+                '<div class="weekday-row">' + weekdayCells + '</div>' +
+                '<div class="cal-grid">' + dayCells + '</div>' +
+                '<div class="legend">' +
+                  '<span><span class="sw zero"></span>$0 Day</span>' +
+                  '<span><span class="sw spend"></span>Spending Day</span>' +
+                  '<span><span class="sw empty"></span>Not yet marked</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="month-col-reflections">' +
+              buildReflectionGroup('patterns') +
+            '</div>' +
+          '</div>' +
+          '<div class="reflection-row">' +
+            buildReflectionGroup('looking_back') +
+            buildReflectionGroup('looking_ahead') +
+          '</div>' +
+        '</div>';
+
+      root.appendChild(section);
+      wireQuoteStars(section, mKey);
+
+      // Wire trigger chips
+      section.querySelectorAll('.trigger-chips').forEach(function(container) {
+        var qKey = container.getAttribute('data-key');
+        var isSingle = container.getAttribute('data-single') === 'true';
+        container.querySelectorAll('.trigger-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            if (isSingle) {
+              // Radio-style: deselect all, select tapped (toggle off if already selected)
+              var wasSelected = chip.classList.contains('selected');
+              container.querySelectorAll('.trigger-chip').forEach(function(c) { c.classList.remove('selected'); });
+              if (!wasSelected) chip.classList.add('selected');
+              store[qKey] = chip.classList.contains('selected') ? chip.getAttribute('data-value') : '';
+            } else {
+              chip.classList.toggle('selected');
+              var selected = [];
+              container.querySelectorAll('.trigger-chip.selected').forEach(function(c) {
+                selected.push(c.getAttribute('data-value'));
+              });
+              store[qKey] = JSON.stringify(selected);
+            }
+            debouncedSave();
+          });
+        });
+      });
+
+      var toggleBtn = section.querySelector('.month-toggle');
+      var headRow = section.querySelector('.head-row');
+      function doToggle() {
+        var collapsed = section.classList.toggle('collapsed');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      }
+      if (headRow) {
+        headRow.style.cursor = 'pointer';
+        headRow.addEventListener('click', function(e) {
+          // Don't trigger if clicking inside the month-body or other interactive elements
+          doToggle();
+        });
+      }
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation(); // prevent double-firing from headRow
+          doToggle();
+        });
+      }
+
+      /* Wire up calendar cells */
+      var cells = section.querySelectorAll('.day-cell[data-key]');
+      var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      function isPastCell(cell) {
+        var parts = cell.getAttribute('data-key').split('-'); // 'cal-2026-07-01'
+        var cellDate = new Date(parseInt(parts[1]), parseInt(parts[2]) - 1, parseInt(parts[3]));
+        return cellDate < todayStart;
+      }
+      function refreshPastUnmarked(cell) {
+        cell.classList.toggle('past-unmarked', isPastCell(cell) && cell.getAttribute('data-state') === '');
+      }
+
+      // Apply on load
+      cells.forEach(function(cell) { refreshPastUnmarked(cell); });
+
+      function updateProgress() {
+        var count = 0;
+        cells.forEach(function (c) { if (c.getAttribute('data-state') === 'zero') count++; });
+        var pill = document.getElementById('progress-' + mKey);
+        if (pill) pill.textContent = count + ' of ' + cells.length + ' $0 days';
+      }
+      cells.forEach(function (cell) {
+        cell.addEventListener('click', function () {
+          var cur  = cell.getAttribute('data-state');
+          var next = cur === '' ? 'zero' : (cur === 'zero' ? 'spend' : '');
+          cell.setAttribute('data-state', next);
+          refreshPastUnmarked(cell);
+          store[cell.getAttribute('data-key')] = next;
+          flushToFirestore(); // calendar taps save immediately
+          updateProgress();
+
+          /* First $0 day celebration */
+          if (next === 'zero' && countAllZeroDays() === 1) {
+            var parts = cell.getAttribute('data-key').split('-'); // 'cal-2026-07-15'
+            var d0 = new Date(parseInt(parts[1]), parseInt(parts[2]) - 1, parseInt(parts[3]));
+            var dateStr = d0.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            buildFirstZeroDayCanvas(m, year, dateStr).then(function(canvas) {
+              openShareModal(canvas, 'Your First $0 Day', 'first-zero-day.png');
+            });
+          }
+        });
+      });
+
+      /* Wire share button */
+      var shareTrigger = section.querySelector('#share-btn-' + mKey);
+      if (shareTrigger) {
+        shareTrigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          showMonthShareModal(m, year, weeks);
+        });
+      }
+
+      /* Wire up reflection textareas (already have values set via innerHTML) */
+      section.querySelectorAll('textarea[data-key]').forEach(function (el) {
+        el.addEventListener('input', function () {
+          store[el.getAttribute('data-key')] = el.value;
+          debouncedSave();
+        });
+      });
+    });
+
+  }
+
+  /* =====================================================================
+     MOBILE LAYOUT — card dashboard + horizontal swipe reader
+     ===================================================================== */
+  function initMobileLayout() {
+    var dashboard = document.getElementById('mobileDashboard');
+    var mainEl    = document.querySelector('#appContent > main');
+    var backBtn   = document.getElementById('mobileBackBtn');
+    var pageTitle = document.getElementById('mobilePageTitle');
+
+    var groups = [
+      { label: 'Introduction', direct: 'why-exists' },
+      { label: 'Rules',        rulesOverlay: true   },
+      {
+        label: 'Calendar',
+        items: [
+          { id: 'month-jul', eyebrow: 'Month 1', title: 'July',      locked: !isUnlocked(7)  },
+          { id: 'month-aug', eyebrow: 'Month 2', title: 'August',    locked: !isUnlocked(8)  },
+          { id: 'month-sep', eyebrow: 'Month 3', title: 'September', locked: !isUnlocked(9)  },
+          { id: 'month-oct', eyebrow: 'Month 4', title: 'October',   locked: !isUnlocked(10) },
+          { id: 'month-nov', eyebrow: 'Month 5', title: 'November',  locked: !isUnlocked(11) },
+          { id: 'month-dec', eyebrow: 'Month 6', title: 'December',  locked: !isUnlocked(12) }
+        ]
+      },
+      {
+        label: 'Journal',
+        items: [
+          { id: 'letter', eyebrow: 'Journal', title: 'Write it Out' }
+        ]
+      }
+    ];
+
+    // Flatten for title lookup
+    var allItems = [];
+    groups.forEach(function(g) {
+      if (g.items) g.items.forEach(function(item) { allItems.push(item); });
+    });
+
+    // Build dashboard HTML
+    var coverSvg = '<svg viewBox="0 0 80 80" width="70" height="70">'
+      + '<path d="M40 48 L40 20" stroke="#8fa377" stroke-width="1.4" fill="none"/>'
+      + '<path d="M40 30 C30 26 26 34 34 38 C38 40 40 36 40 30 Z" fill="#d7e3ce" stroke="#8fa377" stroke-width="1"/>'
+      + '<path d="M40 24 C50 20 54 28 46 32 C42 34 40 30 40 24 Z" fill="#eed9cd" stroke="#c69a82" stroke-width="1"/>'
+      + '<path d="M26 48 L54 48 L50 64 L30 64 Z" fill="#f1ddce" stroke="#d1a988" stroke-width="1.1"/>'
+      + '</svg>';
+    var dedicationName = store['field-belongs'] || '';
+    var dedicationDate = store['field-date'] || '';
+    var html = '<div class="mobile-dash-cover">'
+      + '<div class="illus" style="margin:0 auto 16px;width:fit-content;">' + coverSvg + '</div>'
+      + '<h1 style="font-size:34px;text-align:center;margin-bottom:6px;">The Mindful<br>Spending Journal</h1>'
+      + '<div class="sub" style="text-align:center;">A Practice to Spend with Intention</div>'
+      + '<hr class="rule center">'
+      + '</div>'
+      + '<div class="mobile-dash-dedication">'
+      + '<div class="field-label">This journal belongs to</div>'
+      + '<input type="text" data-key="field-belongs" placeholder="Your name" value="' + dedicationName.replace(/"/g, '&quot;') + '">'
+      + '<div class="field-label" style="margin-top:18px;">Begun on</div>'
+      + '<input type="text" data-key="field-date" placeholder="Today\'s date" value="' + dedicationDate.replace(/"/g, '&quot;') + '">'
+      + '<p class="italic center" style="margin-top:26px;font-size:15px;">You do not need to make more money to feel free.<br>Sometimes you just need to notice the money<br>you already have and where it\'s going.</p>'
+      + '</div>';
+    groups.forEach(function(g) {
+      html += '<div class="mobile-section-group">';
+      if (g.direct) {
+        // Single clickable label row — same style as group labels
+        html += '<div class="mobile-group-label mobile-group-link" data-sid="' + g.direct + '" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+          + g.label
+          + '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          + '</div>';
+      } else if (g.rulesOverlay) {
+        // Rules → opens overlay instead of reader
+        html += '<div class="mobile-group-label mobile-rules-overlay-link" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+          + g.label
+          + '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          + '</div>';
+      } else {
+        if (g.label) html += '<div class="mobile-group-label">' + g.label + '</div>';
+        html += '<ul class="mobile-nav-list">';
+        g.items.forEach(function(item) {
+          html += '<li class="mobile-nav-item' + (item.locked ? ' locked' : '') + '" data-sid="' + item.id + '">';
+          html += '<span class="mobile-nav-title">' + item.title + '</span>';
+          html += '<svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          html += '</li>';
+        });
+        html += '</ul>';
+      }
+      html += '</div>';
+    });
+    dashboard.innerHTML = html;
+
+    // Wire up dedication inputs on dashboard
+    dashboard.querySelectorAll('input[data-key]').forEach(function(el) {
+      var key = el.getAttribute('data-key');
+      el.addEventListener('input', function() {
+        store[key] = el.value;
+        // keep desktop input in sync
+        var desktopEl = document.querySelector('main input[data-key="' + key + '"]');
+        if (desktopEl) desktopEl.value = el.value;
+        debouncedSave();
+      });
+    });
+
+    // Direct group label taps → open reader
+    dashboard.querySelectorAll('.mobile-group-link').forEach(function(el) {
+      el.addEventListener('click', function() {
+        openReader(el.getAttribute('data-sid'));
+      });
+    });
+
+    // Rules dashboard row → open reader at rules
+    dashboard.querySelectorAll('.mobile-rules-overlay-link').forEach(function(el) {
+      el.addEventListener('click', function() {
+        openReader('rules');
+      });
+    });
+
+    // List item tap → open reader
+    dashboard.querySelectorAll('.mobile-nav-item:not(.locked)').forEach(function(item) {
+      item.addEventListener('click', function() {
+        openReader(item.getAttribute('data-sid'));
+      });
+    });
+
+    var savedDashboardScroll = 0;
+
+
+    // Sub-nav section → group mapping
+    var sectionGroupMap = {
+      'why-exists': 'intro', 'why-matters': 'intro', 'how-to-use': 'intro',
+      'rules': 'rules', 'ask-yourself': 'rules',
+      'month-jul': 'calendar', 'month-aug': 'calendar', 'month-sep': 'calendar',
+      'month-oct': 'calendar', 'month-nov': 'calendar', 'month-dec': 'calendar',
+      'letter': 'journal', 'closing': 'journal'
+    };
+
+    // Group → which section IDs to show
+    var groupSectionsMap = {
+      intro:    ['why-exists', 'why-matters', 'how-to-use'],
+      rules:    ['rules', 'ask-yourself'],
+      calendar: ['month-jul', 'month-aug', 'month-sep', 'month-oct', 'month-nov', 'month-dec'],
+      journal:  ['letter', 'closing']
+    };
+
+    function showGroupSections(group) {
+      // Hide all
+      document.querySelectorAll('#appContent > main .section').forEach(function(s) {
+        s.classList.remove('reader-visible');
+      });
+      // Show only this group's sections
+      var ids = groupSectionsMap[group] || [];
+      ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('reader-visible');
+      });
+    }
+
+    function setReaderNavActive(group) {
+      document.querySelectorAll('.reader-nav-item').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-section') === group);
+      });
+    }
+
+    // Sub-nav tap handlers
+    var readerNavEl = document.getElementById('mobileReaderNav');
+    if (readerNavEl) {
+      readerNavEl.querySelectorAll('.reader-nav-item').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var section = btn.getAttribute('data-section');
+          var targetId = section === 'intro'     ? 'why-exists'
+                       : section === 'rules'     ? 'rules'
+                       : section === 'calendar'  ? 'month-jul'
+                       : section === 'journal'   ? 'letter'
+                       : null;
+          if (targetId) openReader(targetId);
+        });
+      });
+    }
+
+    window.__openReader = openReader;
+    function openReader(sectionId) {
+      savedDashboardScroll = window.scrollY;
+      var group = sectionGroupMap[sectionId] || 'calendar';
+      document.body.classList.add('reading');
+      showGroupSections(group);
+      setReaderNavActive(group);
+      setTimeout(function() {
+        if (mainEl) mainEl.scrollTop = 0;
+      }, 20);
+    }
+
+    function closeReader() {
+      document.body.classList.remove('reading');
+      setTimeout(function() {
+        window.scrollTo(0, savedDashboardScroll);
+      }, 20);
+    }
+
+    backBtn.addEventListener('click', closeReader);
+  }
+
+  /* =====================================================================
+     FREE JOURNAL ENTRIES
+     ===================================================================== */
+  function initJournalEntries() {
+    var overlay    = document.getElementById('journalOverlay');
+    var addBtn     = document.getElementById('journalAddBtn');
+    var closeBtn   = document.getElementById('journalCloseBtn');
+    var cancelBtn  = document.getElementById('journalCancelBtn');
+    var saveBtn    = document.getElementById('journalSaveBtn');
+    var titleInput = document.getElementById('journalTitleInput');
+    var bodyInput  = document.getElementById('journalBodyInput');
+    var dateEl     = document.getElementById('journalPaperDate');
+    var list       = document.getElementById('journalEntriesList');
+
+    if (!overlay || !addBtn) return;
+
+    function getEntries() {
+      try { return JSON.parse(store['journal-free-entries'] || '[]'); } catch(e) { return []; }
+    }
+    function saveEntries(entries) {
+      store['journal-free-entries'] = JSON.stringify(entries);
+      debouncedSave();
+    }
+    function updateLastEntryNote() {
+      var note = document.getElementById('letterSaveNote');
+      if (!note) return;
+      var entries = getEntries();
+      if (!entries.length) { note.textContent = ''; return; }
+      var last = entries[entries.length - 1];
+      var d = new Date(last.date);
+      note.textContent = 'Last entry: ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function formatDate(iso) {
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function renderEntries() {
+      var entries = getEntries();
+      list.innerHTML = '';
+      if (!entries.length) return;
+      entries.slice().reverse().forEach(function(entry, ri) {
+        var idx = entries.length - 1 - ri;
+        var card = document.createElement('div');
+        card.className = 'journal-entry-card';
+        card.innerHTML =
+          '<div class="journal-entry-meta">' + formatDate(entry.date) + '</div>' +
+          (entry.title ? '<div class="journal-entry-title">' + entry.title.replace(/</g,'&lt;') + '</div>' : '') +
+          '<div class="journal-entry-body">' + entry.body.replace(/</g,'&lt;') + '</div>' +
+          '<button class="journal-entry-delete" data-idx="' + idx + '" aria-label="Delete entry">' +
+            '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="3" y1="3" x2="11" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="3" x2="3" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
+          '</button>';
+        card.querySelector('.journal-entry-delete').addEventListener('click', function() {
+          var entries2 = getEntries();
+          entries2.splice(parseInt(this.getAttribute('data-idx')), 1);
+          saveEntries(entries2);
+          renderEntries();
+        });
+        list.appendChild(card);
+      });
+    }
+
+    function openOverlay() {
+      titleInput.value = '';
+      bodyInput.value = '';
+      dateEl.textContent = formatDate(new Date().toISOString());
+      overlay.classList.add('open');
+      requestAnimationFrame(function() { overlay.style.opacity = '1'; });
+      setTimeout(function() { bodyInput.focus(); }, 120);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeOverlay() {
+      overlay.classList.remove('open');
+      overlay.style.opacity = '';
+      document.body.style.overflow = '';
+    }
+
+    addBtn.addEventListener('click', function() {
+      var letterEl = document.querySelector('textarea[data-key="letter"]');
+      var body = letterEl ? letterEl.value.trim() : '';
+      if (!body) { if (letterEl) letterEl.focus(); return; }
+      var entries = getEntries();
+      var dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      entries.push({ date: new Date().toISOString(), title: dateStr, body: body });
+      saveEntries(entries);
+      letterEl.value = '';
+      store['letter'] = '';
+      debouncedSave();
+      renderEntries();
+      if (window._refreshJournalDrawer) window._refreshJournalDrawer();
+      updateLastEntryNote();
+      var toast = document.getElementById('journalSaveToast');
+      if (toast) {
+        toast.textContent = 'Entry saved ✓';
+        toast.style.opacity = '1';
+        setTimeout(function() { toast.style.opacity = '0'; }, 2000);
+      }
+    });
+    closeBtn.addEventListener('click', closeOverlay);
+    cancelBtn.addEventListener('click', closeOverlay);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeOverlay(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeOverlay(); });
+
+    saveBtn.addEventListener('click', function() {
+      var body = bodyInput.value.trim();
+      if (!body) { bodyInput.focus(); return; }
+      var entries = getEntries();
+      entries.push({ date: new Date().toISOString(), title: titleInput.value.trim(), body: body });
+      saveEntries(entries);
+      renderEntries();
+      if (window._refreshJournalDrawer) window._refreshJournalDrawer();
+      closeOverlay();
+    });
+
+    renderEntries();
+    updateLastEntryNote();
+  }
+
+  /* =====================================================================
+     JOURNAL ENTRIES DRAWER
+     ===================================================================== */
+  function initJournalDrawer() {
+    var drawer      = document.getElementById('journalDrawer');
+    var backdrop    = document.getElementById('journalDrawerBackdrop');
+    var closeBtn    = document.getElementById('journalDrawerClose');
+    var listEl      = document.getElementById('journalDrawerList');
+    var countEl     = document.getElementById('journalDrawerCount');
+    var triggerBtn  = document.getElementById('journalMyEntriesBtn');
+
+    if (!drawer || !triggerBtn) return;
+
+    function getEntries() {
+      try { return JSON.parse(store['journal-free-entries'] || '[]'); } catch(e) { return []; }
+    }
+    function saveEntries(entries) {
+      store['journal-free-entries'] = JSON.stringify(entries);
+      debouncedSave();
+    }
+    function formatDate(iso) {
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      renderDrawerEntries();
+    }
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function renderDrawerEntries() {
+      var entries = getEntries();
+      countEl.textContent = entries.length === 0 ? 'No entries yet' : entries.length === 1 ? '1 entry' : entries.length + ' entries';
+      listEl.innerHTML = '';
+      if (!entries.length) {
+        listEl.innerHTML = '<div class="journal-drawer-empty">Your entries will appear here.</div>';
+        return;
+      }
+      entries.slice().reverse().forEach(function(entry, ri) {
+        var idx = entries.length - 1 - ri;
+        var card = document.createElement('div');
+        card.className = 'journal-drawer-card';
+        renderCardView(card, entry, idx);
+        listEl.appendChild(card);
+      });
+    }
+
+    function renderCardView(card, entry, idx) {
+      card.classList.remove('editing');
+      var label = entry.title || entry.body.split('\n')[0] || 'Untitled';
+      var shortDate = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      card.innerHTML =
+        '<button class="journal-drawer-row-main edit-btn">' +
+          '<span class="journal-drawer-row-title">' + label.replace(/</g,'&lt;') + '</span>' +
+        '</button>' +
+        '<span class="journal-drawer-card-meta">' + shortDate + '</span>' +
+        '<div class="journal-drawer-card-actions">' +
+          '<button class="jd-btn share-btn" title="Share">' +
+            '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="13" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="13" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M11.5 3.8L4.5 7.3M11.5 12.2L4.5 8.7" stroke="currentColor" stroke-width="1.3"/></svg>' +
+            'Share</button>' +
+          '<button class="jd-btn danger delete-btn" title="Delete">' +
+            '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5a.5.5 0 01.5-.5h5a.5.5 0 01.5.5V4M3 4l1 9a.5.5 0 00.5.5h5a.5.5 0 00.5-.5l1-9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+        '</div>';
+
+      card.querySelector('.edit-btn').addEventListener('click', function() {
+        renderCardEdit(card, entry, idx);
+      });
+      card.querySelector('.share-btn').addEventListener('click', function() {
+        var text = (entry.title ? entry.title + '\n\n' : '') + entry.body;
+        var btn = card.querySelector('.share-btn');
+        if (navigator.share) {
+          navigator.share({ title: entry.title || 'Journal Entry', text: text });
+        } else {
+          navigator.clipboard.writeText(text).then(function() {
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="13" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="13" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M11.5 3.8L4.5 7.3M11.5 12.2L4.5 8.7" stroke="currentColor" stroke-width="1.3"/></svg>Share'; }, 2000);
+          });
+        }
+      });
+      card.querySelector('.delete-btn').addEventListener('click', function() {
+        if (!confirm('Delete this entry?')) return;
+        var updated = getEntries();
+        updated.splice(idx, 1);
+        saveEntries(updated);
+        renderDrawerEntries();
+      });
+    }
+
+    function renderCardEdit(card, entry, idx) {
+      card.classList.add('editing');
+      card.innerHTML =
+        '<div class="journal-drawer-card-meta">' + formatDate(entry.date) + '</div>' +
+        '<input class="journal-drawer-edit-title" type="text" placeholder="Title (optional)" value="' + (entry.title || '').replace(/"/g,'&quot;') + '">' +
+        '<textarea class="journal-drawer-edit-body">' + entry.body.replace(/</g,'&lt;') + '</textarea>' +
+        '<div class="journal-drawer-edit-actions">' +
+          '<button class="jd-btn cancel-edit-btn">Cancel</button>' +
+          '<button class="jd-btn primary save-edit-btn">Save</button>' +
+        '</div>';
+
+      card.querySelector('.cancel-edit-btn').addEventListener('click', function() {
+        renderCardView(card, entry, idx);
+      });
+      card.querySelector('.save-edit-btn').addEventListener('click', function() {
+        var newTitle = card.querySelector('.journal-drawer-edit-title').value.trim();
+        var newBody  = card.querySelector('.journal-drawer-edit-body').value.trim();
+        if (!newBody) { card.querySelector('.journal-drawer-edit-body').focus(); return; }
+        var updated = getEntries();
+        updated[idx] = { date: updated[idx].date, title: newTitle, body: newBody };
+        saveEntries(updated);
+        renderDrawerEntries();
+      });
+    }
+
+    triggerBtn.addEventListener('click', openDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+    });
+
+    window._refreshJournalDrawer = renderDrawerEntries;
+  }
+
+})();
+</script>
+
+<!-- FEEDBACK FAB -->
+<button class="feedback-fab" id="feedbackFab" aria-label="Share feedback">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedbackOverlay" class="feedback-overlay">
+  <div class="feedback-modal" role="dialog" aria-label="Feedback">
+    <div class="feedback-modal-head">
+      <div>
+        <div class="feedback-modal-title">Share your feedback</div>
+        <div class="feedback-modal-sub">We read every message.</div>
+      </div>
+      <button class="feedback-close" id="feedbackClose" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="feedback-stars" id="feedbackStars">
+      <button class="feedback-star" data-star="1">&#9733;</button>
+      <button class="feedback-star" data-star="2">&#9733;</button>
+      <button class="feedback-star" data-star="3">&#9733;</button>
+      <button class="feedback-star" data-star="4">&#9733;</button>
+      <button class="feedback-star" data-star="5">&#9733;</button>
+    </div>
+    <textarea class="feedback-textarea" id="feedbackText" placeholder="What's on your mind?" rows="4"></textarea>
+    <button class="feedback-submit" id="feedbackSubmit">Send feedback</button>
+    <div class="feedback-success" id="feedbackSuccess">Thank you — your feedback means a lot. ✓</div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="shareOverlay" class="share-overlay" role="dialog" aria-modal="true">
+  <div class="share-modal">
+    <button class="share-close-btn" id="shareCloseBtn" aria-label="Close">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <div class="share-modal-label" id="shareModalLabel">Share</div>
+    <div class="share-template-row" id="shareTemplateRow"></div>
+    <div class="share-canvas-wrap" id="shareCanvasWrap"></div>
+    <div class="share-actions">
+      <button class="share-action-btn secondary" id="shareDownloadBtn">Download</button>
+      <button class="share-action-btn primary" id="shareShareBtn">Share</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mindful Spending Journal — Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    background: #f7f5f2;
+    color: #2c2c2c;
+    padding: 48px 32px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1a1a1a;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 40px;
+  }
+  .diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .node-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .node-body {
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #444;
+  }
+  .node-body code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11.5px;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* Browser layer */
+  .browser-layer {
+    background: #fff;
+    border: 2px solid #d9d3cb;
+    border-radius: 16px;
+    padding: 24px 28px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .browser-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #aaa;
+    margin-bottom: 14px;
+  }
+  .index-node {
+    background: #fdf8f4;
+    border: 1.5px solid #e8ddd4;
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .index-node .node-title { color: #b06040; }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .pill {
+    font-size: 11px;
+    background: #f0ebe5;
+    border: 1px solid #ddd4c8;
+    border-radius: 20px;
+    padding: 3px 10px;
+    color: #666;
+  }
+
+  /* Connector */
+  .connector-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 860px;
+    padding: 0 120px;
+    height: 44px;
+  }
+  .connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .connector-line { width: 2px; height: 28px; background: #ccc; }
+  .connector-arrow { color: #bbb; font-size: 14px; line-height: 1; }
+
+  /* Services row */
+  .services-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .service-node {
+    border-radius: 12px;
+    padding: 18px 16px;
+  }
+  .firebase-auth {
+    background: #fff8f0;
+    border: 1.5px solid #f5c98a;
+  }
+  .firebase-auth .node-title { color: #c87a10; }
+
+  .firestore {
+    background: #f0f7ff;
+    border: 1.5px solid #93c5e8;
+  }
+  .firestore .node-title { color: #1a6da0; }
+  .collection {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid #b8d8ee;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 11.5px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    line-height: 1.8;
+  }
+  .collection-name { font-weight: 700; color: #1a6da0; }
+  .field { color: #555; padding-left: 12px; }
+  .field span { color: #999; }
+
+  .ga-node {
+    background: #f4fff4;
+    border: 1.5px solid #86c98a;
+  }
+  .ga-node .node-title { color: #2a7a30; }
+
+  /* Single connector to admin */
+  .single-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 44px;
+    justify-content: center;
+  }
+  .single-connector-line { width: 2px; height: 28px; background: #ccc; }
+  .single-connector-arrow { color: #bbb; font-size: 14px; line-height: 1; }
+
+  /* Admin */
+  .admin-node {
+    background: #fdf4ff;
+    border: 1.5px solid #d4a0e0;
+    border-radius: 12px;
+    padding: 18px 20px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .admin-node .node-title { color: #8030a0; }
+  .admin-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .metric-pill {
+    font-size: 11.5px;
+    background: #f5eaff;
+    border: 1px solid #d4a0e0;
+    border-radius: 20px;
+    padding: 4px 12px;
+    color: #7030a0;
+  }
+
+  /* Table */
+  .data-table-section {
+    width: 100%;
+    max-width: 860px;
+    margin-top: 48px;
+  }
+  .data-table-section h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #333;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #e0dbd4;
+  }
+  th {
+    background: #f0ebe5;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #888;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  td {
+    padding: 10px 14px;
+    border-top: 1px solid #f0ebe5;
+    color: #333;
+    vertical-align: top;
+  }
+  td code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11.5px;
+    background: #f5f0eb;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  tr:hover td { background: #fdf8f4; }
+
+  @media print {
+    body { background: #fff; padding: 24px; }
+    .browser-layer, .service-node, .admin-node { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Mindful Spending Journal &mdash; Architecture</h1>
+<p class="subtitle">No backend server &nbsp;&middot;&nbsp; Browser talks directly to Firebase &nbsp;&middot;&nbsp; All user data lives in Firestore</p>
+
+<div class="diagram">
+
+  <!-- Browser -->
+  <div class="browser-layer">
+    <div class="browser-label">Browser</div>
+    <div class="index-node">
+      <div class="node-title">index.html &nbsp;<span style="font-weight:400;color:#999;text-transform:none;font-size:12px;">single file &mdash; no build step</span></div>
+      <div class="node-body">All HTML, CSS, and JavaScript in one file. Runs entirely client-side.</div>
+      <div class="pills">
+        <span class="pill">Calendar UI</span>
+        <span class="pill">Journal notes</span>
+        <span class="pill">Quote ratings</span>
+        <span class="pill">Auth gate / sign-in</span>
+        <span class="pill">$0 Day tracking</span>
+        <span class="pill">Reading mode (mobile)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 connectors -->
+  <div class="connector-row">
+    <div class="connector"><div class="connector-line"></div><div class="connector-arrow">&#9660;</div></div>
+    <div class="connector"><div class="connector-line"></div><div class="connector-arrow">&#9660;</div></div>
+    <div class="connector"><div class="connector-line"></div><div class="connector-arrow">&#9660;</div></div>
+  </div>
+
+  <!-- Services -->
+  <div class="services-row">
+
+    <div class="service-node firebase-auth">
+      <div class="node-title">Firebase Auth</div>
+      <div class="node-body">
+        Google OAuth only<br><br>
+        Returns:<br>
+        &bull; <code>uid</code><br>
+        &bull; <code>email</code><br>
+        &bull; display name<br>
+        &bull; photo URL
+      </div>
+    </div>
+
+    <div class="service-node firestore">
+      <div class="node-title">Cloud Firestore</div>
+      <div class="collection">
+        <div class="collection-name">journals/{uid}</div>
+        <div class="field">days <span>{ date &rarr; state }</span></div>
+        <div class="field">notes <span>{ date &rarr; text }</span></div>
+        <div class="field">quotes <span>{ id &rarr; &plusmn;1 }</span></div>
+        <div class="field">_lastSaved <span>timestamp</span></div>
+      </div>
+      <div class="collection" style="margin-top:8px;">
+        <div class="collection-name">_meta/authgate</div>
+        <div class="field">total <span>landing visits</span></div>
+      </div>
+      <div class="collection" style="margin-top:8px;">
+        <div class="collection-name">_meta/pageviews</div>
+        <div class="field">total <span>logged-in sessions</span></div>
+      </div>
+    </div>
+
+    <div class="service-node ga-node">
+      <div class="node-title">Google Analytics 4</div>
+      <div class="node-body">
+        Written via <code>gtag.js</code> in index.html<br><br>
+        Tracks:<br>
+        &bull; Sessions<br>
+        &bull; Page views<br>
+        &bull; New vs returning users<br>
+        &bull; Bounce rate<br>
+        &bull; Avg session duration
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Single connector to admin -->
+  <div class="single-connector">
+    <div class="single-connector-line"></div>
+    <div class="single-connector-arrow">&#9660;</div>
+  </div>
+
+  <!-- Admin -->
+  <div class="admin-node">
+    <div class="node-title">admin.html &nbsp;<span style="font-weight:400;color:#b060c0;text-transform:none;font-size:12px;">sparakala@gmail.com only</span></div>
+    <div class="node-body">Reads directly from Firestore (all journals) and the GA4 Data API via OAuth. No server involved.</div>
+    <div class="admin-metrics">
+      <span class="metric-pill">Landing visits</span>
+      <span class="metric-pill">Total sign-ups</span>
+      <span class="metric-pill">Conversion rate</span>
+      <span class="metric-pill">Journal entries</span>
+      <span class="metric-pill">Quote ratings</span>
+      <span class="metric-pill">Active users (30d)</span>
+      <span class="metric-pill">GA sessions &amp; bounce rate</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Data table -->
+<div class="data-table-section">
+  <h2>Where data lives</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Location</th>
+        <th>Who can access</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Calendar days, journal notes</td>
+        <td><code>journals/{uid}.days</code> / <code>.notes</code></td>
+        <td>Owner only (Firestore rules)</td>
+      </tr>
+      <tr>
+        <td>Quote ratings</td>
+        <td><code>journals/{uid}.quotes</code></td>
+        <td>Owner only</td>
+      </tr>
+      <tr>
+        <td>Landing page visit count</td>
+        <td><code>_meta/authgate.total</code></td>
+        <td>Public write, admin read</td>
+      </tr>
+      <tr>
+        <td>Logged-in session count</td>
+        <td><code>_meta/pageviews.total</code></td>
+        <td>Authenticated write, admin read</td>
+      </tr>
+      <tr>
+        <td>Traffic analytics</td>
+        <td>Google Analytics 4</td>
+        <td>Admin via GA4 Data API + OAuth</td>
+      </tr>
+      <tr>
+        <td>User identity</td>
+        <td>Firebase Auth</td>
+        <td>Google OAuth token</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
