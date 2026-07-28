@@ -462,17 +462,25 @@
   .kj-save-btn{ background:var(--gold); border-color:var(--gold); color:var(--ink); font-weight:700; }
   .kj-save-btn:hover{ background:var(--gold-deep); border-color:var(--gold-deep); color:#fff; }
   .kj-entries-list{ display:flex; flex-direction:column; gap:16px; }
-  /* Side panel */
-  .kj-side-panel{ position:fixed; top:0; right:0; height:100vh; width:360px; max-width:92vw; background:#f8f3ea; box-shadow:-4px 0 32px rgba(30,26,20,0.13); z-index:180; display:flex; flex-direction:column; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+  /* Side panel — matches spending journal drawer */
+  .kj-side-panel{ position:fixed; top:0; right:0; height:100vh; width:560px; max-width:100vw; background-color:#EAC66B; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"); box-shadow:-6px 0 48px rgba(0,0,0,0.13); z-index:180; display:flex; flex-direction:column; overflow:hidden; transform:translateX(100%); transition:transform 0.34s cubic-bezier(0.4,0,0.2,1); }
   .kj-side-panel.open{ transform:translateX(0); }
-  .kj-side-panel-header{ display:flex; align-items:center; justify-content:space-between; padding:22px 20px 16px; border-bottom:1px solid var(--line); flex-shrink:0; }
-  .kj-side-panel-title{ font-family:'EB Garamond',Georgia,serif; font-size:20px; color:var(--ink); margin:0; }
-  .kj-side-panel-close{ background:none; border:none; cursor:pointer; color:#b0a898; padding:4px; transition:color 0.14s; }
-  .kj-side-panel-close:hover{ color:var(--ink); }
-  .kj-side-panel-body{ flex:1; overflow-y:auto; padding:16px 16px 24px; display:flex; flex-direction:column; gap:14px; }
-  .kj-side-panel-empty{ font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-label); text-align:center; margin-top:40px; }
-  .kj-panel-overlay{ position:fixed; inset:0; z-index:170; background:rgba(30,26,20,0.25); opacity:0; pointer-events:none; transition:opacity 0.3s; }
+  .kj-side-panel-header{ display:flex; flex-direction:column; align-items:center; padding:40px 24px 24px; border-bottom:1px solid rgba(0,0,0,0.1); flex-shrink:0; position:relative; }
+  .kj-side-panel-title{ font-family:'EB Garamond',Georgia,serif; font-size:27px; color:#2d3a20; margin:14px 0 0; letter-spacing:0.01em; }
+  .kj-side-panel-count{ font-family:'Nunito',sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(0,0,0,0.4); margin-top:5px; }
+  .kj-side-panel-close{ position:absolute; top:18px; right:18px; background:none; border:1px solid rgba(0,0,0,0.18); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(0,0,0,0.45); font-size:18px; line-height:1; transition:background 0.14s,color 0.14s; }
+  .kj-side-panel-close:hover{ background:rgba(0,0,0,0.08); color:#2d3a20; }
+  .kj-side-panel-body{ flex:1; overflow-y:auto; padding:22px 20px 48px; }
+  .kj-side-panel-empty{ text-align:center; color:rgba(0,0,0,0.35); font-family:'EB Garamond',Georgia,serif; font-size:17px; font-style:italic; padding:52px 0; }
+  .kj-panel-overlay{ position:fixed; inset:0; z-index:170; background:rgba(30,26,20,0.32); opacity:0; pointer-events:none; transition:opacity 0.34s; }
   .kj-panel-overlay.open{ opacity:1; pointer-events:auto; }
+  /* Entry cards inside panel — row style on gold bg */
+  .kj-side-panel-body .kj-entry-card{ background:none; border:none; border-radius:0; border-bottom:1px solid rgba(0,0,0,0.1); padding:14px 4px; box-shadow:none; }
+  .kj-side-panel-body .kj-entry-title{ color:rgba(0,0,0,0.75); font-size:18px; }
+  .kj-side-panel-body .kj-entry-body{ color:rgba(0,0,0,0.55); font-size:13.5px; }
+  .kj-side-panel-body .kj-entry-meta{ color:rgba(0,0,0,0.38); }
+  .kj-side-panel-body .kj-entry-badge{ background:rgba(255,255,255,0.4) !important; color:#2d3a20 !important; border:none; }
+  .kj-side-panel-body .kj-entry-delete{ color:rgba(0,0,0,0.35); top:14px; right:4px; }
   .kj-entry-card{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px; position:relative; }
   .kj-entry-meta{ font-size:11px; color:var(--ink-label); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
   .kj-entry-badge{ font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; letter-spacing:0.06em; text-transform:uppercase; }
@@ -943,10 +951,15 @@
 <div class="kj-panel-overlay" id="kjPanelOverlay"></div>
 <div class="kj-side-panel" id="kjSidePanel">
   <div class="kj-side-panel-header">
-    <div class="kj-side-panel-title">My entries</div>
-    <button class="kj-side-panel-close" id="kjSidePanelClose" type="button" title="Close">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="4" y1="4" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="4" x2="4" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-    </button>
+    <button class="kj-side-panel-close" id="kjSidePanelClose" type="button" aria-label="Close">&times;</button>
+    <svg viewBox="0 0 60 90" width="44" height="66">
+      <path d="M32 84 C31 68 30 52 28 18" stroke="#4a6e3a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M28 64 C16 56 12 40 22 36 C28 34 30 48 28 64 Z" fill="rgba(255,255,255,0.4)" stroke="#4a6e3a" stroke-width="1.2"/>
+      <path d="M29 46 C42 40 50 28 42 24 C37 22 30 34 29 46 Z" fill="rgba(255,255,255,0.4)" stroke="#4a6e3a" stroke-width="1.2"/>
+      <path d="M28 28 C18 22 16 10 24 8 C29 7 29 18 28 28 Z" fill="rgba(255,255,255,0.4)" stroke="#4a6e3a" stroke-width="1.2"/>
+    </svg>
+    <div class="kj-side-panel-title">My Entries</div>
+    <div class="kj-side-panel-count" id="kjSidePanelCount"></div>
   </div>
   <div class="kj-side-panel-body" id="kjSidePanelBody"></div>
 </div>
@@ -1409,6 +1422,8 @@
   const panelOverlay = document.getElementById('kjPanelOverlay');
   const toast = document.getElementById('kitchenJournalToast');
 
+  const sidePanelCount = document.getElementById('kjSidePanelCount');
+  function updateCount(){ sidePanelCount.textContent = entries.length === 1 ? '1 entry' : entries.length + ' entries'; }
   function openSidePanel(){ sidePanel.classList.add('open'); panelOverlay.classList.add('open'); renderSidePanel(); }
   function closeSidePanel(){ sidePanel.classList.remove('open'); panelOverlay.classList.remove('open'); }
 
@@ -1464,7 +1479,7 @@
 
   function renderEntries(){ /* no-op: inline list no longer used */ }
 
-  function renderSidePanel(){ buildEntryCards(sidePanelBody, renderSidePanel); }
+  function renderSidePanel(){ updateCount(); buildEntryCards(sidePanelBody, renderSidePanel); }
 
   document.getElementById('kjAddBtn').addEventListener('click', function(){
     const body = document.getElementById('kjText').value.trim();
