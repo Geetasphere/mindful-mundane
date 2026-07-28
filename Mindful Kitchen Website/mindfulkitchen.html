@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mindful Kitchen</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,700;0,800;1,200;1,300&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<style>
+  :root{
+    --gold: #EAC66B;
+    --gold-deep: #c99f3f;
+    --sage: #8FA377;
+    --blue: #9FB9C9;
+    --clay: #C69A82;
+    --blue-tint: #CFE0EA;
+    --sage-tint: #D7E3CE;
+    --tan: #D99A6C;
+    --peach-tint: #EED9CD;
+    --apricot-tint: #F3CBAB;
+    --yellow-tint: #FFEDBE;
+    --white: #FFFFFF;
+    --bg: #FFFAF0;
+    --card: #FFFFFF;
+    --ink: #3a352f;
+    --ink-soft: #5c6650;
+    --ink-label: #8a8266;
+    --line: #ece3cd;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Nunito','Helvetica Neue',Arial,sans-serif;
+    font-size:16px; line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{ font-family:'EB Garamond',Georgia,serif; }
+  .sans{ font-family:'Nunito','Helvetica Neue',Arial,sans-serif; }
+  a{ color:inherit; }
+  img,svg{ display:block; }
+
+  /* ---------- NAV ---------- */
+  .topbar{
+    position:sticky; top:36px; z-index:50;
+    display:flex; align-items:center; flex-wrap:nowrap; gap:12px;
+    padding:10px 18px;
+    background:rgba(250,246,240,0.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'EB Garamond', Georgia, serif; font-weight:500; font-size:18px; color:var(--ink);
+    text-decoration:none; flex-shrink:0;
+  }
+  .topbar-right{ display:flex; align-items:center; gap:4px; margin-left:auto; }
+  .topbar-nav{ display:flex; align-items:center; gap:2px; }
+  .topbar-nav-btn{
+    display:flex; align-items:center; gap:6px; padding:7px 13px;
+    border-radius:7px; font-family:'Nunito',sans-serif; font-size:14px;
+    color:var(--ink-soft); text-decoration:none;
+    transition:background 0.14s, color 0.14s; white-space:nowrap;
+  }
+  .topbar-nav-btn:hover{ background:var(--bg); color:var(--ink); }
+  .topbar-divider{ width:1px; height:18px; background:var(--line); flex-shrink:0; margin:0 8px; }
+  @media (max-width:820px){ .topbar-nav{ display:none; } }
+  /* Mobile tab nav */
+  #mobileNav{ display:none; position:sticky; top:84px; z-index:49; background:rgba(250,246,240,0.97); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  @media (max-width:820px){ #mobileNav{ display:flex; } }
+  .mobile-nav-item{ flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 4px 9px; font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-soft); text-decoration:none; border-right:1px solid var(--line); transition:color 0.15s; white-space:nowrap; }
+  .mobile-nav-item:last-child{ border-right:none; }
+  .mobile-nav-item:hover{ color:var(--ink); }
+  @media (max-width:400px){ .mobile-nav-item{ font-size:11px; padding:10px 2px 9px; } }
+  /* Mobile section sizing */
+  @media (max-width:620px){
+    section{ padding:40px 16px; }
+    .hero{ padding:48px 20px 36px; }
+    .tmpl-grid{ grid-template-columns:repeat(3,1fr); }
+    .utility-bar{ padding:5px 14px; }
+    .utility-links{ gap:12px; }
+  }
+  @media (max-width:420px){
+    .tmpl-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+  .utility-bar{
+    position:sticky; top:0; z-index:60; height:36px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px; background:rgba(217,154,108,0.96);
+    backdrop-filter:blur(6px); border-bottom:1px solid rgba(163,137,102,0.25);
+    font-family:'EB Garamond', Georgia, serif; font-size:14px; color:var(--ink-soft);
+  }
+  .utility-bar a{ color:inherit; text-decoration:none; }
+  .utility-links{ display:flex; gap:22px; align-items:center; }
+  .utility-links a{ font-family:'Nunito',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); text-decoration:none; }
+  .utility-links a:hover, .utility-links a.active{ color:var(--ink); font-weight:700; }
+  .nav-inner{
+    max-width:1100px; margin:0 auto; padding:12px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .brand{ font-family:'EB Garamond', Georgia, serif; font-weight:500; font-size:19px; color:var(--ink); }
+  nav.links{ display:flex; gap:16px; flex-wrap:wrap; }
+  nav.links a{
+    font-family:'Nunito',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--ink-soft); text-decoration:none; padding:4px 0; border-bottom:2px solid transparent;
+  }
+  nav.links a:hover{ color:var(--ink); border-bottom-color:var(--gold); }
+  .nav-cta{
+    font-family:'Nunito',sans-serif; font-size:12.5px; font-weight:700; text-decoration:none;
+    background:var(--gold); color:#3a2e10; padding:8px 16px; border-radius:20px; white-space:nowrap;
+  }
+  @media (max-width:820px){ nav.links{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    max-width:1100px; margin:0 auto; padding:80px 28px 60px; text-align:center;
+  }
+  .kicker{
+    font-family:'Nunito',sans-serif; text-transform:uppercase; letter-spacing:0.22em; font-size:11.5px;
+    color:var(--gold-deep); font-weight:800; margin-bottom:22px;
+  }
+  .hero .icon{ margin:14px auto 28px; }
+  h1.hero-title{ font-size:clamp(36px,6vw,58px); font-weight:500; line-height:1.15; margin:0 0 18px; }
+  h1.hero-title .accent{ color:var(--gold-deep); font-style:italic; }
+  .hero-sub{ font-family:'Nunito',sans-serif; font-size:19px; font-style:italic; color:var(--ink-soft); max-width:560px; margin:0 auto 30px; line-height:1.6; }
+  .hero-tags{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:'Nunito',sans-serif; font-size:12.5px; color:var(--ink-label); }
+  .hero-tags span{ background:var(--white); border:1px solid var(--line); padding:6px 14px; border-radius:20px; }
+
+  section{ max-width:1000px; margin:0 auto; padding:70px 28px; }
+  .eyebrow{
+    font-family:'Nunito',sans-serif; text-transform:uppercase; letter-spacing:0.18em; font-size:11.5px;
+    color:var(--gold-deep); font-weight:800; margin-bottom:10px;
+  }
+  h2.title{ font-size:clamp(26px,4vw,36px); font-weight:500; margin:0 0 18px; }
+  .lede{ font-size:17px; line-height:1.75; color:var(--ink); max-width:680px; }
+  .lede.soft{ color:var(--ink-soft); font-style:italic; }
+  .rule{ width:44px; height:3px; background:var(--gold); border:none; margin:22px 0; border-radius:2px; }
+
+  /* ---------- INTRO ---------- */
+  #intro .lede + .lede{ margin-top:14px; }
+
+  /* ---------- CHAPTER CARDS ---------- */
+  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:32px; }
+  @media (max-width:800px){ .grid3{ grid-template-columns:1fr; } }
+  .chapter-card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:26px 22px;
+  }
+  .chapter-card .cnum{ font-family:'Nunito',sans-serif; font-size:12px; color:var(--gold-deep); font-weight:800; letter-spacing:0.08em; margin-bottom:10px; }
+  .chapter-card h3{ font-size:20px; font-weight:500; margin:0 0 10px; }
+  .chapter-card p{ font-size:14.5px; line-height:1.65; color:var(--ink-soft); margin:0 0 8px; font-family:'Nunito',sans-serif;}
+  .chapter-card p:last-child{ font-style:italic; color:var(--ink); }
+
+  /* ---------- LAYERS ---------- */
+  .layers{ margin-top:34px; display:flex; flex-direction:column; gap:14px; }
+  .layer-row{
+    display:flex; align-items:center; gap:20px; background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:18px 22px;
+  }
+  .layer-row .lswatch{ width:44px; height:44px; border-radius:10px; flex-shrink:0; }
+  .layer-row .lbody{ flex:1; }
+  .layer-row .lname{ font-size:19px; margin:0 0 4px; }
+  .layer-row .ldesc{ font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-soft); margin:0 0 8px; }
+  .layer-row .litems{ font-family:'Nunito',sans-serif; font-size:12.5px; color:var(--ink-label); }
+  .layer-row .litems b{ color:var(--ink); font-weight:700; }
+
+  /* ---------- READINESS ---------- */
+  .ready-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:30px; }
+  @media (max-width:700px){ .ready-grid{ grid-template-columns:repeat(2,1fr); } }
+  .ready-item{
+    display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:14px 16px; cursor:pointer; user-select:none; transition:background .15s, border-color .15s;
+    font-family:'Nunito',sans-serif; font-size:14.5px; font-weight:700;
+  }
+  .ready-item .rc{ width:20px; height:20px; border-radius:50%; border:2px solid var(--gold-deep); flex-shrink:0; position:relative; }
+  .ready-item.done{ background:var(--yellow-tint); border-color:var(--gold); }
+  .ready-item.done .rc{ background:var(--gold); }
+  .ready-item.done .rc::after{ content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#3a2e10; }
+  .ready-note{ margin-top:22px; font-style:italic; color:var(--ink-soft); font-size:15px; }
+
+  /* ---------- SUGGESTED RHYTHM (within calendar) ---------- */
+  .cal-subhead{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:16px; }
+  .suggest-btn{
+    font-family:'Nunito',sans-serif; font-size:12px; font-weight:800; color:#3a2e10; background:var(--gold);
+    border:none; border-radius:16px; padding:8px 16px; cursor:pointer;
+  }
+  .suggest-btn:hover{ background:var(--gold-deep); }
+  .suggest-note{ font-family:'Nunito',sans-serif; font-size:11px; color:#a9ae98; font-style:italic; }
+
+  /* ---------- CHAOS ---------- */
+  .principle-list{ margin-top:30px; display:flex; flex-direction:column; gap:14px; }
+  .principle-item{ display:flex; gap:14px; align-items:flex-start; }
+  .principle-item .pdot{ width:8px; height:8px; border-radius:50%; background:var(--gold); margin-top:9px; flex-shrink:0; }
+  .principle-item p{ margin:0; font-size:16px; font-family:'Nunito',sans-serif; }
+  .principle-item b{ font-weight:800; }
+
+  /* ---------- TEMPLATES ---------- */
+  .tmpl-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-top:32px; }
+  .tmpl-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .tmpl-card .tdot{ width:34px; height:34px; border-radius:9px; margin-bottom:14px; }
+  .tmpl-card h4{ margin:0 0 8px; font-size:18px; }
+  .tmpl-card .tparts{ font-family:'Nunito',sans-serif; font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
+
+  /* ---------- CALENDAR / TRACKER ---------- */
+  .cal-card{ background:var(--white); border-radius:26px; border:1px solid var(--line); padding:44px 36px; margin-top:24px; }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:6px; }
+  .cal-nav{ display:flex; align-items:center; gap:14px; font-family:'Nunito',sans-serif; }
+  .cal-nav button{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:var(--white);
+    cursor:pointer; font-size:15px; color:var(--ink); display:flex; align-items:center; justify-content:center;
+  }
+  .cal-nav button:hover{ background:var(--yellow-tint); border-color:var(--gold); }
+  .cal-range{ font-family:'EB Garamond',Georgia,serif; font-weight:500; font-size:22px; }
+  .cal-progress{ font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-soft); }
+  .cal-progress b{ color:var(--gold-deep); }
+  .today-btn{ font-family:'Nunito',sans-serif; font-size:11.5px; font-weight:700; background:none; border:1px solid var(--line); border-radius:14px; padding:5px 12px; cursor:pointer; color:var(--ink-soft); }
+  .today-btn:hover{ border-color:var(--gold); color:var(--ink); }
+
+  /* ---- task bank ---- */
+  .bank{
+    margin-top:6px; padding:16px; background:#fbf7ec; border:1px dashed #e3d9b8; border-radius:14px;
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center; min-height:52px; transition:background .15s, border-color .15s;
+  }
+  .bank.drag-over{ background:var(--yellow-tint); border-color:var(--gold); }
+  .bank:empty::before{ content:'All tasks placed for this week.'; font-family:'Nunito',sans-serif; font-size:12.5px; color:#a9ae98; font-style:italic; }
+
+  .chip{
+    font-family:'Nunito',sans-serif; font-size:12.5px; font-weight:700; color:var(--ink);
+    padding:8px 14px; border-radius:16px; border:1px solid; cursor:grab; user-select:none;
+    touch-action:none; white-space:nowrap; background:var(--white); transition:box-shadow .15s, opacity .15s;
+  }
+  .chip:active{ cursor:grabbing; }
+  .chip.dragging{ position:fixed; z-index:200; box-shadow:0 10px 24px rgba(58,53,47,0.22); pointer-events:none; opacity:0.95; }
+  .chip.done{ opacity:0.55; text-decoration:line-through; }
+  .chip.cat-stock{ background:var(--peach-tint); border-color:var(--tan); }
+  .chip.cat-prep{ background:var(--sage-tint); border-color:var(--sage); }
+  .chip.cat-preserve{ background:var(--blue-tint); border-color:var(--blue); }
+  .chip.cat-tidy{ background:var(--apricot-tint); border-color:var(--clay); }
+
+  .legend{ display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; margin-bottom:6px; font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-soft); }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend .sw{ width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .legend .time-note{ margin-left:auto; font-weight:800; color:var(--gold-deep); }
+
+  .board{ margin-top:20px; display:grid; grid-template-columns:repeat(7,1fr); gap:10px; }
+  @media (max-width:820px){ .board{ grid-template-columns:repeat(4,1fr); } }
+  @media (max-width:520px){ .board{ grid-template-columns:1fr; } }
+  .day-col{
+    background:#fffef9; border:1px solid var(--line); border-radius:12px; padding:10px 8px; min-height:130px;
+    display:flex; flex-direction:column; gap:6px; transition:background .15s, border-color .15s;
+  }
+  .day-col.drag-over{ background:var(--yellow-tint); border-color:var(--gold); }
+  .day-col .dname{ font-family:'Nunito',sans-serif; font-weight:800; font-size:16px; text-align:center; color:var(--ink); margin-bottom:8px; }
+  .day-col .chip{ font-size:11px; padding:6px 9px; white-space:normal; text-align:center; line-height:1.3; }
+  @media (max-width:520px){
+    .day-col{ flex-direction:row; flex-wrap:wrap; align-items:flex-start; align-content:flex-start; }
+    .day-col .dname{ width:100%; margin-bottom:4px; }
+    .day-col .day-status{ width:100%; margin-top:8px; padding-top:8px; }
+    .day-col .chip{ flex:0 0 auto; }
+  }
+
+  .day-status{ margin-top:auto; padding-top:9px; border-top:1px dashed var(--line); display:flex; flex-direction:column; gap:5px; }
+  .mode-row{ display:flex; gap:4px; }
+  .mode-btn, .clean-btn{
+    font-family:'Nunito',sans-serif; font-size:9px; font-weight:800; padding:5px 2px 4px; border-radius:8px;
+    border:1px solid var(--line); background:var(--white); cursor:pointer; color:#8a8570; text-align:center; flex:1;
+    display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1;
+  }
+  .mode-btn svg, .clean-btn svg{ width:15px; height:15px; display:block; }
+  .mode-btn .lbl, .clean-btn .lbl{ text-transform:uppercase; letter-spacing:0.03em; }
+  .mode-btn.active.cook{ background:var(--apricot-tint); border-color:var(--tan); color:#8a4f1f; }
+  .mode-btn.active.leftovers{ background:var(--blue-tint); border-color:var(--blue); color:#3d6a82; }
+  .clean-btn.active{ background:var(--sage-tint); border-color:var(--sage); color:#4f6a3a; }
+
+  .reflect-box{ margin-top:28px; padding-top:22px; border-top:2px solid var(--yellow-tint); }
+  .reflect-box .rq{ font-family:'Nunito',sans-serif; font-style:italic; font-size:15px; color:var(--ink); margin-bottom:10px; }
+  .reflect-box textarea{
+    width:100%; min-height:64px; border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+    font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink); resize:vertical; outline:none; background:#fffef9;
+  }
+  .reflect-box textarea:focus{ border-color:var(--gold); }
+  .saved-hint{ font-family:'Nunito',sans-serif; font-size:11px; color:#a9ae98; margin-top:8px; text-align:right; opacity:0; transition:opacity .3s; }
+  .saved-hint.show{ opacity:1; }
+  .what-worked{ display:none; }
+  .ww-subtitle{ font-family:'Nunito',sans-serif; font-style:italic; font-size:14px; color:var(--ink-soft); margin:0 0 16px; }
+  .ww-category{ margin-bottom:16px; }
+  .ww-category-label{ font-family:'Nunito',sans-serif; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-label); margin-bottom:8px; }
+  .ww-tags{ display:flex; flex-wrap:wrap; gap:8px; }
+  .ww-tag{ font-family:'Nunito',sans-serif; font-size:13px; font-weight:600; padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--white); color:var(--ink); cursor:pointer; transition:background 0.15s, border-color 0.15s, color 0.15s; }
+  .ww-tag.selected{ background:#FFEDBE; border-color:#EAC66B; color:#7a6520; }
+
+  /* ---------- PHILOSOPHY ---------- */
+  #philosophy{ text-align:center; }
+  .principles8{ margin-top:36px; display:grid; grid-template-columns:repeat(2,1fr); gap:22px 40px; text-align:left; max-width:820px; margin-left:auto; margin-right:auto; }
+  @media (max-width:700px){ .principles8{ grid-template-columns:1fr; } }
+  .p8-item{ display:flex; gap:14px; align-items:baseline; }
+  .p8-item .p8num{ font-family:'Nunito',sans-serif; font-weight:800; color:var(--gold-deep); font-size:14px; width:22px; flex-shrink:0; }
+  .p8-item p{ margin:0; font-size:15.5px; font-family:'Nunito',sans-serif; color:var(--ink); }
+
+  /* ---------- LOADING OVERLAY ---------- */
+  .loading-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .loading-spinner{
+    width:32px; height:32px; border-radius:50%;
+    border:2px solid var(--line); border-top-color:var(--sage);
+    animation:spin 0.7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- AUTH GATE ---------- */
+  .auth-gate{
+    min-height:100vh; min-height:100dvh;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    text-align:center; padding:32px 24px 60px; background:var(--bg);
+  }
+  .auth-gate > .illus{ margin:0 auto 0; width:fit-content; }
+  .auth-gate > .illus img{ width:auto; height:96px; }
+  .auth-accordion .illus{ margin:0; width:auto; }
+  .auth-gate h1{ margin:10px 0 2px; font-size:44px; line-height:1.15; font-weight:500; }
+  .auth-gate .sub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-bottom:4px; font-family:'Nunito', sans-serif; font-weight:300; }
+  .auth-gate .tag{ font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-label); margin-top:4px; white-space:nowrap; }
+  .auth-gate .rule{ width:40px; height:2px; background:var(--sage); border:none; margin:28px auto 16px; }
+  .google-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; max-width:280px; padding:11px 20px;
+    background:#fff; border:1px solid var(--line); border-radius:6px;
+    font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink);
+    cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.09);
+    margin-top:24px; transition:background 0.15s;
+  }
+  .google-btn:hover{ background:var(--bg); }
+  .auth-error{
+    font-family:'Nunito',sans-serif; font-size:12px; color:#b5392e;
+    min-height:18px; margin-top:8px; text-align:center;
+  }
+  .auth-foot-note{
+    font-family:'Nunito',sans-serif; font-size:11.5px; color:var(--ink-label);
+    max-width:280px; margin-top:16px; line-height:1.5;
+  }
+
+  /* ---------- AUTH ACCORDION ---------- */
+  .auth-accordion{ width:100%; max-width:620px; margin:28px auto 0; text-align:left; }
+  .accordion-item{ padding:16px 0; border-bottom:1px solid var(--line); }
+  .accordion-btn{ width:100%; display:flex; align-items:center; justify-content:space-between; background:none; border:none; padding:0; cursor:pointer; text-align:left; gap:16px; }
+  .accordion-btn-inner{ display:flex; align-items:center; gap:16px; flex:1; min-width:0; }
+  .accordion-btn-text{ display:flex; flex-direction:column; gap:2px; }
+  .accordion-eyebrow{ font-family:'Nunito',sans-serif; text-transform:uppercase; letter-spacing:0.16em; font-size:12px; color:var(--ink-label); margin:0 0 5px; }
+  .accordion-title{ font-family:'EB Garamond',serif; font-size:22px; font-weight:normal; color:var(--ink); margin:0; }
+  .accordion-btn:hover .accordion-title{ color:var(--ink-soft); }
+  .accordion-chevron{ width:18px; height:18px; flex-shrink:0; color:var(--ink-label); transition:transform 0.2s; margin-left:auto; }
+  .accordion-item.open .accordion-chevron{ transform:rotate(180deg); }
+  .accordion-rule{ display:none; height:2px; width:36px; border:none; margin:16px 0 18px; background:var(--line); }
+  .accordion-item.open .accordion-rule{ display:block; }
+  .accordion-body{ display:none; font-size:15px; line-height:1.75; color:var(--ink); font-family:'Nunito',sans-serif; font-weight:300; }
+  .accordion-body p{ margin:0 0 12px; }
+  .accordion-body p:last-child{ margin-bottom:0; }
+  .accordion-item.open .accordion-body{ display:block; }
+  .steps-list{ display:flex; flex-direction:row; gap:12px; margin:20px 0 24px; }
+  .step-item{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:12px; background:var(--yellow-tint); border:1px solid var(--line); border-radius:12px; padding:18px 14px 20px; font-size:14px; line-height:1.6; }
+  .step-num{ width:30px; height:30px; background:var(--sage-tint); color:var(--ink-soft); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Nunito',sans-serif; font-size:13px; flex-shrink:0; }
+  @media (max-width:600px){ .steps-list{ flex-direction:column; } }
+
+  /* ---------- USER CHIP ---------- */
+  .chip-avatar{
+    width:32px; height:32px; border-radius:50%; border:1.5px solid var(--line);
+    overflow:hidden; background:var(--bg); cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center; position:relative;
+    flex-shrink:0;
+  }
+  .chip-avatar:hover{ border-color:var(--ink-soft); }
+  .chip-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .chip-initials{ font-family:'Nunito',sans-serif; font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .chip-dropdown{
+    position:absolute; top:calc(100% + 8px); right:0;
+    background:#fff; border:1px solid var(--line); border-radius:8px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.1); padding:8px; min-width:160px;
+    z-index:100; display:none; flex-direction:column; gap:4px;
+    font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-soft);
+  }
+  .chip-dropdown.open{ display:flex; }
+  .chip-name{ padding:6px 8px; font-weight:700; color:var(--ink); font-size:13px; }
+  .chip-signout{
+    padding:7px 8px; background:none; border:none; border-radius:5px;
+    font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-soft);
+    cursor:pointer; text-align:left; transition:background 0.12s;
+  }
+  .chip-signout:hover{ background:var(--bg); color:var(--ink); }
+  .user-chip{ position:relative; }
+
+  /* ---------- INTRO (spending-style) ---------- */
+  .head-row{ display:flex; align-items:center; justify-content:flex-start; gap:16px; }
+  .head-row .illus{ flex-shrink:0; }
+  .head-row h2{ font-size:26px; font-weight:normal; margin:0; }
+  .pull-quote-block{
+    border-left:2px solid var(--sage);
+    padding:4px 0 4px 18px;
+    margin:16px 0;
+    font-style:italic; font-weight:700; color:var(--ink-soft); font-size:16px; line-height:1.8;
+  }
+  #intro{ max-width:620px; margin:0 auto; border-bottom:1px solid var(--line); padding:56px 20px; }
+  #intro p{ font-size:16px; margin:0 0 14px; line-height:1.75; }
+  @media (min-width:700px){ #intro{ max-width:720px; } }
+  @media (min-width:1000px){ #intro{ max-width:1000px; padding:84px 28px; } }
+  .intro-subhead{
+    font-family:'EB Garamond',Georgia,serif; font-size:22px; font-weight:500; color:var(--ink);
+    margin:36px 0 16px;
+  }
+  .mindset-item{ margin:0 0 40px; padding:0; background:none; border:none; border-radius:0; display:flex; flex-direction:column; gap:4px; }
+  .mindset-item .eyebrow{ margin:0 0 6px; }
+  .mindset-item .mindset-title{ font-family:'EB Garamond',Georgia,serif; font-size:22px; font-weight:normal; margin:0 0 10px; color:var(--ink); }
+  .mindset-item p{ font-size:16px; margin:0 0 10px; line-height:1.75; }
+  .mindset-item p:last-child{ margin-bottom:0; }
+  .intro-principles{ list-style:none; padding:0; margin:14px 0 0; display:flex; flex-direction:column; gap:10px; }
+  .intro-principles li{ font-family:'Nunito',sans-serif; font-size:15px; line-height:1.7; color:var(--ink); border:1px solid var(--line); background:#f2ede0; border-radius:8px; padding:14px 16px; display:block; }
+  .intro-principles li strong{ font-weight:700; }
+  .layer-block{ margin:28px 0 0; padding:0 0 24px; border-bottom:1px solid var(--line); }
+  .layer-block:last-of-type{ border-bottom:none; }
+  .layer-title{ font-family:'EB Garamond',Georgia,serif; font-size:20px; font-weight:500; color:var(--ink); margin:0 0 10px; }
+  .layer-block p{ font-size:16px; margin:0 0 10px; line-height:1.75; }
+  .layer-block p:last-child{ margin-bottom:0; }
+  .layer-examples{ color:var(--ink-soft); font-size:15px; }
+  .layer-ex-label{ font-family:'Nunito',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--gold-deep); margin-right:8px; }
+  .layer-reminder{ margin:36px 0 0; padding:20px 24px; background:#f2ede0; border-radius:12px; }
+  .layer-reminder .layer-title{ font-size:18px; margin-bottom:8px; }
+  .layer-reminder p{ font-size:16px; margin:0; line-height:1.75; }
+
+  /* ---------- DEDICATION ---------- */
+  #dedication{
+    max-width:620px; margin:0 auto; padding:48px 20px 52px; border-top:1px solid var(--line);
+  }
+  @media (min-width:700px){ #dedication{ max-width:720px; } }
+  @media (min-width:1000px){ #dedication{ max-width:1000px; padding:48px 28px 52px; } }
+  .field-label{
+    font-family:'Nunito',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.1em; color:var(--ink-label); margin:0 0 6px 0;
+  }
+  #dedication input[type=text]{
+    width:100%; font-family:'Nunito',sans-serif; font-size:16px; color:var(--ink);
+    background:transparent; border:none; border-bottom:1px solid var(--line);
+    padding:6px 2px 10px 2px; margin-bottom:22px; outline:none;
+  }
+  #dedication input[type=text]:focus{ border-bottom-color:var(--ink-soft); }
+  .dedication-quote{
+    font-family:'Nunito',sans-serif; font-style:italic; font-size:17px;
+    color:var(--ink-soft); text-align:center; line-height:1.7; margin-top:28px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  /* ---------- JOURNAL ---------- */
+  #journal{ max-width:1000px; margin:0 auto; padding:56px 20px; border-top:1px solid var(--line); }
+  @media(min-width:1000px){ #journal{ padding:70px 28px; } }
+  .kj-add-btn{ display:flex; align-items:center; gap:8px; padding:10px 18px; background:none; border:1px solid var(--line); border-radius:8px; cursor:pointer; font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-soft); transition:background 0.14s,color 0.14s,border-color 0.14s; }
+  .kj-add-btn:hover{ background:#f2ede0; color:var(--ink); border-color:var(--ink-label); }
+  .kj-save-btn{ background:var(--gold); border-color:var(--gold); color:var(--ink); font-weight:700; }
+  .kj-save-btn:hover{ background:var(--gold-deep); border-color:var(--gold-deep); color:#fff; }
+  .kj-entries-list{ display:flex; flex-direction:column; gap:16px; }
+  /* Side panel */
+  .kj-side-panel{ position:fixed; top:0; right:0; height:100vh; width:360px; max-width:92vw; background:#f8f3ea; box-shadow:-4px 0 32px rgba(30,26,20,0.13); z-index:180; display:flex; flex-direction:column; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .kj-side-panel.open{ transform:translateX(0); }
+  .kj-side-panel-header{ display:flex; align-items:center; justify-content:space-between; padding:22px 20px 16px; border-bottom:1px solid var(--line); flex-shrink:0; }
+  .kj-side-panel-title{ font-family:'EB Garamond',Georgia,serif; font-size:20px; color:var(--ink); margin:0; }
+  .kj-side-panel-close{ background:none; border:none; cursor:pointer; color:#b0a898; padding:4px; transition:color 0.14s; }
+  .kj-side-panel-close:hover{ color:var(--ink); }
+  .kj-side-panel-body{ flex:1; overflow-y:auto; padding:16px 16px 24px; display:flex; flex-direction:column; gap:14px; }
+  .kj-side-panel-empty{ font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-label); text-align:center; margin-top:40px; }
+  .kj-panel-overlay{ position:fixed; inset:0; z-index:170; background:rgba(30,26,20,0.25); opacity:0; pointer-events:none; transition:opacity 0.3s; }
+  .kj-panel-overlay.open{ opacity:1; pointer-events:auto; }
+  .kj-entry-card{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px; position:relative; }
+  .kj-entry-meta{ font-size:11px; color:var(--ink-label); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .kj-entry-badge{ font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; letter-spacing:0.06em; text-transform:uppercase; }
+  .kj-entry-badge.note{ background:var(--yellow-tint); color:#7a6520; }
+  .kj-entry-badge.recipe{ background:var(--apricot-tint); color:#8a4f1f; }
+  .kj-entry-badge.list{ background:var(--blue-tint); color:#2d5e78; }
+  .kj-entry-title{ font-family:'EB Garamond',Georgia,serif; font-size:18px; color:var(--ink); margin:0 0 6px; }
+  .kj-entry-body{ font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-soft); line-height:1.7; white-space:pre-wrap; }
+  .kj-entry-delete{ position:absolute; top:14px; right:14px; background:none; border:none; cursor:pointer; color:var(--ink-label); opacity:0.5; padding:4px; transition:opacity 0.14s; }
+  .kj-entry-delete:hover{ opacity:1; }
+  /* Overlay */
+  .kj-overlay{ position:fixed; inset:0; z-index:200; background:rgba(30,26,20,0.6); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:12px; opacity:0; transition:opacity 0.25s ease; }
+  .kj-overlay.open{ display:flex; opacity:1; }
+  .kj-paper{ background:#f8f3ea; border-radius:18px; box-shadow:0 32px 80px rgba(0,0,0,0.22),0 2px 8px rgba(0,0,0,0.08); width:100%; max-width:640px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; }
+  .kj-paper-header{ display:flex; align-items:flex-start; justify-content:space-between; padding:28px 28px 16px; flex-shrink:0; }
+  .kj-paper-header-left{ display:flex; flex-direction:column; gap:6px; flex:1; }
+  .kj-paper-date{ font-family:'Nunito',sans-serif; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#9a9080; }
+  .kj-paper-close{ background:none; border:none; cursor:pointer; color:#b0a898; padding:4px; flex-shrink:0; margin-top:2px; transition:color 0.14s; }
+  .kj-paper-close:hover{ color:var(--ink); }
+  .kj-paper-title-input{ width:100%; border:none; border-bottom:1px solid #ddd5c4; background:transparent; outline:none; font-family:'EB Garamond',Georgia,serif; font-size:24px; font-style:italic; color:var(--ink); padding:0 0 6px; transition:border-color 0.14s; }
+  .kj-paper-title-input:focus{ border-bottom-color:#9a9080; }
+  .kj-paper-title-input::placeholder{ color:#cdc4b4; font-style:italic; }
+  .kj-tag-row{ display:flex; gap:8px; padding:0 28px 16px; flex-shrink:0; }
+  .kj-tag{ font-family:'Nunito',sans-serif; font-size:13px; font-weight:600; padding:6px 14px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--ink-soft); cursor:pointer; transition:background 0.14s,border-color 0.14s,color 0.14s; }
+  .kj-tag.selected[data-tag="note"]{ background:var(--yellow-tint); border-color:#c9a832; color:#7a6520; }
+  .kj-tag.selected[data-tag="recipe"]{ background:var(--apricot-tint); border-color:var(--tan); color:#8a4f1f; }
+  .kj-tag.selected[data-tag="list"]{ background:var(--blue-tint); border-color:var(--blue); color:#2d5e78; }
+  .kj-paper-divider{ height:1px; background:linear-gradient(to right,transparent,#d8cfbf 20%,#d8cfbf 80%,transparent); margin:0 28px; flex-shrink:0; }
+  .kj-paper-body{ flex:1; overflow-y:auto; padding:22px 28px 8px; }
+  .kj-paper-textarea{ width:100%; min-height:260px; border:none; background:transparent; outline:none; resize:none; font-family:'Nunito',sans-serif; font-size:15px; font-weight:300; color:var(--ink); line-height:1.85; padding:0; box-sizing:border-box; }
+  .kj-paper-textarea::placeholder{ color:#cdc4b4; }
+  .kj-paper-footer{ display:flex; justify-content:flex-end; align-items:center; gap:10px; padding:16px 28px 22px; flex-shrink:0; }
+  .kj-paper-save{ padding:10px 24px; border-radius:9px; border:none; cursor:pointer; font-family:'Nunito',sans-serif; font-size:13px; font-weight:500; background:var(--gold-deep); color:#fff; transition:opacity 0.14s; }
+  .kj-paper-save:hover{ opacity:0.85; }
+  .kj-paper-cancel{ padding:10px 16px; border-radius:9px; border:1px solid #d8cfbf; background:none; cursor:pointer; font-family:'Nunito',sans-serif; font-size:13px; color:#9a9080; transition:background 0.14s; }
+  .kj-paper-cancel:hover{ background:#ede8de; }
+  footer{
+    background:var(--ink); color:#e9e3d0; text-align:center; padding:60px 28px 40px; margin-top:40px;
+  }
+  footer .fquote{ font-family:'EB Garamond',serif; font-style:italic; font-size:20px; line-height:1.6; max-width:520px; margin:0 auto 26px; color:#f3ecd8; }
+  footer .fbrand{ font-family:'Nunito',sans-serif; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#b5ac8c; }
+  footer .fbrand .gold{ color:var(--gold); }
+
+</style>
+</head>
+<body>
+
+<!-- ALWAYS-VISIBLE NAV -->
+<div class="utility-bar">
+  <a href="../index.html">The Mindful <span style="color:#fff;font-style:italic;">Mundane</span></a>
+  <nav class="utility-links">
+    <a href="../Mindful%20Spending%20Website/mindfulspending.html">Mindful Spending</a>
+    <a href="mindfulkitchen.html" class="active">Mindful Kitchen</a>
+    <a href="../Mindful%20Spaces%20Website/mindfulspaces.html">Mindful Spaces</a>
+  </nav>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- AUTH GATE -->
+<div class="auth-gate" id="authGate" style="display:none;">
+  <div class="illus">
+    <img src="../mindful-kitchen-bowl-icon.svg" aria-hidden="true" alt="">
+  </div>
+  <h1>The Mindful Kitchen</h1>
+  <div class="sub">Design a Kitchen That is Always Ready</div>
+  <div style="display:flex;gap:10px;justify-content:center;margin:16px 0 10px;">
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--clay);display:inline-block;opacity:0.7;"></span>
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--sage);display:inline-block;opacity:0.7;"></span>
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--blue);display:inline-block;opacity:0.7;"></span>
+  </div>
+  <div class="auth-accordion">
+    <div class="accordion-item">
+      <button class="accordion-btn" type="button">
+        <div class="accordion-btn-inner">
+          <div class="illus">
+            <svg viewBox="0 0 80 80" width="48" height="48">
+              <ellipse cx="40" cy="34" rx="15" ry="19" fill="#FFEDBE" fill-opacity="0.8" stroke="#EAC66B" stroke-width="1.2"/>
+              <line x1="40" y1="53" x2="40" y2="62" stroke="#D99A6C" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="34" y1="62" x2="46" y2="62" stroke="#D99A6C" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="accordion-btn-text">
+            <div class="accordion-eyebrow">Introduction</div>
+            <div class="accordion-title">Why this exists</div>
+          </div>
+        </div>
+        <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none">
+          <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <hr class="accordion-rule">
+      <div class="accordion-body">
+        <p>Most people think cooking begins with a recipe.</p>
+        <p>It does not.</p>
+        <p>Cooking begins long before you turn on the stove. It begins with the kitchen you have designed.</p>
+        <p>A mindful kitchen is built around readiness, not recipes. When your kitchen is ready, meals become easier, shopping becomes simpler, food goes to waste less often, and cooking creates less chaos.</p>
+        <p>This is not about becoming a better cook.</p>
+        <p>It is about creating a kitchen that works for you.</p>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn" type="button">
+        <div class="accordion-btn-inner">
+          <div class="illus">
+            <svg viewBox="0 0 80 80" width="48" height="48">
+              <rect x="29" y="24" width="8" height="32" rx="2" fill="#FFEDBE" stroke="#EAC66B" stroke-width="1"/>
+              <rect x="43" y="32" width="8" height="24" rx="2" fill="#f1d6ab" stroke="#D99A6C" stroke-width="1"/>
+              <rect x="15" y="38" width="8" height="18" rx="2" fill="#eed9cd" stroke="#c69a82" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="accordion-btn-text">
+            <div class="accordion-eyebrow">Introduction</div>
+            <div class="accordion-title">What you will discover</div>
+          </div>
+        </div>
+        <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none">
+          <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <hr class="accordion-rule">
+      <div class="accordion-body">
+        <p>A different way of thinking about your kitchen. Not as a place where recipes happen. But as a system that shapes how you shop, cook, and use the food you already have.</p>
+        <p>Inside, you will discover simple practices that help you reduce waste, spend less time deciding what to cook, and build a kitchen that works for you.</p>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn" type="button">
+        <div class="accordion-btn-inner">
+          <div class="illus">
+            <svg viewBox="0 0 80 80" width="48" height="48">
+              <path d="M40 26 C34 22 24 22 18 26 V56 C24 52 34 52 40 56 C46 52 56 52 62 56 V26 C56 22 46 22 40 26 Z" fill="#FFEDBE" fill-opacity="0.7" stroke="#EAC66B" stroke-width="1.2"/>
+              <line x1="40" y1="26" x2="40" y2="56" stroke="#D99A6C" stroke-width="1" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <div class="accordion-btn-text">
+            <div class="accordion-eyebrow">Introduction</div>
+            <div class="accordion-title">How to use it</div>
+          </div>
+        </div>
+        <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none">
+          <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <hr class="accordion-rule">
+      <div class="accordion-body">
+        <p>Mindful Kitchen is not a meal planner. It is a weekly practice.</p>
+        <div class="steps-list">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <div><strong>Build your kitchen</strong> &mdash; Start by organizing your kitchen one layer at a time. Build a foundation.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <div><strong>Create your routine</strong> &mdash; Drag and drop tasks into your weekly calendar so you have a simple plan to follow.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <div><strong>Practice throughout the week</strong> &mdash; Use the weekly calendar as your guide. Use the &lsquo;Make&rsquo; section to find your meal.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">4</span>
+            <div><strong>Reflect and adjust</strong> &mdash; At the end of the week, spend a few minutes reflecting.</div>
+          </div>
+        </div>
+        <p>There is no perfect way to do this. Some weeks you will prepare more than others. Some weeks life will get in the way. That is not failure. It is information.</p>
+        <p><strong>The goal is not a perfect kitchen. It is a kitchen that is ready when you need it &mdash; one that makes everyday cooking a little easier and leaves a little more room to enjoy it.</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+  <div class="tag">Start your mindful kitchen journey&mdash;for free, in one easy step.</div>
+  <button class="google-btn" id="googleSignInBtn" type="button">
+    <svg width="18" height="18" viewBox="0 0 18 18">
+      <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62Z"/>
+      <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.95v2.33A9 9 0 0 0 9 18Z"/>
+      <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.66 9c0-.59.1-1.16.29-1.7V4.97H.95A9 9 0 0 0 0 9c0 1.45.35 2.83.95 4.03l3-2.33Z"/>
+      <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.42 0 9 0A9 9 0 0 0 .95 4.97l3 2.33C4.66 5.17 6.65 3.58 9 3.58Z"/>
+    </svg>
+    Continue with Google
+  </button>
+  <div class="auth-error" id="authError"></div>
+  <p class="auth-foot-note">Your kitchen guide is private and syncs across all your devices.<br>Your entries are encrypted and will never be shared or sold.</p>
+
+</div>
+
+<!-- APP CONTENT -->
+<div id="appContent" style="display:none;">
+<div class="topbar">
+  <a href="../index.html" class="topbar-brand">
+    <img src="../mindful-kitchen-bowl-icon.svg" width="28" height="28" aria-hidden="true" alt="">
+    The Mindful Kitchen
+  </a>
+  <div class="topbar-right">
+    <nav class="topbar-nav">
+      <a href="#intro" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4 4h5v12H4zM11 4h5v12h-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Intro
+      </a>
+      <a href="#build" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h10M3 15h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Build
+      </a>
+      <a href="#calendar" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 2v3M13 2v3M3 9h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Calendar
+      </a>
+      <a href="#journal" class="topbar-nav-btn">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M5 3h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.4"/><path d="M7 7h6M7 10h6M7 13h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Journal
+      </a>
+      <a href="make.html" class="topbar-nav-btn" style="font-weight:700;">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M3 10h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Make
+      </a>
+    </nav>
+    <div style="width:1px;height:18px;background:var(--line);margin:0 8px;flex-shrink:0;"></div>
+    <div class="user-chip" id="userChip"></div>
+  </div>
+</div>
+
+<!-- MOBILE SECTION NAV -->
+<nav id="mobileNav">
+  <a href="#intro" class="mobile-nav-item">Intro</a>
+  <a href="#build" class="mobile-nav-item">Build</a>
+  <a href="#calendar" class="mobile-nav-item">Calendar</a>
+  <a href="#journal" class="mobile-nav-item">Journal</a>
+  <a href="make.html" class="mobile-nav-item" style="font-weight:700;">Make</a>
+</nav>
+
+<section class="hero">
+  <div class="icon">
+    <img src="../mindful-kitchen-bowl-icon.svg" width="96" height="96" style="margin:0 auto;" aria-hidden="true" alt="">
+  </div>
+  <h1 class="hero-title">The Mindful Kitchen</h1>
+  <div class="hero-sub">Design a Kitchen That is Always Ready</div>
+  <div style="display:flex;gap:10px;justify-content:center;margin:16px 0 0;">
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--clay);display:inline-block;opacity:0.7;"></span>
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--sage);display:inline-block;opacity:0.7;"></span>
+    <span style="width:9px;height:9px;border-radius:50%;background:var(--blue);display:inline-block;opacity:0.7;"></span>
+  </div>
+</section>
+
+<!-- DEDICATION -->
+<section id="dedication">
+  <div class="field-label">This Kitchen Belongs to</div>
+  <input type="text" data-key="field-belongs" placeholder="Your name">
+  <div class="field-label">Start Date</div>
+  <input type="text" data-key="field-date" placeholder="Today's date">
+  <p class="dedication-quote">You do not need to become a better cook.<br>Sometimes you just need a system that makes cooking easier.</p>
+</section>
+
+<section id="intro">
+  <div class="eyebrow">Introduction</div>
+  <div class="head-row">
+    <div class="illus">
+      <svg viewBox="0 0 80 80" width="42" height="42">
+        <path d="M22 44 Q22 58 40 58 Q58 58 58 44 L58 36 L22 36 Z" fill="#D7E3CE" fill-opacity="0.6" stroke="#8FA377" stroke-width="1.3"/>
+        <line x1="22" y1="36" x2="58" y2="36" stroke="#8FA377" stroke-width="1.3"/>
+        <line x1="40" y1="58" x2="40" y2="64" stroke="#8FA377" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="33" y1="64" x2="47" y2="64" stroke="#8FA377" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M30 36 Q30 28 38 28" fill="none" stroke="#8FA377" stroke-width="1.1" stroke-linecap="round"/>
+        <path d="M40 36 Q40 26 48 26" fill="none" stroke="#8FA377" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2>Why this Exists: a Kitchen Before a Recipe</h2>
+  </div>
+  <hr class="rule">
+
+  <p>Most people think cooking begins with a recipe. It does not.</p>
+  <div class="pull-quote-block">Cooking begins long before you turn on the stove. It begins with the kitchen you have designed.</div>
+  <p>A mindful kitchen is built around readiness, not recipes. When your kitchen is ready, meals become easier, shopping becomes simpler, food goes to waste less often, and cooking creates less chaos.</p>
+  <p>This is not about becoming a better cook. It is about creating a kitchen that works for you.</p>
+
+  <hr style="margin-top:36px; border:none; border-top:1px solid var(--line); width:100%;">
+  <div class="eyebrow" style="margin-top:28px;">Introduction</div>
+  <div class="head-row">
+    <div class="illus"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 80 80"><rect x="4" y="4" width="72" height="72" rx="18" fill="#FFFAF0" stroke="#ece3cd" stroke-width="1.5"/><rect x="36" y="10" width="8" height="24" rx="4" fill="#D99A6C" stroke="#8A4F1F" stroke-width="1.2"/><circle cx="40" cy="34" r="2.2" fill="#8A4F1F"/><path d="M40 34 C 20 42, 20 58, 40 68" fill="none" stroke="#9FB9C9" stroke-width="1.5" stroke-linecap="round"/><path d="M40 34 C 60 42, 60 58, 40 68" fill="none" stroke="#9FB9C9" stroke-width="1.5" stroke-linecap="round"/><path d="M40 34 C 27 41, 27 61, 40 68" fill="none" stroke="#9FB9C9" stroke-width="1.4" stroke-linecap="round"/><path d="M40 34 C 53 41, 53 61, 40 68" fill="none" stroke="#9FB9C9" stroke-width="1.4" stroke-linecap="round"/><path d="M40 34 C 34 40, 34 62, 40 68" fill="none" stroke="#9FB9C9" stroke-width="1.3" stroke-linecap="round"/><path d="M40 34 C 46 40, 46 62, 40 68" fill="none" stroke="#9FB9C9" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+    <h2 class="title">A Different Way to Think About Cooking</h2>
+  </div>
+  <hr class="rule">
+  <p class="lede soft">Three shifts in how you see your kitchen — before you touch a single ingredient.</p>
+  <div class="grid3">
+    <div class="chapter-card">
+      <div class="cnum">Mindset One</div>
+      <h3>Your kitchen is a system.</h3>
+      <p>Cooking is only one part of the process. Shopping, preparing, storing, and maintaining your kitchen all work together. Small improvements in one area make everything else easier.</p>
+    </div>
+    <div class="chapter-card">
+      <div class="cnum">Mindset Two</div>
+      <h3>Build readiness, not recipes.</h3>
+      <p>Recipes solve one meal. A ready kitchen gives you hundreds of possibilities.</p>
+      <p>Instead of shopping for one dinner at a time, build a kitchen that helps you cook whatever the week brings.</p>
+    </div>
+    <div class="chapter-card">
+      <div class="cnum">Mindset Three</div>
+      <h3>Think in possibilities.</h3>
+      <p>Instead of asking, "What should I cook tonight?", ask, "What is my kitchen ready for?" That small shift changes the way you shop, prepare, and use what you already have.</p>
+    </div>
+  </div>
+
+  <hr style="margin-top:40px; border:none; border-top:1px solid var(--line); width:100%;">
+  <div class="eyebrow" style="margin-top:28px;">Introduction</div>
+  <div class="head-row">
+    <div class="illus"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 80 80"><rect x="4" y="4" width="72" height="72" rx="18" fill="#FFFAF0" stroke="#ece3cd" stroke-width="1.5"/><path d="M22 42 L58 42 L55 62 C55 65 25 65 25 62 Z" fill="#C69A82" stroke="#8A4F1F" stroke-width="1.4"/><path d="M22 44 C15 44 14 51 21 52" fill="none" stroke="#8A4F1F" stroke-width="1.6" stroke-linecap="round"/><path d="M58 44 C65 44 66 51 59 52" fill="none" stroke="#8A4F1F" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="40" cy="38" rx="21" ry="5.5" fill="#D9E6EC" stroke="#5B8CA3" stroke-width="1.3"/><ellipse cx="40" cy="35.5" rx="15" ry="3.6" fill="#EAF3F7" stroke="#5B8CA3" stroke-width="1.1"/><rect x="37" y="27" width="6" height="5" rx="2" fill="#5B8CA3"/><circle cx="40" cy="26" r="2.6" fill="#D9E6EC" stroke="#5B8CA3" stroke-width="1.1"/></svg></div>
+    <h2 class="title">Principles</h2>
+  </div>
+  <hr class="rule">
+  <p class="lede soft">A few reminders as you build your practice.</p>
+  <ul class="intro-principles">
+    <li><strong>Start with what you have.</strong> Build on the ingredients, tools, and habits you already own.</li>
+    <li><strong>Small actions compound.</strong> Washing vegetables, cooking a pot of rice, or making a simple sauce today can make tomorrow's meal much easier.</li>
+    <li><strong>Reduce friction.</strong> The easier it is to cook, the more likely you are to cook.</li>
+    <li><strong>Use food before buying more.</strong> A mindful kitchen helps you notice and use what is already there.</li>
+    <li><strong>Stay flexible.</strong> Your kitchen should support your life, not the other way around.</li>
+    <li><strong>Progress over perfection.</strong> Some weeks will be more prepared than others. Keep noticing. Keep adjusting.</li>
+  </ul>
+</section>
+
+
+<section id="build">
+  <div class="eyebrow">Build</div>
+  <h2 class="title">Build Your Kitchen</h2>
+  <hr class="rule">
+  <p><strong>A ready kitchen is built one layer at a time.</strong></p>
+  <p>Each layer supports the next. You do not need to build everything at once. Start where you are, add what you need, and let your kitchen grow with you.</p>
+  <div class="layer-block">
+    <div class="layer-title">🏠 Foundation</div>
+    <p>The tools that make everyday cooking possible. These are the items you reach for again and again.</p>
+    <p class="layer-examples"><span class="layer-ex-label">Examples</span> Chef's knife · Cutting board · Pots and pans · Mixing bowls · Measuring cups · Colander · Storage containers</p>
+  </div>
+  <div class="layer-block">
+    <div class="layer-title">🌾 Pantry</div>
+    <p>The ingredients that give you options. A well-stocked pantry lets you create meals without another trip to the store.</p>
+    <p class="layer-examples"><span class="layer-ex-label">Examples</span> Rice · Pasta · Beans · Lentils · Flour · Oils · Vinegar · Nuts and seeds · Herbs and spices</p>
+  </div>
+  <div class="layer-block">
+    <div class="layer-title">🥬 Fresh</div>
+    <p>The ingredients that bring meals to life. Keep what you enjoy using most. Fresh ingredients should support your cooking, not become a source of waste. Only buy for a week or two.</p>
+    <p class="layer-examples"><span class="layer-ex-label">Examples</span> Vegetables · Fruit · Herbs · Garlic · Ginger · Eggs · Milk or plant-based alternatives · Cheese or yogurt</p>
+  </div>
+  <div class="layer-block">
+    <div class="layer-title">🧂 Flavor</div>
+    <p>The ingredients that transform simple food. A few sauces, spices, and seasonings can turn the same ingredients into completely different meals.</p>
+    <p class="layer-examples"><span class="layer-ex-label">Examples</span> Soy sauce · Tahini · Curry paste · Salsa · Mustard · Lemon juice · Spices</p>
+  </div>
+  <div class="layer-block">
+    <div class="layer-title">🍱 Prepared</div>
+    <p>The work your future self will thank you for. These are the ingredients and meals you've already prepared. They make busy days easier.</p>
+    <p class="layer-examples"><span class="layer-ex-label">Examples</span> Cooked rice · Roasted vegetables · Chopped onions · Washed greens · Marinated tofu · Homemade sauce · Frozen leftovers · Soup</p>
+  </div>
+  <div class="layer-reminder">
+    <div class="layer-title">A gentle reminder</div>
+    <p>You do not need to have everything. You do not need the perfect pantry. You do not need expensive tools. Build your kitchen slowly. Use what you already have. Add what makes your everyday life easier.</p>
+  </div>
+</section>
+
+
+
+<section id="templates">
+  <div class="eyebrow">Build</div>
+  <h2 class="title">Practice with Meal Templates</h2>
+  <hr class="rule">
+  <p class="lede soft">Instead of two hundred recipes, learn a handful of templates. These work across cuisines.</p>
+  <div class="tmpl-grid">
+    <div class="tmpl-card"><div class="tdot" style="background:var(--yellow-tint);"></div><h4>Bowl</h4><div class="tparts">Carb · Protein · Vegetable · Sauce</div></div>
+    <div class="tmpl-card"><div class="tdot" style="background:var(--apricot-tint);"></div><h4>Curry</h4><div class="tparts">Protein · Vegetables · Curry base · Rice</div></div>
+    <div class="tmpl-card"><div class="tdot" style="background:var(--sage-tint);"></div><h4>Stir Fry</h4><div class="tparts">Protein · Vegetables · Sauce · Rice or noodles</div></div>
+    <div class="tmpl-card"><div class="tdot" style="background:var(--blue-tint);"></div><h4>Pasta / Noodle / Rice</h4><div class="tparts">Pasta · Vegetables · Protein · Flavor</div></div>
+    <div class="tmpl-card"><div class="tdot" style="background:var(--peach-tint);"></div><h4>Soup</h4><div class="tparts">Base · Protein · Vegetables · Grain</div></div>
+  </div>
+</section>
+
+<section id="calendar">
+  <div class="eyebrow">Calendar</div>
+  <h2 class="title">The Weekly Rhythm</h2>
+  <hr class="rule">
+  <p class="lede">Instead of meal planning, create a kitchen rhythm — a rhythm you return to, instead of a plan you rebuild every night. This is where the practice begins.</p>
+  <p class="lede soft">Drag each task onto whichever day actually fits your week, tap a placed task to mark it done, or tap "Apply Suggested Rhythm" for a starting point you can rearrange freely. The board clears every Sunday — arranging it is part of the practice.</p>
+  <p class="lede soft">Every task here is scoped to take no more than thirty minutes. Small enough to actually happen, not another chore that piles up.</p>
+  <div class="cal-card">
+  <div class="cal-head">
+    <div class="cal-nav">
+      <button id="prevWeek" aria-label="Previous week">←</button>
+      <div class="cal-range" id="weekRange">This Week</div>
+      <button id="nextWeek" aria-label="Next week">→</button>
+      <button class="today-btn" id="todayBtn">This week</button>
+    </div>
+    <button class="suggest-btn" id="suggestBtn">✨ Apply Suggested Rhythm</button>
+  </div>
+
+  <div class="legend">
+    <span><span class="sw" style="background:var(--tan);"></span>Stock &amp; Track</span>
+    <span><span class="sw" style="background:var(--sage);"></span>Prep</span>
+    <span><span class="sw" style="background:var(--blue);"></span>Preserve</span>
+    <span><span class="sw" style="background:var(--clay);"></span>Tidy</span>
+    <span class="time-note">⏱ Every task: 30 minutes or less</span>
+  </div>
+
+  <div class="bank" id="bank"></div>
+  <div class="cal-progress" style="margin-top:8px; text-align:right;"><b id="progressCount">0/14</b> tasks placed</div>
+
+  <div class="board" id="board"></div>
+
+  <div class="reflect-box">
+    <div class="rq" id="reflectQ">What made this week easier?</div>
+    <textarea id="reflectText" placeholder="Write a line or two..."></textarea>
+    <div class="what-worked" id="whatWorked">
+      <p class="ww-subtitle">Select all that apply.</p>
+      <div class="ww-category">
+        <div class="ww-category-label">Preparation</div>
+        <div class="ww-tags">
+          <button class="ww-tag" data-ww="Washed produce">Washed produce</button>
+          <button class="ww-tag" data-ww="Chopped vegetables">Chopped vegetables</button>
+          <button class="ww-tag" data-ww="Cooked grains">Cooked grains</button>
+          <button class="ww-tag" data-ww="Prepared protein">Prepared protein</button>
+          <button class="ww-tag" data-ww="Made a sauce">Made a sauce</button>
+        </div>
+      </div>
+      <div class="ww-category">
+        <div class="ww-category-label">Outcomes</div>
+        <div class="ww-tags">
+          <button class="ww-tag" data-ww="Less food waste">Less food waste</button>
+          <button class="ww-tag" data-ww="Faster dinners">Faster dinners</button>
+          <button class="ww-tag" data-ww="Used what I already had">Used what I already had</button>
+          <button class="ww-tag" data-ww="Fewer takeout meals">Fewer takeout meals</button>
+          <button class="ww-tag" data-ww="Grocery shopping was easier">Grocery shopping was easier</button>
+          <button class="ww-tag" data-ww="Healthier meals">Healthier meals</button>
+          <button class="ww-tag" data-ww="Felt less stressed">Felt less stressed</button>
+          <button class="ww-tag" data-ww="Other">Other</button>
+        </div>
+      </div>
+    </div>
+    <div class="saved-hint" id="savedHint">Saved</div>
+  </div>
+  </div><!-- /.cal-card -->
+</section>
+
+
+<section id="journal">
+  <div class="eyebrow">Journal</div>
+  <h2 class="title">Write it Out</h2>
+  <p style="margin:0 0 0; font-size:16px; color:var(--ink-soft);">Use this space to capture recipes, ideas, lists, and reflections.</p>
+  <hr class="rule">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:4px; margin-bottom:10px;">
+    <div class="field-label" style="margin:0;">New entry</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span id="kitchenJournalToast" style="font-size:12px;color:var(--ink-soft);font-style:italic;opacity:0;transition:opacity 0.3s;"></span>
+      <button class="kj-add-btn kj-save-btn" id="kjAddBtn" type="button">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Save
+      </button>
+      <button class="kj-add-btn" id="kjMyEntriesBtn" type="button">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M5 3h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="1.4"/><path d="M7 7h6M7 10h6M7 13h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        My entries
+      </button>
+    </div>
+  </div>
+  <textarea id="kjText" rows="8" placeholder="Start writing..." style="width:100%;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-family:'Nunito',sans-serif;font-size:15px;color:var(--ink);resize:vertical;outline:none;background:#fffef9;line-height:1.75;"></textarea>
+  <div class="kj-entries-list" id="kjEntriesList" style="display:none; margin-top:24px;"></div>
+</section>
+
+<!-- ENTRIES SIDE PANEL -->
+<div class="kj-panel-overlay" id="kjPanelOverlay"></div>
+<div class="kj-side-panel" id="kjSidePanel">
+  <div class="kj-side-panel-header">
+    <div class="kj-side-panel-title">My entries</div>
+    <button class="kj-side-panel-close" id="kjSidePanelClose" type="button" title="Close">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="4" y1="4" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="4" x2="4" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="kj-side-panel-body" id="kjSidePanelBody"></div>
+</div>
+
+<!-- JOURNAL OVERLAY -->
+<div class="kj-overlay" id="kjOverlay">
+  <div class="kj-paper" id="kjPaper">
+    <div class="kj-paper-header">
+      <div class="kj-paper-header-left">
+        <div class="kj-paper-date" id="kjPaperDate"></div>
+        <input class="kj-paper-title-input" id="kjTitleInput" type="text" placeholder="Title (optional)…" maxlength="80">
+      </div>
+      <button class="kj-paper-close" id="kjCloseBtn" type="button" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="4" y1="4" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="4" x2="4" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="kj-tag-row">
+      <button class="kj-tag" data-tag="note">📝 Note</button>
+      <button class="kj-tag" data-tag="recipe">🍳 Recipe</button>
+      <button class="kj-tag" data-tag="list">📋 List</button>
+    </div>
+    <div class="kj-paper-divider"></div>
+    <div class="kj-paper-body">
+      <textarea class="kj-paper-textarea" id="kjBodyInput" placeholder="Write freely…" rows="12"></textarea>
+    </div>
+    <div class="kj-paper-footer">
+      <button class="kj-paper-cancel" id="kjCancelBtn" type="button">Cancel</button>
+      <button class="kj-paper-save" id="kjSaveBtn" type="button">Save entry</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="fquote">"A mindful kitchen isn't measured by what's in it. It's measured by what it's ready to do."</div>
+  <div class="fbrand">Mindful Kitchen · <span class="gold">The Mindful Mundane</span></div>
+</footer>
+
+<script>
+(function(){
+  const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const DAY_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  const TASKS = [
+    {name:"Restock", cat:"stock"},
+    {name:"Monthly Restock Basics", cat:"stock"},
+    {name:"Refill", cat:"stock"},
+    {name:"Check Inventory", cat:"stock"},
+    {name:"Wash", cat:"prep"},
+    {name:"Dry", cat:"prep"},
+    {name:"Cut Vegetables", cat:"prep"},
+    {name:"Marinate", cat:"prep"},
+    {name:"Prep Base", cat:"prep"},
+    {name:"Freeze Extras", cat:"preserve"},
+    {name:"Store Extras", cat:"preserve"},
+    {name:"Reduce Waste", cat:"preserve"},
+    {name:"Clean", cat:"tidy"},
+    {name:"Arrange", cat:"tidy"},
+  ];
+
+  const SUGGESTED_DAY = {
+    "Restock":"Sunday", "Monthly Restock Basics":"Sunday", "Refill":"Sunday", "Check Inventory":"Sunday",
+    "Wash":"Wednesday", "Dry":"Wednesday", "Cut Vegetables":"Wednesday", "Marinate":"Wednesday", "Prep Base":"Wednesday",
+    "Reduce Waste":"Friday",
+    "Clean":"Saturday", "Arrange":"Saturday", "Freeze Extras":"Saturday", "Store Extras":"Saturday",
+  };
+
+  const ICON_COOK = `<svg viewBox="0 0 80 80"><path d="M18 36 H62 L57 58 H23 Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><line x1="12" y1="36" x2="68" y2="36" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M12 29 C10 32 10 35 12 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M68 29 C70 32 70 35 68 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
+  const ICON_LEFTOVERS = `<svg viewBox="0 0 80 80"><rect x="16" y="24" width="48" height="11" rx="4" fill="none" stroke="currentColor" stroke-width="5"/><rect x="20" y="35" width="40" height="29" rx="6" fill="none" stroke="currentColor" stroke-width="5"/></svg>`;
+  const ICON_CLEAN = `<svg viewBox="0 0 80 80"><rect x="16" y="30" width="48" height="26" rx="8" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="29" cy="43" r="2.8" fill="currentColor"/><circle cx="40" cy="43" r="2.8" fill="currentColor"/><circle cx="51" cy="43" r="2.8" fill="currentColor"/></svg>`;
+
+  const REFLECTIONS = [
+    "Which meal felt effortless this week?",
+    "What created unnecessary chaos?",
+    "What ingredient did I buy but never use?",
+    "What did I run out of too often?",
+    "What preparation saved me the most time?",
+    "What worked well this week?",
+  ];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  const STORE_KEY = "mindfulKitchenBoard";
+  const READY_KEY = "mindfulKitchenReadiness";
+  let store = {};
+  try{ store = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ store = {}; }
+
+  // ---- dedication fields ----
+  document.querySelectorAll('#dedication input[data-key]').forEach(function(inp){
+    const k = inp.dataset.key;
+    if(store[k]) inp.value = store[k];
+    inp.addEventListener('input', function(){
+      store[k] = inp.value;
+      localStorage.setItem(STORE_KEY, JSON.stringify(store));
+    });
+  });
+
+  let weekOffset = 0;
+
+  function startOfWeek(date, offsetWeeks){
+    const d = new Date(date);
+    d.setHours(0,0,0,0);
+    const day = d.getDay(); // 0 = Sunday
+    d.setDate(d.getDate() - day + offsetWeeks*7);
+    return d;
+  }
+
+  function isoWeekKey(sunday){
+    const y = sunday.getFullYear();
+    const startOfYear = new Date(y,0,1);
+    const diffDays = Math.floor((sunday - startOfYear) / 86400000);
+    const weekNum = Math.floor(diffDays/7);
+    return y + "-W" + weekNum;
+  }
+
+  function fmtRange(sunday){
+    const sat = new Date(sunday); sat.setDate(sat.getDate()+6);
+    const sameMonth = sunday.getMonth() === sat.getMonth();
+    if(sameMonth){
+      return `${MONTHS[sunday.getMonth()]} ${sunday.getDate()}–${sat.getDate()}`;
+    }
+    return `${MONTHS[sunday.getMonth()]} ${sunday.getDate()} – ${MONTHS[sat.getMonth()]} ${sat.getDate()}`;
+  }
+
+  function currentWeek(){
+    const sunday = startOfWeek(new Date(), weekOffset);
+    const key = isoWeekKey(sunday);
+    if(!store[key]) store[key] = { placements:{}, reflection:"", habits:{} };
+    if(!store[key].habits) store[key].habits = {};
+    DAYS.forEach(day=>{
+      if(!store[key].habits[day]) store[key].habits[day] = { mode:null, clean:false };
+    });
+    return { sunday, key, wd: store[key] };
+  }
+
+  function saveStore(){
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+    const hint = document.getElementById('savedHint');
+    hint.classList.add('show');
+    clearTimeout(saveStore._t);
+    saveStore._t = setTimeout(()=>hint.classList.remove('show'), 1400);
+  }
+
+  function clearHighlights(){
+    document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  }
+
+  function attachDrag(chip, taskName, wd){
+    chip.addEventListener('pointerdown', (e)=>{
+      if(e.button !== undefined && e.button !== 0) return;
+      e.preventDefault();
+      const startX = e.clientX, startY = e.clientY;
+      const rect = chip.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left, offsetY = e.clientY - rect.top;
+      const origW = rect.width;
+      let dragging = false;
+
+      function onMove(ev){
+        const dx = ev.clientX-startX, dy = ev.clientY-startY;
+        if(!dragging && Math.hypot(dx,dy) > 5){
+          dragging = true;
+          chip.classList.add('dragging');
+          chip.style.width = origW+'px';
+          document.body.appendChild(chip);
+        }
+        if(dragging){
+          chip.style.left = (ev.clientX-offsetX)+'px';
+          chip.style.top = (ev.clientY-offsetY)+'px';
+          clearHighlights();
+          const under = document.elementFromPoint(ev.clientX, ev.clientY);
+          const zone = under && under.closest('.day-col, .bank');
+          if(zone) zone.classList.add('drag-over');
+        }
+      }
+      function onUp(ev){
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
+        clearHighlights();
+        if(dragging){
+          const under = document.elementFromPoint(ev.clientX, ev.clientY);
+          const zone = under && under.closest('.day-col, .bank');
+          if(zone && zone.classList.contains('day-col')){
+            const day = zone.dataset.day;
+            const prev = wd.placements[taskName];
+            wd.placements[taskName] = { day, done: prev ? prev.done : false };
+            saveStore();
+          } else if(zone && zone.classList.contains('bank')){
+            delete wd.placements[taskName];
+            saveStore();
+          }
+          chip.remove();
+          renderBoard();
+        } else {
+          const rec = wd.placements[taskName];
+          if(rec){
+            rec.done = !rec.done;
+            saveStore();
+            renderBoard();
+          }
+        }
+      }
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
+  }
+
+  function renderBoard(){
+    const { sunday, wd } = currentWeek();
+
+    document.getElementById('weekRange').textContent = fmtRange(sunday) + (weekOffset===0 ? " · This Week" : "");
+    document.getElementById('todayBtn').style.display = weekOffset===0 ? "none" : "inline-block";
+
+    const bankEl = document.getElementById('bank');
+    const boardEl = document.getElementById('board');
+    bankEl.innerHTML = "";
+    boardEl.innerHTML = "";
+
+    const cols = {};
+    DAYS.forEach((day,i)=>{
+      const col = document.createElement('div');
+      col.className = 'day-col';
+      col.dataset.day = day;
+      col.innerHTML = `<div class="dname">${DAYS[i]}</div>`;
+      boardEl.appendChild(col);
+      cols[day] = col;
+    });
+
+    let placedCount = 0;
+    TASKS.forEach(t=>{
+      const rec = wd.placements[t.name];
+      const chip = document.createElement('div');
+      chip.className = `chip cat-${t.cat}` + (rec && rec.done ? ' done' : '');
+      chip.textContent = t.name;
+      attachDrag(chip, t.name, wd);
+      if(rec){
+        placedCount++;
+        (cols[rec.day] || bankEl).appendChild(chip);
+      } else {
+        bankEl.appendChild(chip);
+      }
+    });
+
+    document.getElementById('progressCount').textContent = `${placedCount}/${TASKS.length}`;
+
+    DAYS.forEach(day=>{
+      const col = cols[day];
+      const h = wd.habits[day];
+      const status = document.createElement('div');
+      status.className = 'day-status';
+      status.innerHTML = `
+        <div class="mode-row">
+          <button class="mode-btn cook${h.mode==='cook'?' active':''}" data-mode="cook" title="Cook">${ICON_COOK}<span class="lbl">Cook</span></button>
+          <button class="mode-btn leftovers${h.mode==='leftovers'?' active':''}" data-mode="leftovers" title="Leftovers">${ICON_LEFTOVERS}<span class="lbl">Leftovers</span></button>
+        </div>
+        <button class="clean-btn${h.clean?' active':''}" data-mode="clean" title="Clean">${ICON_CLEAN}<span class="lbl">Clean</span></button>
+      `;
+      status.querySelector('[data-mode="cook"]').addEventListener('click', ()=>{
+        h.mode = h.mode === 'cook' ? null : 'cook';
+        saveStore(); renderBoard();
+      });
+      status.querySelector('[data-mode="leftovers"]').addEventListener('click', ()=>{
+        h.mode = h.mode === 'leftovers' ? null : 'leftovers';
+        saveStore(); renderBoard();
+      });
+      status.querySelector('[data-mode="clean"]').addEventListener('click', ()=>{
+        h.clean = !h.clean;
+        saveStore(); renderBoard();
+      });
+      col.appendChild(status);
+    });
+
+    const startOfYear = new Date(sunday.getFullYear(),0,1);
+    const diffDays = Math.floor((sunday - startOfYear)/86400000);
+    const weekNum = Math.floor(diffDays/7);
+    const refl = REFLECTIONS[((weekNum % REFLECTIONS.length)+REFLECTIONS.length) % REFLECTIONS.length];
+    document.getElementById('reflectQ').textContent = refl;
+    const textarea = document.getElementById('reflectText');
+    const whatWorked = document.getElementById('whatWorked');
+    const isWW = refl === "What worked well this week?";
+    textarea.style.display = isWW ? 'none' : '';
+    whatWorked.style.display = isWW ? 'block' : 'none';
+    if(isWW){
+      if(!wd.whatWorked) wd.whatWorked = [];
+      document.querySelectorAll('.ww-tag').forEach(function(btn){
+        btn.classList.toggle('selected', wd.whatWorked.includes(btn.dataset.ww));
+        btn.onclick = function(){
+          const val = btn.dataset.ww;
+          if(wd.whatWorked.includes(val)){ wd.whatWorked = wd.whatWorked.filter(function(v){ return v !== val; }); }
+          else { wd.whatWorked.push(val); }
+          btn.classList.toggle('selected', wd.whatWorked.includes(val));
+          saveStore();
+        };
+      });
+    } else {
+      textarea.value = wd.reflection || "";
+      textarea.oninput = ()=>{ wd.reflection = textarea.value; saveStore(); };
+    }
+  }
+
+  document.getElementById('prevWeek').addEventListener('click', ()=>{ weekOffset--; renderBoard(); });
+  document.getElementById('nextWeek').addEventListener('click', ()=>{ weekOffset++; renderBoard(); });
+  document.getElementById('todayBtn').addEventListener('click', ()=>{ weekOffset=0; renderBoard(); });
+  document.getElementById('suggestBtn').addEventListener('click', ()=>{
+    const { wd } = currentWeek();
+    TASKS.forEach(t=>{
+      if(!wd.placements[t.name] && SUGGESTED_DAY[t.name]){
+        wd.placements[t.name] = { day: SUGGESTED_DAY[t.name], done:false };
+      }
+    });
+    saveStore();
+    renderBoard();
+  });
+
+  renderBoard();
+
+  // ---- readiness checklist ----
+  let ready = {};
+  try{ ready = JSON.parse(localStorage.getItem(READY_KEY)) || {}; }catch(e){ ready = {}; }
+  document.querySelectorAll('.ready-item').forEach(el=>{
+    const key = el.dataset.key;
+    if(ready[key]) el.classList.add('done');
+    el.addEventListener('click', ()=>{
+      ready[key] = !ready[key];
+      el.classList.toggle('done', ready[key]);
+      localStorage.setItem(READY_KEY, JSON.stringify(ready));
+    });
+  });
+})();
+</script>
+
+</div><!-- /appContent -->
+
+<script>
+(function() {
+  var firebaseConfig = {
+    apiKey:       'AIzaSyBT_hMR2tpsvCVqoZogfjsDleOhE6qbtgk',
+    authDomain:   'mindfulmundane-ef7bd.firebaseapp.com',
+    projectId:    'mindfulmundane-ef7bd',
+    storageBucket:'mindfulmundane-ef7bd.firebasestorage.app',
+    messagingSenderId: '577498747565',
+    appId:        '1:577498747565:web:df11001da977a13b66ac24'
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+
+  var loadingOverlay = document.getElementById('loadingOverlay');
+  var authGate       = document.getElementById('authGate');
+  var appContent     = document.getElementById('appContent');
+
+  function show(el) { el.style.display = ''; }
+  function hide(el) { el.style.display = 'none'; }
+
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      renderUserChip(user);
+      hide(loadingOverlay);
+      hide(authGate);
+      show(appContent);
+    } else {
+      hide(loadingOverlay);
+      hide(appContent);
+      show(authGate);
+    }
+  });
+
+  document.getElementById('googleSignInBtn').addEventListener('click', function() {
+    document.getElementById('authError').textContent = '';
+    show(loadingOverlay);
+    var provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(function(err) {
+      hide(loadingOverlay);
+      document.getElementById('authError').textContent = 'Sign-in failed. Please try again.';
+    });
+  });
+
+  document.querySelectorAll('.accordion-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = btn.closest('.accordion-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.accordion-item').forEach(function(i) { i.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  function renderUserChip(user) {
+    var chip = document.getElementById('userChip');
+    chip.innerHTML = '';
+
+    var avatarBtn = document.createElement('button');
+    avatarBtn.type = 'button';
+    avatarBtn.className = 'chip-avatar';
+    avatarBtn.setAttribute('aria-label', 'Account');
+
+    if (user.photoURL) {
+      var img = document.createElement('img');
+      img.src = user.photoURL;
+      img.alt = '';
+      avatarBtn.appendChild(img);
+    } else {
+      var initials = document.createElement('span');
+      initials.className = 'chip-initials';
+      initials.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+      avatarBtn.appendChild(initials);
+    }
+
+    var dropdown = document.createElement('div');
+    dropdown.className = 'chip-dropdown';
+
+    var nameEl = document.createElement('div');
+    nameEl.className = 'chip-name';
+    nameEl.textContent = user.displayName || user.email;
+    dropdown.appendChild(nameEl);
+
+    var signOutBtn = document.createElement('button');
+    signOutBtn.type = 'button';
+    signOutBtn.className = 'chip-signout';
+    signOutBtn.textContent = 'Sign out';
+    signOutBtn.addEventListener('click', function() {
+      auth.signOut().then(function() { window.location.reload(); });
+    });
+    dropdown.appendChild(signOutBtn);
+
+    avatarBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      dropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', function() { dropdown.classList.remove('open'); });
+
+    chip.appendChild(avatarBtn);
+    chip.appendChild(dropdown);
+  }
+})();
+</script>
+
+<script>
+// Kitchen Journal
+(function(){
+  const KJ_KEY = 'mindfulKitchenJournal';
+  let entries = [];
+  try{ entries = JSON.parse(localStorage.getItem(KJ_KEY)) || []; }catch(e){ entries = []; }
+
+  function saveEntries(){ localStorage.setItem(KJ_KEY, JSON.stringify(entries)); }
+
+  function formatDate(ts){
+    const d = new Date(ts);
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }
+
+  let selectedTag = '';
+  let editingId = null;
+
+  const overlay = document.getElementById('kjOverlay');
+  const titleInput = document.getElementById('kjTitleInput');
+  const bodyInput = document.getElementById('kjBodyInput');
+  const dateEl = document.getElementById('kjPaperDate');
+  const entriesList = document.getElementById('kjEntriesList');
+  const sidePanel = document.getElementById('kjSidePanel');
+  const sidePanelBody = document.getElementById('kjSidePanelBody');
+  const panelOverlay = document.getElementById('kjPanelOverlay');
+  const toast = document.getElementById('kitchenJournalToast');
+
+  function openSidePanel(){ sidePanel.classList.add('open'); panelOverlay.classList.add('open'); renderSidePanel(); }
+  function closeSidePanel(){ sidePanel.classList.remove('open'); panelOverlay.classList.remove('open'); }
+
+  function showToast(msg){
+    toast.textContent = msg; toast.style.opacity = '1';
+    setTimeout(()=>{ toast.style.opacity = '0'; }, 2000);
+  }
+
+  function openOverlay(entry){
+    editingId = entry ? entry.id : null;
+    selectedTag = entry ? (entry.tag || '') : '';
+    titleInput.value = entry ? (entry.title || '') : '';
+    bodyInput.value = entry ? (entry.body || '') : '';
+    dateEl.textContent = entry ? formatDate(entry.ts) : formatDate(Date.now());
+    document.querySelectorAll('.kj-tag').forEach(function(b){
+      b.classList.toggle('selected', b.dataset.tag === selectedTag);
+    });
+    overlay.style.display = 'flex';
+    requestAnimationFrame(()=>{ overlay.style.opacity = '1'; });
+    bodyInput.focus();
+  }
+
+  function closeOverlay(){
+    overlay.style.opacity = '0';
+    setTimeout(()=>{ overlay.style.display = 'none'; }, 250);
+    editingId = null; selectedTag = '';
+  }
+
+  function buildEntryCards(container, onDelete){
+    container.innerHTML = '';
+    if(!entries.length){
+      container.innerHTML = '<div class="kj-side-panel-empty">No entries yet.</div>';
+      return;
+    }
+    entries.slice().reverse().forEach(function(e){
+      const card = document.createElement('div');
+      card.className = 'kj-entry-card';
+      const tagLabel = e.tag ? ({'note':'📝 Note','recipe':'🍳 Recipe','list':'📋 List'}[e.tag] || e.tag) : '';
+      card.innerHTML = '<div class="kj-entry-meta">'+(e.tag ? '<span class="kj-entry-badge '+e.tag+'">'+tagLabel+'</span>' : '')+formatDate(e.ts)+'</div>'
+        +(e.title ? '<div class="kj-entry-title">'+e.title+'</div>' : '')
+        +'<div class="kj-entry-body">'+e.body.replace(/</g,'&lt;')+'</div>'
+        +'<button class="kj-entry-delete" data-id="'+e.id+'" title="Delete"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><line x1="4" y1="4" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="4" x2="4" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>';
+      card.querySelector('.kj-entry-delete').addEventListener('click', function(){
+        entries = entries.filter(function(x){ return x.id !== e.id; });
+        saveEntries(); onDelete();
+      });
+      card.addEventListener('click', function(ev){
+        if(!ev.target.closest('.kj-entry-delete')) openOverlay(e);
+      });
+      container.appendChild(card);
+    });
+  }
+
+  function renderEntries(){ /* no-op: inline list no longer used */ }
+
+  function renderSidePanel(){ buildEntryCards(sidePanelBody, renderSidePanel); }
+
+  document.getElementById('kjAddBtn').addEventListener('click', function(){
+    const body = document.getElementById('kjText').value.trim();
+    if(!body) return;
+    entries.push({ id: Date.now()+'', ts: Date.now(), title:'', body: body, tag: '' });
+    saveEntries();
+    document.getElementById('kjText').value = '';
+    showToast('Saved');
+  });
+
+  document.getElementById('kjMyEntriesBtn').addEventListener('click', openSidePanel);
+  document.getElementById('kjSidePanelClose').addEventListener('click', closeSidePanel);
+  panelOverlay.addEventListener('click', closeSidePanel);
+
+  document.querySelectorAll('.kj-tag').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      selectedTag = selectedTag === btn.dataset.tag ? '' : btn.dataset.tag;
+      document.querySelectorAll('.kj-tag').forEach(function(b){
+        b.classList.toggle('selected', b.dataset.tag === selectedTag);
+      });
+    });
+  });
+
+  document.getElementById('kjSaveBtn').addEventListener('click', function(){
+    const body = bodyInput.value.trim();
+    if(!body) return;
+    if(editingId){
+      const idx = entries.findIndex(function(e){ return e.id === editingId; });
+      if(idx > -1){ entries[idx].title = titleInput.value.trim(); entries[idx].body = body; entries[idx].tag = selectedTag; }
+    } else {
+      entries.push({ id: Date.now()+'', ts: Date.now(), title: titleInput.value.trim(), body: body, tag: selectedTag });
+    }
+    saveEntries(); renderEntries(); closeOverlay();
+    showToast('Saved');
+  });
+
+  document.getElementById('kjCancelBtn').addEventListener('click', closeOverlay);
+  document.getElementById('kjCloseBtn').addEventListener('click', closeOverlay);
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) closeOverlay(); });
+
+  renderEntries();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mindful Mundane</title>
+  <style>
+    :root {
+      --gold: #EAC66B;
+      --gold-deep: #c99f3f;
+      --sage: #8FA377;
+      --blue: #9FB9C9;
+      --clay: #C69A82;
+      --blue-tint: #CFE0EA;
+      --sage-tint: #D7E3CE;
+      --tan: #D99A6C;
+      --peach-tint: #EED9CD;
+      --apricot-tint: #F3CBAB;
+      --yellow-tint: #FFEDBE;
+      --white: #FFFFFF;
+      --bg: #FFFAF0;
+      --card: #FFFFFF;
+      --ink: #3a352f;
+      --ink-soft: #5c6650;
+      --ink-label: #8a8266;
+      --line: #ece3cd;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'EB Garamond', Georgia, serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .sans {
+      font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    header.nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(217, 154, 108, 0.96);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(163, 137, 102, 0.25);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      font-size: 20px;
+      color: var(--ink);
+    }
+    .brand .accent {
+      color: var(--white);
+    }
+    nav.links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    nav.links a {
+      font-family: 'Nunito', sans-serif;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink-soft);
+      padding: 4px 0;
+      border-bottom: 2px solid transparent;
+    }
+    nav.links a:hover {
+      color: var(--ink);
+      border-bottom-color: var(--gold);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 28px 80px;
+    }
+    .hero {
+      text-align: center;
+      padding: 12px 0 18px;
+    }
+    .kicker {
+      font-family: 'Nunito', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 11.5px;
+      color: var(--gold-deep);
+      font-weight: 800;
+      margin-bottom: 22px;
+    }
+    .hero-dot {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 22px;
+      display: block;
+    }
+    h1.hero-title {
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 500;
+      line-height: 1.15;
+      margin: 0 0 18px;
+    }
+    .accent {
+      color: var(--gold-deep);
+      font-style: italic;
+    }
+    .hero-sub {
+      font-family: 'Nunito', sans-serif;
+      font-size: 19px;
+      color: var(--ink-soft);
+      max-width: 620px;
+      margin: 0 auto 22px;
+      line-height: 1.6;
+    }
+    .hero-divider {
+      width: 68px;
+      height: 2px;
+      background: var(--gold-deep);
+      border: none;
+      border-radius: 999px;
+      margin: 10px auto 0;
+      opacity: 0.7;
+    }
+    .grid {
+      display: grid;
+      gap: 56px;
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+      margin-top: 24px;
+      align-items: center;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(194, 179, 143, 0.35);
+      border-radius: 50%;
+      padding: 24px 16px 14px;
+      aspect-ratio: 1 / 1;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(58, 53, 47, .08);
+    }
+    .card h2 {
+      margin: 0;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+    }
+    .card p {
+      margin: 0;
+      color: var(--sage);
+      line-height: 1.9;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      max-width: 180px;
+    }
+    .card svg {
+      margin-top: 8px;
+      margin-bottom: 14px;
+      width: 54px;
+      height: auto;
+    }
+    .card-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      width: 100%;
+      height: 100%;
+      color: inherit;
+      text-decoration: none;
+      padding: 18px;
+    }
+    .card-link:hover {
+      text-decoration: none;
+    }
+
+    .card-divider {
+      width: 32px;
+      height: 2px;
+      background: var(--sage);
+      border-radius: 999px;
+      margin-top: 8px;
+      opacity: 0.7;
+    }
+
+    .card .card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    #spending .card-content {
+      gap: 8px;
+      margin-top: -8px;
+    }
+    #spending .card-content h2 {
+      margin-top: -12px;
+    }
+    #spending .card-content p {
+      margin-top: -4px;
+      margin-bottom: 6px;
+    }
+    #kitchen .card-content {
+      gap: 10px;
+      margin-top: -6px;
+    }
+    #kitchen svg {
+      width: 63px;
+    }
+    #kitchen .card-content h2 {
+      margin-top: -10px;
+    }
+
+    .note {
+      margin: 0 0 20px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14.5px;
+    }
+    .note {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--ink-soft);
+      font-style: italic;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+      .nav-inner { padding: 14px 18px; }
+      nav.links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">The Mindful <span class="accent">Mundane</span></div>
+      <nav class="links">
+        <a href="Mindful%20Spending%20Website/mindfulspending.html">Mindful Spending</a>
+        <a href="Mindful%20Kitchen%20Website/mindfulkitchen.html">Mindful Kitchen</a>
+        <a href="./index.html">Mindful Spaces</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img src="MMlogo.png" alt="" class="hero-dot" aria-hidden="true">
+      <h1 class="hero-title">The Mindful <span class="accent">Mundane</span></h1>
+      <p class="hero-sub">A meaningful life is built from the ordinary moments we choose to notice. Through intentional choices, we create space for what matters, show ourselves a little more care, and bring more joy into everyday life.</p>
+    </section>
+
+    <hr class="hero-divider">
+
+    <div class="grid">
+      <article class="card" id="spending">
+        <a class="card-link" href="Mindful%20Spending%20Website/mindfulspending.html">
+          <div class="card-content">
+            <svg width="52" height="52" viewBox="0 0 84 125" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M41.5732 77.9181V0" stroke="#8FA377" stroke-width="5.19591"/>
+              <path d="M41.5734 27.8286C13.7455 16.6975 2.61431 38.9598 24.8766 50.091C36.0078 55.6565 41.5734 44.5254 41.5734 27.8286Z" fill="#D7E3CE" stroke="#8FA377" stroke-width="3.71136"/>
+              <path d="M41.5732 11.1314C69.4012 0.000208241 80.5323 22.2625 58.27 33.3937C47.1388 38.9593 41.5732 27.8281 41.5732 11.1314Z" fill="#EED9CD" stroke="#C69A82" stroke-width="3.71136"/>
+              <path d="M45.6143 45.815C62.1903 39.1555 68.8207 52.4744 55.5599 59.1338C48.9295 62.4636 45.6143 55.8041 45.6143 45.815Z" fill="#FFEDBE" stroke="#EAC66B" stroke-width="3.71136"/>
+              <path d="M2.61426 77.9175H80.5324L69.4012 122.442H13.7454L2.61426 77.9175Z" fill="#CFE0EA" stroke="#9FB9C9" stroke-width="4.0825"/>
+            </svg>
+            <h2>Mindful Spending</h2>
+            <p>A practice to spend with intention.</p>
+            <div class="card-divider"></div>
+          </div>
+        </a>
+      </article>
+
+      <article class="card" id="kitchen">
+        <a class="card-link" href="Mindful%20Kitchen%20Website/mindfulkitchen.html">
+          <div class="card-content">
+            <img src="mindful-kitchen-bowl-icon.svg" width="56" height="56" aria-hidden="true" alt="">
+            <h2>Mindful Kitchen</h2>
+            <p>Designing a kitchen that's always ready</p>
+            <div class="card-divider"></div>
+          </div>
+        </a>
+      </article>
+
+      <article class="card" id="spaces">
+        <a class="card-link" href="./index.html">
+          <div class="card-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 80 80" aria-hidden="true">
+              <ellipse cx="18" cy="63" rx="7" ry="2.2" fill="none" stroke="#C69A82" stroke-width="1.2"/>
+              <line x1="18" y1="60" x2="18" y2="22" stroke="#C69A82" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M18 22 C18 14 28 12 34 20" stroke="#C69A82" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              <path d="M27 22 L40 22 L44 33 L23 33 Z" fill="#FFEDBE" stroke="#EAC66B" stroke-width="1.2"/>
+              <line x1="34" y1="33" x2="34" y2="39" stroke="#C69A82" stroke-width="1"/>
+
+              <rect x="45" y="13" width="21" height="27" rx="3" fill="#D7E3CE" stroke="#8FA377" stroke-width="1.3"/>
+              <rect x="53" y="37" width="23" height="19" rx="3" fill="#F3CBAB" stroke="#D99A6C" stroke-width="1.3"/>
+              <circle cx="59" cy="43" r="2.2" fill="#EAC66B"/>
+            </svg>
+            <h2>Mindful Spaces</h2>
+            <p>Creating intentional spaces for everyday living.</p>
+            <div class="card-divider"></div>
+          </div>
+        </a>
+      </article>
+
+    </div>
+
+
+  </main>
+</body>
+</html>

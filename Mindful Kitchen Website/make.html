@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make — Mindful Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,700;0,800;1,200;1,300&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold: #EAC66B;
+    --gold-deep: #c99f3f;
+    --sage: #8FA377;
+    --blue: #9FB9C9;
+    --clay: #C69A82;
+    --blue-tint: #CFE0EA;
+    --sage-tint: #D7E3CE;
+    --tan: #D99A6C;
+    --peach-tint: #EED9CD;
+    --apricot-tint: #F3CBAB;
+    --yellow-tint: #FFEDBE;
+    --white: #FFFFFF;
+    --bg: #FFFAF0;
+    --card: #FFFFFF;
+    --ink: #3a352f;
+    --ink-soft: #5c6650;
+    --ink-label: #8a8266;
+    --line: #ece3cd;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito','Helvetica Neue',Arial,sans-serif; font-size:16px; line-height:1.75; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4{ font-family:'EB Garamond',Georgia,serif; }
+  a{ color:inherit; }
+  img,svg{ display:block; }
+
+  .utility-bar{ position:sticky; top:0; z-index:60; height:36px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:rgba(217,154,108,0.96); backdrop-filter:blur(6px); border-bottom:1px solid rgba(163,137,102,0.25); font-family:'EB Garamond', Georgia, serif; font-size:14px; color:var(--ink-soft); }
+  .utility-bar a{ color:inherit; text-decoration:none; }
+  .utility-links{ display:flex; gap:22px; align-items:center; }
+  .utility-links a{ font-family:'Nunito',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); text-decoration:none; }
+  .utility-links a:hover, .utility-links a.active{ color:var(--ink); font-weight:700; }
+  .topbar{ position:sticky; top:36px; z-index:50; display:flex; align-items:center; flex-wrap:nowrap; gap:12px; padding:10px 18px; background:rgba(250,246,240,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  .topbar-brand{ display:flex; align-items:center; gap:10px; font-family:'EB Garamond',Georgia,serif; font-weight:500; font-size:18px; color:var(--ink); text-decoration:none; flex-shrink:0; }
+  .topbar-right{ display:flex; align-items:center; gap:4px; margin-left:auto; }
+  .topbar-nav{ display:flex; align-items:center; gap:2px; }
+  .topbar-nav-btn{ display:flex; align-items:center; gap:6px; padding:7px 13px; border-radius:7px; font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-soft); text-decoration:none; transition:background 0.14s,color 0.14s; white-space:nowrap; }
+  .topbar-nav-btn:hover{ background:var(--bg); color:var(--ink); }
+  .topbar-nav-btn.active{ font-weight:700; color:var(--ink); }
+  @media (max-width:820px){ .topbar-nav{ display:none; } }
+  /* Mobile tab nav */
+  #mobileNav{ display:none; position:sticky; top:84px; z-index:49; background:rgba(250,246,240,0.97); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  @media (max-width:820px){ #mobileNav{ display:flex; } }
+  .mobile-nav-item{ flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:10px 4px 9px; font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-soft); text-decoration:none; border-right:1px solid var(--line); transition:color 0.15s; white-space:nowrap; }
+  .mobile-nav-item:last-child{ border-right:none; }
+  .mobile-nav-item.active{ font-weight:700; color:var(--ink); }
+  @media (max-width:400px){ .mobile-nav-item{ font-size:11px; padding:10px 2px 9px; } }
+
+  main{ max-width:820px; margin:0 auto; padding:60px 28px 100px; }
+  .kicker{ font-family:'Nunito',sans-serif; text-transform:uppercase; letter-spacing:0.2em; font-size:11px; color:var(--gold-deep); font-weight:800; margin-bottom:16px; text-align:center; }
+  h1.title{ font-size:clamp(30px,5vw,42px); font-weight:500; text-align:center; margin:0 0 14px; }
+  .sub{ font-size:16px; font-style:italic; color:var(--ink-soft); text-align:center; max-width:560px; margin:0 auto 44px; line-height:1.6; }
+
+  .card{ background:var(--white); border:1px solid var(--line); border-radius:20px; padding:30px 28px; margin-bottom:20px; }
+  .step-label{ font-family:'Nunito',sans-serif; text-transform:uppercase; letter-spacing:0.1em; font-size:11px; color:var(--gold-deep); font-weight:800; margin-bottom:8px; }
+  .step-q{ font-size:21px; margin:0 0 16px; }
+
+  .tag-input-row{ display:flex; gap:8px; margin-bottom:14px; }
+  .tag-input-row input{
+    flex:1; font-family:'Nunito',sans-serif; font-size:14px; padding:10px 14px; border:1px solid var(--line);
+    border-radius:10px; outline:none; background:#fffef9;
+  }
+  .tag-input-row input:focus{ border-color:var(--gold); }
+  .tag-input-row button{
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:13px; padding:10px 18px; border-radius:10px;
+    border:none; background:var(--sage-tint); color:#4f6a3a; cursor:pointer;
+  }
+  .tag-input-row button:hover{ background:var(--sage); color:#fff; }
+  .chip-wrap{ display:flex; flex-wrap:wrap; gap:8px; min-height:16px; }
+  .chip{
+    font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; padding:7px 12px; border-radius:14px;
+    background:var(--sage-tint); border:1px solid var(--sage); color:#4f6a3a; display:flex; align-items:center; gap:8px;
+  }
+  .chip .x{ cursor:pointer; opacity:0.6; font-weight:800; }
+  .chip .x:hover{ opacity:1; }
+
+  .option-grid{ display:flex; flex-wrap:wrap; gap:9px; }
+  .option-btn{
+    font-family:'Nunito',sans-serif; font-size:13.5px; font-weight:700; padding:9px 16px; border-radius:16px;
+    border:1px solid var(--line); background:var(--white); color:var(--ink-soft); cursor:pointer; transition:all .15s;
+  }
+  .option-btn:hover{ border-color:var(--gold); }
+  .option-btn.selected{ background:var(--yellow-tint); border-color:var(--gold); color:var(--ink); }
+  .option-btn.time.selected{ background:var(--apricot-tint); border-color:var(--tan); color:#8a4f1f; }
+  .option-btn.serving.selected{ background:var(--blue-tint); border-color:var(--blue); color:#3d6a82; }
+
+  .pref-group{ margin-bottom:20px; }
+  .pref-group:last-child{ margin-bottom:0; }
+  .pref-label{ font-family:'Nunito',sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-label); font-weight:800; margin-bottom:9px; }
+
+  .submit-row{ text-align:center; margin-top:8px; }
+  .submit-btn{
+    font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; color:#3a2e10; background:var(--gold);
+    border:none; border-radius:24px; padding:14px 34px; cursor:pointer; transition:background .15s;
+  }
+  .submit-btn:hover{ background:var(--gold-deep); }
+  .submit-btn:disabled{ background:#e3d9b8; color:#a9a184; cursor:not-allowed; }
+
+  .result-card{ display:none; }
+  .result-card.show{ display:block; }
+  .result-card .rtitle{ font-size:24px; margin:0 0 6px; }
+  .result-card .rtemplate{
+    display:inline-block; font-family:'Nunito',sans-serif; font-size:11px; font-weight:800; text-transform:uppercase;
+    letter-spacing:0.06em; color:#4f6a3a; background:var(--sage-tint); border-radius:12px; padding:4px 12px; margin-bottom:16px;
+  }
+  .result-card .rbody{ font-family:'Nunito',sans-serif; font-size:14.5px; line-height:1.75; color:var(--ink); white-space:pre-wrap; }
+  .result-card .rbody strong{ color:var(--ink); }
+  .result-card .rbody a{ color:#7a5a20; text-decoration:underline; text-decoration-color:var(--gold); text-underline-offset:2px; }
+  .result-card .rbody a:hover{ color:var(--gold-deep); }
+
+  .loading{ display:none; text-align:center; padding:30px 0; font-family:'Nunito',sans-serif; color:var(--ink-soft); font-style:italic; }
+  .loading.show{ display:block; }
+  .error-box{ display:none; background:#fbeceb; border:1px solid #e3b3af; color:#8a3a35; border-radius:10px; padding:14px 16px; font-family:'Nunito',sans-serif; font-size:13.5px; margin-top:14px; }
+  .error-box.show{ display:block; }
+  .affiliate-disclosure{ text-align:center; font-family:'Nunito',sans-serif; font-size:11px; color:var(--ink-label); margin-top:36px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <a href="../index.html">The Mindful <span style="color:#fff;font-style:italic;">Mundane</span></a>
+  <nav class="utility-links">
+    <a href="../Mindful%20Spending%20Website/mindfulspending.html">Mindful Spending</a>
+    <a href="mindfulkitchen.html">Mindful Kitchen</a>
+    <a href="../Mindful%20Spaces%20Website/mindfulspaces.html">Mindful Spaces</a>
+  </nav>
+</div>
+<div class="topbar">
+  <a href="mindfulkitchen.html" class="topbar-brand">
+    <img src="../mindful-kitchen-bowl-icon.svg" width="28" height="28" aria-hidden="true" alt="">
+    The Mindful Kitchen
+  </a>
+  <div class="topbar-right">
+    <nav class="topbar-nav">
+      <a href="mindfulkitchen.html#intro" class="topbar-nav-btn">Intro</a>
+      <a href="mindfulkitchen.html#build" class="topbar-nav-btn">Build</a>
+      <a href="mindfulkitchen.html#calendar" class="topbar-nav-btn">Calendar</a>
+      <a href="mindfulkitchen.html#journal" class="topbar-nav-btn">Journal</a>
+      <a href="make.html" class="topbar-nav-btn active" style="font-weight:700;">Make</a>
+    </nav>
+  </div>
+</div>
+<nav id="mobileNav">
+  <a href="mindfulkitchen.html#intro" class="mobile-nav-item">Intro</a>
+  <a href="mindfulkitchen.html#build" class="mobile-nav-item">Build</a>
+  <a href="mindfulkitchen.html#calendar" class="mobile-nav-item">Calendar</a>
+  <a href="mindfulkitchen.html#journal" class="mobile-nav-item">Journal</a>
+  <a href="make.html" class="mobile-nav-item active" style="font-weight:700;">Make</a>
+</nav>
+
+<main>
+  <div class="kicker">Not a search. A conversation.</div>
+  <h1 class="title">What Can I Make?</h1>
+  <p class="sub">Tell it what's in your kitchen, what sounds good, and how much time you have. It won't send you off to search for a recipe &mdash; it'll tell you what to make with what's already there.</p>
+
+  <div class="card">
+    <div class="step-label">Step One</div>
+    <h2 class="step-q">What do you have?</h2>
+    <div class="tag-input-row">
+      <input type="text" id="haveInput" placeholder="Type an ingredient and press Enter&hellip; e.g. Rice">
+      <button id="haveAddBtn" class="sans">Add</button>
+    </div>
+    <div class="chip-wrap" id="haveChips"></div>
+  </div>
+
+  <div class="card">
+    <div class="step-label">Step Two</div>
+    <h2 class="step-q">What sounds good?</h2>
+    <div class="option-grid" id="moodOptions">
+      <button class="option-btn" data-mood="Indian">Indian</button>
+      <button class="option-btn" data-mood="Italian">Italian</button>
+      <button class="option-btn" data-mood="Mexican">Mexican</button>
+      <button class="option-btn" data-mood="Comfort Food">Comfort Food</button>
+      <button class="option-btn" data-mood="Light">Light</button>
+      <button class="option-btn" data-mood="Spicy">Spicy</button>
+      <button class="option-btn" data-mood="Healthy">Healthy</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step-label">Step Three</div>
+    <h2 class="step-q">How much time?</h2>
+    <div class="option-grid" id="timeOptions">
+      <button class="option-btn time" data-time="15 min">15 min</button>
+      <button class="option-btn time" data-time="30 min">30 min</button>
+      <button class="option-btn time" data-time="45 min">45 min</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step-label">Step Four</div>
+    <h2 class="step-q">Anything else?</h2>
+    <div class="pref-group">
+      <div class="pref-label">Preferences</div>
+      <div class="option-grid" id="prefOptions">
+        <button class="option-btn" data-pref="leftovers">Use up leftovers first</button>
+        <button class="option-btn" data-pref="substitutions">Suggest substitutions if I'm missing something</button>
+        <button class="option-btn" data-pref="explain">Explain any techniques I don't know</button>
+        <button class="option-btn" data-pref="expiring">Prioritize what's about to expire</button>
+      </div>
+    </div>
+    <div class="pref-group">
+      <div class="pref-label">Dietary</div>
+      <div class="option-grid" id="dietOptions">
+        <button class="option-btn" data-diet="Vegetarian">Vegetarian</button>
+        <button class="option-btn" data-diet="Vegan">Vegan</button>
+        <button class="option-btn" data-diet="Gluten-Free">Gluten-Free</button>
+        <button class="option-btn" data-diet="Dairy-Free">Dairy-Free</button>
+      </div>
+    </div>
+    <div class="pref-group">
+      <div class="pref-label">Servings</div>
+      <div class="option-grid" id="servingOptions">
+        <button class="option-btn serving" data-serving="2 people">2 people</button>
+        <button class="option-btn serving" data-serving="4 people">4 people</button>
+        <button class="option-btn serving" data-serving="6 people">6 people</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-row">
+    <button class="submit-btn" id="submitBtn">What Can I Make?</button>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <div class="loading" id="loadingBox">Thinking it through, building-block by building-block&hellip;</div>
+
+  <div class="card result-card" id="resultCard">
+    <div class="rtemplate" id="resultTemplate"></div>
+    <h3 class="rtitle" id="resultTitle"></h3>
+    <div class="rbody" id="resultBody"></div>
+  </div>
+
+  <p class="affiliate-disclosure">As an Amazon Associate, Mindful Kitchen earns from qualifying purchases made through links on this page.</p>
+</main>
+
+<script>
+(function(){
+  // TODO: replace with your real Amazon Associates tracking ID once approved
+  // (looks like "mindfulkitchen-20"). Until then this links to Amazon search
+  // results with no affiliate credit attached.
+  const AMAZON_ASSOCIATE_TAG = "";
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function amazonSearchLink(query){
+    const q = encodeURIComponent(query);
+    const tagParam = AMAZON_ASSOCIATE_TAG ? `&tag=${encodeURIComponent(AMAZON_ASSOCIATE_TAG)}` : "";
+    return `https://www.amazon.com/s?k=${q}${tagParam}`;
+  }
+
+  const haves = [];
+  const moods = new Set();
+  const prefs = new Set();
+  const diets = new Set();
+  let selectedTime = null;
+  let selectedServing = null;
+
+  const PREF_TEXT = {
+    leftovers: "prioritize using up leftovers",
+    substitutions: "suggest substitutions for anything I'm missing",
+    explain: "explain any techniques I might not know",
+    expiring: "prioritize whichever ingredients I listed that are closest to expiring",
+  };
+
+  const haveInput = document.getElementById('haveInput');
+  const haveAddBtn = document.getElementById('haveAddBtn');
+  const haveChips = document.getElementById('haveChips');
+
+  function renderHaves(){
+    haveChips.innerHTML = "";
+    haves.forEach((h, i)=>{
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.innerHTML = `<span>${h}</span><span class="x" data-i="${i}">&times;</span>`;
+      chip.querySelector('.x').addEventListener('click', ()=>{
+        haves.splice(i,1);
+        renderHaves();
+      });
+      haveChips.appendChild(chip);
+    });
+  }
+
+  function addHave(){
+    const v = haveInput.value.trim();
+    if(v && !haves.includes(v)){
+      haves.push(v);
+      renderHaves();
+    }
+    haveInput.value = "";
+    haveInput.focus();
+  }
+
+  haveAddBtn.addEventListener('click', addHave);
+  haveInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); addHave(); }
+  });
+
+  document.querySelectorAll('#moodOptions .option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const m = btn.dataset.mood;
+      if(moods.has(m)){ moods.delete(m); btn.classList.remove('selected'); }
+      else { moods.add(m); btn.classList.add('selected'); }
+    });
+  });
+
+  document.querySelectorAll('#timeOptions .option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#timeOptions .option-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedTime = btn.dataset.time;
+    });
+  });
+
+  document.querySelectorAll('#prefOptions .option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const p = btn.dataset.pref;
+      if(prefs.has(p)){ prefs.delete(p); btn.classList.remove('selected'); }
+      else { prefs.add(p); btn.classList.add('selected'); }
+    });
+  });
+
+  document.querySelectorAll('#dietOptions .option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const d = btn.dataset.diet;
+      if(diets.has(d)){ diets.delete(d); btn.classList.remove('selected'); }
+      else { diets.add(d); btn.classList.add('selected'); }
+    });
+  });
+
+  document.querySelectorAll('#servingOptions .option-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const isSame = btn.classList.contains('selected');
+      document.querySelectorAll('#servingOptions .option-btn').forEach(b=>b.classList.remove('selected'));
+      if(isSame){ selectedServing = null; }
+      else { btn.classList.add('selected'); selectedServing = btn.dataset.serving; }
+    });
+  });
+
+  function buildUserPrompt(){
+    const haveList = haves.length ? haves.join(', ') : '(nothing listed)';
+    const moodList = moods.size ? [...moods].join(', ') : '(no preference)';
+    let prompt = `What I have: ${haveList}\nWhat sounds good: ${moodList}\nTime available: ${selectedTime}`;
+    if(prefs.size){
+      prompt += `\nAlso: ${[...prefs].map(p=>PREF_TEXT[p]).join('; ')}`;
+    }
+    if(diets.size){
+      prompt += `\nDietary: ${[...diets].join(', ')}`;
+    }
+    if(selectedServing){
+      prompt += `\nServings: ${selectedServing}`;
+    }
+    return prompt;
+  }
+
+  function parseResponse(text){
+    const titleM = text.match(/TITLE:\s*(.+)/);
+    const templateM = text.match(/TEMPLATE:\s*(.+)/);
+    const stepsM = text.match(/STEPS:\s*([\s\S]*?)MISSING:/);
+    const missingM = text.match(/MISSING:\s*([\s\S]*)/);
+    return {
+      title: titleM ? titleM[1].trim() : "Here's what to make",
+      template: templateM ? templateM[1].trim() : "",
+      steps: stepsM ? stepsM[1].trim() : text.trim(),
+      missing: missingM ? missingM[1].trim() : "",
+    };
+  }
+
+  const submitBtn = document.getElementById('submitBtn');
+  const errorBox = document.getElementById('errorBox');
+  const loadingBox = document.getElementById('loadingBox');
+  const resultCard = document.getElementById('resultCard');
+
+  submitBtn.addEventListener('click', async ()=>{
+    errorBox.classList.remove('show');
+    resultCard.classList.remove('show');
+
+    if(haves.length === 0){
+      errorBox.textContent = "Add at least one ingredient you have.";
+      errorBox.classList.add('show');
+      return;
+    }
+    if(!selectedTime){
+      errorBox.textContent = "Pick how much time you have.";
+      errorBox.classList.add('show');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    loadingBox.classList.add('show');
+
+    try{
+      const res = await fetch('/api/kitchen-suggest', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ userPrompt: buildUserPrompt() }),
+      });
+
+      const data = await res.json();
+      if(!res.ok){
+        throw new Error(data.error || `Request failed (${res.status})`);
+      }
+
+      const parsed = parseResponse(data.text || "");
+
+      document.getElementById('resultTemplate').textContent = parsed.template;
+      document.getElementById('resultTitle').textContent = parsed.title;
+
+      const stepsHtml = escapeHtml(parsed.steps);
+      let missingHtml = "";
+      if(parsed.missing){
+        const isNothing = /^nothing/i.test(parsed.missing.trim());
+        if(isNothing){
+          missingHtml = `\n\n${escapeHtml(parsed.missing)}`;
+        } else {
+          const link = amazonSearchLink(parsed.missing);
+          missingHtml = `\n\nIf not — <a href="${link}" target="_blank" rel="nofollow sponsored noopener">${escapeHtml(parsed.missing)}</a>`;
+        }
+      }
+      document.getElementById('resultBody').innerHTML = stepsHtml + missingHtml;
+      resultCard.classList.add('show');
+    } catch(err){
+      errorBox.textContent = "Couldn't reach Claude: " + err.message;
+      errorBox.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      loadingBox.classList.remove('show');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

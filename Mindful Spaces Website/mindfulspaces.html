@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mindful Spaces — The Mindful Mundane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,700;0,800;1,200;1,300&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold: #EAC66B;
+    --gold-deep: #c99f3f;
+    --sage: #8FA377;
+    --blue: #9FB9C9;
+    --clay: #C69A82;
+    --blue-tint: #CFE0EA;
+    --sage-tint: #D7E3CE;
+    --tan: #D99A6C;
+    --peach-tint: #EED9CD;
+    --apricot-tint: #F3CBAB;
+    --yellow-tint: #FFEDBE;
+    --white: #FFFFFF;
+    --bg: #FFFAF0;
+    --card: #FFFFFF;
+    --ink: #3a352f;
+    --ink-soft: #5c6650;
+    --ink-label: #8a8266;
+    --line: #ece3cd;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito','Helvetica Neue',Arial,sans-serif; font-size:16px; line-height:1.75; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4{ font-family:'EB Garamond',Georgia,serif; }
+  a{ color:inherit; text-decoration:none; }
+  img,svg{ display:block; }
+
+  /* ---------- UTILITY BAR ---------- */
+  .utility-bar{ position:sticky; top:0; z-index:60; height:36px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:rgba(217,154,108,0.96); backdrop-filter:blur(6px); border-bottom:1px solid rgba(163,137,102,0.25); font-family:'EB Garamond',Georgia,serif; font-size:14px; color:var(--ink-soft); }
+  .utility-bar a{ color:inherit; text-decoration:none; }
+  .utility-links{ display:flex; gap:22px; align-items:center; }
+  .utility-links a{ font-family:'Nunito',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); text-decoration:none; }
+  .utility-links a:hover{ color:var(--ink); font-weight:700; }
+  .utility-links a.active{ color:var(--ink); font-weight:700; }
+  @media (max-width:620px){ .utility-bar{ padding:0 14px; } .utility-links{ gap:12px; } }
+
+  /* ---------- TOPBAR ---------- */
+  .topbar{ position:sticky; top:36px; z-index:50; display:flex; align-items:center; flex-wrap:nowrap; gap:12px; padding:10px 18px; background:rgba(250,246,240,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  .topbar-brand{ display:flex; align-items:center; gap:10px; font-family:'EB Garamond',Georgia,serif; font-weight:500; font-size:18px; color:var(--ink); text-decoration:none; flex-shrink:0; }
+  .topbar-right{ display:flex; align-items:center; gap:4px; margin-left:auto; }
+  .topbar-nav{ display:flex; align-items:center; gap:2px; }
+  .topbar-nav-btn{ display:flex; align-items:center; gap:6px; padding:7px 13px; border-radius:7px; font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-soft); text-decoration:none; transition:background 0.14s,color 0.14s; white-space:nowrap; }
+  .topbar-nav-btn:hover{ background:var(--bg); color:var(--ink); }
+  .topbar-nav-btn.active{ font-weight:700; color:var(--ink); }
+  @media (max-width:820px){ .topbar-nav{ display:none; } }
+
+  /* ---------- MAIN ---------- */
+  .coming-soon{
+    max-width:620px; margin:0 auto; padding:120px 24px 100px; text-align:center;
+  }
+  .eyebrow{ font-family:'Nunito',sans-serif; text-transform:uppercase; letter-spacing:0.18em; font-size:11.5px; color:var(--gold-deep); font-weight:800; margin-bottom:20px; }
+  h1.title{ font-size:clamp(32px,6vw,52px); font-weight:500; margin:0 0 20px; line-height:1.2; }
+  .subtitle{ font-size:18px; font-style:italic; color:var(--ink-soft); max-width:480px; margin:0 auto 40px; line-height:1.6; }
+  .rule{ width:44px; height:3px; background:var(--gold); border:none; margin:0 auto 40px; border-radius:2px; }
+  .notice{
+    display:inline-block; font-family:'Nunito',sans-serif; font-size:13px; color:var(--ink-label);
+    background:var(--yellow-tint); border:1px solid var(--gold); border-radius:24px; padding:10px 24px;
+    letter-spacing:0.04em;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{ background:var(--ink); color:#e9e3d0; text-align:center; padding:48px 28px 36px; margin-top:80px; }
+  footer .fquote{ font-family:'EB Garamond',serif; font-style:italic; font-size:18px; line-height:1.6; max-width:480px; margin:0 auto 20px; color:#f3ecd8; }
+  footer .fbrand{ font-family:'Nunito',sans-serif; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#b5ac8c; }
+  footer .fbrand .gold{ color:var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- UTILITY BAR -->
+<div class="utility-bar">
+  <a href="../index.html">The Mindful <span style="color:#fff;font-style:italic;">Mundane</span></a>
+  <nav class="utility-links">
+    <a href="../Mindful%20Spending%20Website/mindfulspending.html">Mindful Spending</a>
+    <a href="../Mindful%20Kitchen%20Website/mindfulkitchen.html">Mindful Kitchen</a>
+    <a href="mindfulspaces.html" class="active">Mindful Spaces</a>
+  </nav>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="../index.html" class="topbar-brand">
+    <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
+      <rect x="6" y="12" width="28" height="20" rx="4" fill="var(--sage-tint)" stroke="var(--sage)" stroke-width="1.4"/>
+      <rect x="10" y="8" width="20" height="6" rx="2" fill="var(--peach-tint)" stroke="var(--clay)" stroke-width="1.2"/>
+      <line x1="14" y1="20" x2="26" y2="20" stroke="var(--sage)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="14" y1="24" x2="22" y2="24" stroke="var(--sage)" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+    Mindful Spaces
+  </a>
+  <div class="topbar-right">
+    <nav class="topbar-nav">
+      <a href="../Mindful%20Spending%20Website/mindfulspending.html" class="topbar-nav-btn">Spending</a>
+      <a href="../Mindful%20Kitchen%20Website/mindfulkitchen.html" class="topbar-nav-btn">Kitchen</a>
+      <a href="mindfulspaces.html" class="topbar-nav-btn active">Spaces</a>
+    </nav>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="coming-soon">
+  <div class="eyebrow">Mindful Spaces</div>
+  <h1 class="title">A home that supports the life you want to live.</h1>
+  <hr class="rule">
+  <p class="subtitle">A space to rethink how you design, organise, and inhabit your home — one room at a time.</p>
+  <div class="notice">Coming soon</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p class="fquote">"The objective of cleaning is not just to clean, but to feel happiness living within that environment."</p>
+  <div class="fbrand">The Mindful <span class="gold">Mundane</span></div>
+</footer>
+
+</body>
+</html>
