@@ -339,6 +339,10 @@ service cloud.firestore {
       allow read, write: if request.auth.uid == userId;
       allow read: if request.auth.token.email == 'sparakala@gmail.com';
     }
+    match /kitchen_users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      allow read: if request.auth.token.email == 'sparakala@gmail.com';
+    }
     match /_meta/{doc} {
       allow read, write: if request.auth != null;
     }
@@ -346,7 +350,8 @@ service cloud.firestore {
 }</pre>
   </div>
 
-  <!-- Stat cards -->
+  <!-- Spending Stat cards -->
+  <div class="section-heading">Mindful Spending</div>
   <div class="stats-grid">
     <div class="stat-card" id="statVisits">
       <div class="stat-label">Landing page visits</div>
@@ -380,8 +385,38 @@ service cloud.firestore {
     </div>
   </div>
 
+  <!-- Kitchen Stat cards -->
+  <div class="section-heading" style="margin-top:32px;">Mindful Kitchen</div>
+  <div class="stats-grid">
+    <div class="stat-card" id="kStatVisits">
+      <div class="stat-label">Landing page visits</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">public + signed-in</div>
+    </div>
+    <div class="stat-card" id="kStatUsers">
+      <div class="stat-label">Total sign-ups</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">all time</div>
+    </div>
+    <div class="stat-card" id="kStatActive">
+      <div class="stat-label">Active users</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">last 30 days</div>
+    </div>
+    <div class="stat-card" id="kStatEntries">
+      <div class="stat-label">Journal entries</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">total written</div>
+    </div>
+    <div class="stat-card" id="kStatViews">
+      <div class="stat-label">Logged-in sessions</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">authenticated page loads</div>
+    </div>
+  </div>
+
   <!-- Google Analytics -->
-  <div class="section-heading">Google Analytics</div>
+  <div class="section-heading" style="margin-top:32px;">Google Analytics</div>
   <div class="ga-section" id="gaSection">
 
     <div class="ga-connect-row">
@@ -551,6 +586,34 @@ service cloud.firestore {
       .then(function(doc) {
         return doc.exists ? (doc.data().total || 0) : 0;
       }).catch(function() { return null; });
+
+    // Kitchen stats
+    var kVisitsPromise = db.collection('_meta').doc('kitchen_authgate').get()
+      .then(function(doc) { return doc.exists ? (doc.data().total || 0) : 0; }).catch(function() { return null; });
+    var kViewsPromise = db.collection('_meta').doc('kitchen_pageviews').get()
+      .then(function(doc) { return doc.exists ? (doc.data().total || 0) : 0; }).catch(function() { return null; });
+    var kUsersPromise = db.collection('kitchen_users').get()
+      .then(function(snap) {
+        var thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        var total = snap.size;
+        var active = 0, entries = 0;
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          if (d._lastSeen && d._lastSeen > thirtyDaysAgo) active++;
+          entries += (d.entryCount || 0);
+        });
+        return { total: total, active: active, entries: entries };
+      }).catch(function() { return null; });
+
+    Promise.all([kVisitsPromise, kViewsPromise, kUsersPromise]).then(function(r) {
+      setStatCard('kStatVisits', r[0] !== null ? r[0] : '—', 'public + signed-in');
+      setStatCard('kStatViews',  r[1] !== null ? r[1] : '—', 'authenticated page loads');
+      if (r[2] !== null) {
+        setStatCard('kStatUsers',   r[2].total,   'all time');
+        setStatCard('kStatActive',  r[2].active,  'last 30 days');
+        setStatCard('kStatEntries', r[2].entries, 'total written');
+      }
+    });
 
     Promise.all([visitsPromise, pageviewsPromise]).then(function(results) {
       var visits = results[0];

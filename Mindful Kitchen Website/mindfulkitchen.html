@@ -12,6 +12,7 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <style>
   :root{
@@ -729,7 +730,7 @@
   <input type="text" data-key="field-belongs" placeholder="Your name">
   <div class="field-label">Start Date</div>
   <input type="text" data-key="field-date" placeholder="Today's date">
-  <p class="dedication-quote">You do not need to become a better cook.<br>Sometimes you just need a system that makes cooking easier.</p>
+  <p class="dedication-quote">You do not need to become a better cook.<br>Sometimes you just need a system that makes cooking easier. A good kitchen is not measured by how much you own. It is measured by how well it supports your life.</p>
 </section>
 
 <section id="intro">
@@ -809,7 +810,7 @@
   <p>Each layer supports the next. You do not need to build everything at once. Start where you are, add what you need, and let your kitchen grow with you.</p>
   <div class="layer-block">
     <div class="layer-title">🏠 Foundation</div>
-    <p>The tools that make everyday cooking possible. These are the items you reach for again and again.</p>
+    <p>A capable kitchen does not need expensive gadgets or overflowing cabinets. A few well-chosen tools that you use often are more valuable than dozens that sit unused.</p>
     <p class="layer-examples"><span class="layer-ex-label">Examples</span> Chef's knife · Cutting board · Pots and pans · Mixing bowls · Measuring cups · Colander · Storage containers</p>
   </div>
   <div class="layer-block">
@@ -1315,6 +1316,13 @@
 
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
+  var db   = firebase.firestore();
+
+  // Track every page load (public + signed-in)
+  db.collection('_meta').doc('kitchen_authgate').set({
+    total: firebase.firestore.FieldValue.increment(1),
+    lastSeen: new Date().toISOString()
+  }, { merge: true }).catch(function() {});
 
   var loadingOverlay = document.getElementById('loadingOverlay');
   var authGate       = document.getElementById('authGate');
@@ -1325,6 +1333,17 @@
 
   auth.onAuthStateChanged(function(user) {
     if (user) {
+      // Track signed-in session
+      db.collection('_meta').doc('kitchen_pageviews')
+        .set({ total: firebase.firestore.FieldValue.increment(1), lastSeen: new Date().toISOString() }, { merge: true })
+        .catch(function() {});
+      // Upsert user record
+      db.collection('kitchen_users').doc(user.uid)
+        .set({ _lastSeen: new Date().toISOString(), email: user.email, displayName: user.displayName || '' }, { merge: true })
+        .catch(function() {});
+      // Expose for journal IIFE
+      window._kitchenDb  = db;
+      window._kitchenUid = user.uid;
       renderUserChip(user);
       hide(loadingOverlay);
       hide(authGate);
@@ -1412,7 +1431,14 @@
   let entries = [];
   try{ entries = JSON.parse(localStorage.getItem(KJ_KEY)) || []; }catch(e){ entries = []; }
 
-  function saveEntries(){ localStorage.setItem(KJ_KEY, JSON.stringify(entries)); }
+  function saveEntries(){
+    localStorage.setItem(KJ_KEY, JSON.stringify(entries));
+    if (window._kitchenDb && window._kitchenUid) {
+      window._kitchenDb.collection('kitchen_users').doc(window._kitchenUid)
+        .set({ entryCount: entries.length, _lastSaved: new Date().toISOString() }, { merge: true })
+        .catch(function() {});
+    }
+  }
 
   function formatDate(ts){
     const d = new Date(ts);
