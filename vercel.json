@@ -3,6 +3,7 @@
     { "source": "/kitchen",  "destination": "/Mindful Kitchen Website/mindfulkitchen.html" },
     { "source": "/make",     "destination": "/Mindful Kitchen Website/make.html" },
     { "source": "/spending", "destination": "/Mindful Spending Website/mindfulspending.html" },
-    { "source": "/spaces",   "destination": "/Mindful Spaces Website/mindfulspaces.html" }
+    { "source": "/spaces",   "destination": "/Mindful Spaces Website/mindfulspaces.html" },
+    { "source": "/admin",    "destination": "/Mindful Spending Website/admin.html" }
   ]
 }
