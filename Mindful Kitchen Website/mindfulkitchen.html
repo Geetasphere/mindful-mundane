@@ -1110,6 +1110,21 @@
     hint.classList.add('show');
     clearTimeout(saveStore._t);
     saveStore._t = setTimeout(()=>hint.classList.remove('show'), 1400);
+    // Track first calendar use
+    if (window._kitchenDb && window._kitchenUid && !saveStore._calendarTracked) {
+      const hasPlacement = Object.keys(store).some(function(k) {
+        return store[k] && store[k].placements && Object.keys(store[k].placements).length > 0;
+      });
+      if (hasPlacement) {
+        saveStore._calendarTracked = true;
+        window._kitchenDb.collection('kitchen_users').doc(window._kitchenUid)
+          .set({ calendarCreated: true }, { merge: true }).catch(function() {});
+        window._kitchenDb.collection('_meta').doc('kitchen_calendars').set({
+          total: firebase.firestore.FieldValue.increment(1),
+          lastSeen: new Date().toISOString()
+        }, { merge: true }).catch(function() {});
+      }
+    }
   }
 
   function clearHighlights(){
@@ -1337,10 +1352,19 @@
       db.collection('_meta').doc('kitchen_pageviews')
         .set({ total: firebase.firestore.FieldValue.increment(1), lastSeen: new Date().toISOString() }, { merge: true })
         .catch(function() {});
-      // Upsert user record
-      db.collection('kitchen_users').doc(user.uid)
-        .set({ _lastSeen: new Date().toISOString(), email: user.email, displayName: user.displayName || '' }, { merge: true })
-        .catch(function() {});
+      // Upsert user record — track first sign-up
+      db.collection('kitchen_users').doc(user.uid).get().then(function(doc) {
+        var isNew = !doc.exists;
+        db.collection('kitchen_users').doc(user.uid)
+          .set({ _lastSeen: new Date().toISOString(), email: user.email, displayName: user.displayName || '' }, { merge: true })
+          .catch(function() {});
+        if (isNew) {
+          db.collection('_meta').doc('accounts_kitchen').set({
+            total: firebase.firestore.FieldValue.increment(1),
+            lastSeen: new Date().toISOString()
+          }, { merge: true }).catch(function() {});
+        }
+      }).catch(function() {});
       // Expose for journal IIFE
       window._kitchenDb  = db;
       window._kitchenUid = user.uid;

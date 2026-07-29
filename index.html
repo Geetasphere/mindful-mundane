@@ -338,5 +338,41 @@
 
 
   </main>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+(function() {
+  var firebaseConfig = {
+    apiKey:            'AIzaSyBT_hMR2tpsvCVqoZogfjsDleOhE6qbtgk',
+    authDomain:        'mindfulmundane-ef7bd.firebaseapp.com',
+    projectId:         'mindfulmundane-ef7bd',
+    storageBucket:     'mindfulmundane-ef7bd.firebasestorage.app',
+    messagingSenderId: '577498747565',
+    appId:             '1:577498747565:web:df11001da977a13b66ac24'
+  };
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  // Track home page visit
+  db.collection('_meta').doc('home').set({
+    total: firebase.firestore.FieldValue.increment(1),
+    lastSeen: new Date().toISOString()
+  }, { merge: true }).catch(function() {});
+
+  // Track section card clicks
+  var clickMap = { spending: 'clicks_spending', kitchen: 'clicks_kitchen', spaces: 'clicks_spaces' };
+  Object.keys(clickMap).forEach(function(id) {
+    var card = document.getElementById(id);
+    if (card) {
+      card.addEventListener('click', function() {
+        db.collection('_meta').doc(clickMap[id]).set({
+          total: firebase.firestore.FieldValue.increment(1),
+          lastSeen: new Date().toISOString()
+        }, { merge: true }).catch(function() {});
+      });
+    }
+  });
+})();
+</script>
 </body>
 </html>

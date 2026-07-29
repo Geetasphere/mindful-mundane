@@ -2194,6 +2194,12 @@
   }
 
   function bootApp(user) {
+    if (isFirstVisit) {
+      db.collection('_meta').doc('accounts_spending').set({
+        total: firebase.firestore.FieldValue.increment(1),
+        lastSeen: new Date().toISOString()
+      }, { merge: true }).catch(function() {});
+    }
     renderUserChip(user);
     initApp();
     prefillDedication(user);
@@ -3353,6 +3359,12 @@
           store[cell.getAttribute('data-key')] = next;
           flushToFirestore(); // calendar taps save immediately
           updateProgress();
+          if (next === 'zero') {
+            db.collection('_meta').doc('zero_dollar_days').set({
+              total: firebase.firestore.FieldValue.increment(1),
+              lastSeen: new Date().toISOString()
+            }, { merge: true }).catch(function() {});
+          }
 
           /* First $0 day celebration */
           if (next === 'zero' && countAllZeroDays() === 1) {

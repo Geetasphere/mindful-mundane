@@ -350,6 +350,31 @@ service cloud.firestore {
 }</pre>
   </div>
 
+  <!-- Home page stats -->
+  <div class="section-heading">Home Page</div>
+  <div class="stats-grid" style="margin-bottom:24px;">
+    <div class="stat-card" id="statHome">
+      <div class="stat-label">Home page visits</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">mindfulmundane.com</div>
+    </div>
+    <div class="stat-card" id="statClickSpending">
+      <div class="stat-label">Clicked Spending</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">from home page</div>
+    </div>
+    <div class="stat-card" id="statClickKitchen">
+      <div class="stat-label">Clicked Kitchen</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">from home page</div>
+    </div>
+    <div class="stat-card" id="statClickSpaces">
+      <div class="stat-label">Clicked Spaces</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">from home page</div>
+    </div>
+  </div>
+
   <!-- Spending Stat cards -->
   <div class="section-heading">Mindful Spending</div>
   <div class="stats-grid">
@@ -383,6 +408,11 @@ service cloud.firestore {
       <div class="stat-num">—</div>
       <div class="stat-sub">authenticated page loads</div>
     </div>
+    <div class="stat-card" id="statZeroDays">
+      <div class="stat-label">$0 days logged</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">all time, all users</div>
+    </div>
   </div>
 
   <!-- Kitchen Stat cards -->
@@ -412,6 +442,11 @@ service cloud.firestore {
       <div class="stat-label">Logged-in sessions</div>
       <div class="stat-num">—</div>
       <div class="stat-sub">authenticated page loads</div>
+    </div>
+    <div class="stat-card" id="kStatCalendars">
+      <div class="stat-label">Calendars created</div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub">users who planned meals</div>
     </div>
   </div>
 
@@ -586,6 +621,29 @@ service cloud.firestore {
       .then(function(doc) {
         return doc.exists ? (doc.data().total || 0) : 0;
       }).catch(function() { return null; });
+
+    // Home page stats
+    var homePromise    = db.collection('_meta').doc('home').get()
+      .then(function(d) { return d.exists ? (d.data().total || 0) : 0; }).catch(function() { return null; });
+    var clickSpPromise = db.collection('_meta').doc('clicks_spending').get()
+      .then(function(d) { return d.exists ? (d.data().total || 0) : 0; }).catch(function() { return null; });
+    var clickKiPromise = db.collection('_meta').doc('clicks_kitchen').get()
+      .then(function(d) { return d.exists ? (d.data().total || 0) : 0; }).catch(function() { return null; });
+    var clickSpPromise2 = db.collection('_meta').doc('clicks_spaces').get()
+      .then(function(d) { return d.exists ? (d.data().total || 0) : 0; }).catch(function() { return null; });
+    var zeroDaysPromise = db.collection('_meta').doc('zero_dollar_days').get()
+      .then(function(d) { return d.exists ? (d.data().total || 0) : 0; }).catch(function() { return null; });
+    var kCalendarsPromise = db.collection('_meta').doc('kitchen_calendars').get()
+      .then(function(d) { return d.exists ? (d.data().total || 0) : 0; }).catch(function() { return null; });
+
+    Promise.all([homePromise, clickSpPromise, clickKiPromise, clickSpPromise2, zeroDaysPromise, kCalendarsPromise]).then(function(r) {
+      setStatCard('statHome',         r[0] !== null ? r[0] : '—', 'mindfulmundane.com');
+      setStatCard('statClickSpending', r[1] !== null ? r[1] : '—', 'from home page');
+      setStatCard('statClickKitchen',  r[2] !== null ? r[2] : '—', 'from home page');
+      setStatCard('statClickSpaces',   r[3] !== null ? r[3] : '—', 'from home page');
+      setStatCard('statZeroDays',      r[4] !== null ? r[4] : '—', 'all time, all users');
+      setStatCard('kStatCalendars',    r[5] !== null ? r[5] : '—', 'users who planned meals');
+    });
 
     // Kitchen stats
     var kVisitsPromise = db.collection('_meta').doc('kitchen_authgate').get()
