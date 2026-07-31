@@ -190,7 +190,7 @@
 
   @media (max-width:600px){
     .page-header{ padding:10px 14px 10px; }
-    #selFull{ padding:10px 14px 10px; }
+    #selFull{ padding:10px 14px 0; }
     .more-toggle{ padding-left:0; }
     .sel-label{ width:36px; }
     .chip-row{ padding-left:0; }
@@ -198,6 +198,13 @@
     .chat-thread{ padding:16px 14px 12px; }
     .chat-input-bar{ padding:8px 12px 12px; }
     #selSummary{ padding:8px 14px; }
+  }
+  /* On mobile the form can be taller than the screen — make the panel
+     scroll internally and pin the ask button so it's always reachable */
+  @media (max-width:820px){
+    .sel-panel{ overflow-y:auto; }
+    .ask-btn{ position:sticky; bottom:0; border-radius:0 0 0 0; margin-top:8px;
+              background:var(--gold); box-shadow:0 -8px 16px rgba(255,250,240,1); }
   }
 </style>
 </head>
