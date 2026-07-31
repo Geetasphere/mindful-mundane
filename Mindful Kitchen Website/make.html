@@ -79,6 +79,12 @@
   .ing-add:hover{ border-color:var(--gold); color:var(--ink); }
   .chip-row{ display:flex; flex-wrap:wrap; gap:5px; padding-left:52px; margin-bottom:5px; }
   .chip-row:empty{ display:none; margin:0; }
+  /* Quick picks */
+  .qp-group{ display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; margin-bottom:4px; padding-left:52px; }
+  .qp-label{ font-family:'Nunito',sans-serif; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-label); flex-shrink:0; min-width:44px; }
+  .qp-chip{ font-family:'Nunito',sans-serif; font-size:11px; padding:3px 9px; border-radius:10px; border:1px dashed var(--line); background:transparent; color:var(--ink-label); cursor:pointer; transition:all .12s; white-space:nowrap; }
+  .qp-chip:hover{ border-color:var(--gold); color:var(--ink); background:var(--yellow-tint); border-style:solid; }
+  .qp-chip.added{ border-color:var(--gold); border-style:solid; background:var(--yellow-tint); color:var(--ink); }
   .chip{ display:inline-flex; align-items:center; gap:3px; background:var(--yellow-tint); border:1px solid var(--gold); border-radius:12px; padding:2px 6px 2px 9px; font-size:12px; font-family:'Nunito',sans-serif; }
   .chip .x{ cursor:pointer; color:var(--ink-label); font-size:15px; line-height:1; background:none; border:none; padding:0 2px; }
   .pill-row{ display:flex; flex-wrap:wrap; gap:5px; flex:1; }
@@ -146,6 +152,7 @@
     .more-toggle{ padding-left:0; }
     .sel-label{ width:36px; }
     .chip-row{ padding-left:0; }
+    .qp-group{ padding-left:0; }
     .chat-thread{ padding:16px 14px 12px; }
     .chat-input-bar{ padding:8px 12px 12px; }
     #selSummary{ padding:8px 14px; }
@@ -207,6 +214,43 @@
         </div>
       </div>
       <div class="chip-row" id="haveChips"></div>
+
+      <div class="qp-group">
+        <span class="qp-label">Protein</span>
+        <button class="qp-chip" data-item="chicken">chicken</button>
+        <button class="qp-chip" data-item="eggs">eggs</button>
+        <button class="qp-chip" data-item="tofu">tofu</button>
+        <button class="qp-chip" data-item="lentils">lentils</button>
+        <button class="qp-chip" data-item="chickpeas">chickpeas</button>
+        <button class="qp-chip" data-item="canned tuna">tuna</button>
+      </div>
+      <div class="qp-group">
+        <span class="qp-label">Grains</span>
+        <button class="qp-chip" data-item="rice">rice</button>
+        <button class="qp-chip" data-item="pasta">pasta</button>
+        <button class="qp-chip" data-item="noodles">noodles</button>
+        <button class="qp-chip" data-item="bread">bread</button>
+        <button class="qp-chip" data-item="oats">oats</button>
+      </div>
+      <div class="qp-group">
+        <span class="qp-label">Veg</span>
+        <button class="qp-chip" data-item="onion">onion</button>
+        <button class="qp-chip" data-item="garlic">garlic</button>
+        <button class="qp-chip" data-item="tomato">tomato</button>
+        <button class="qp-chip" data-item="spinach">spinach</button>
+        <button class="qp-chip" data-item="potato">potato</button>
+        <button class="qp-chip" data-item="carrot">carrot</button>
+        <button class="qp-chip" data-item="broccoli">broccoli</button>
+      </div>
+      <div class="qp-group" style="margin-bottom:8px;">
+        <span class="qp-label">Flavor</span>
+        <button class="qp-chip" data-item="soy sauce">soy sauce</button>
+        <button class="qp-chip" data-item="butter">butter</button>
+        <button class="qp-chip" data-item="lemon">lemon</button>
+        <button class="qp-chip" data-item="curry paste">curry paste</button>
+        <button class="qp-chip" data-item="tahini">tahini</button>
+        <button class="qp-chip" data-item="olive oil">olive oil</button>
+      </div>
 
       <div class="sel-section">
         <span class="sel-label">Mood</span>
@@ -325,7 +369,14 @@
       const chip = document.createElement('div');
       chip.className = 'chip';
       chip.innerHTML = '<span>' + escapeHtml(h) + '</span><button class="x" aria-label="remove">&times;</button>';
-      chip.querySelector('.x').addEventListener('click', function(){ haves.splice(i,1); renderChips(); });
+      chip.querySelector('.x').addEventListener('click', function(){
+        haves.splice(i, 1);
+        renderChips();
+        // sync qp-chip added state
+        document.querySelectorAll('.qp-chip').forEach(function(b){
+          b.classList.toggle('added', haves.includes(b.dataset.item));
+        });
+      });
       haveChips.appendChild(chip);
     });
   }
@@ -339,6 +390,22 @@
 
   haveAddBtn.addEventListener('click', addHave);
   haveInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); addHave(); } });
+
+  // ── Quick pick chips ───────────────────────────────────────────────────
+  document.querySelectorAll('.qp-chip').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var item = btn.dataset.item;
+      if(btn.classList.contains('added')){
+        // remove
+        var idx = haves.indexOf(item);
+        if(idx !== -1){ haves.splice(idx, 1); renderChips(); }
+        btn.classList.remove('added');
+      } else {
+        if(!haves.includes(item)){ haves.push(item); renderChips(); }
+        btn.classList.add('added');
+      }
+    });
+  });
 
   // ── Pill toggles ───────────────────────────────────────────────────────
   document.querySelectorAll('#moodOptions .pill').forEach(function(btn){
