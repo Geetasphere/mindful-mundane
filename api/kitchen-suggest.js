@@ -64,12 +64,9 @@ MISSING: <one ingredient that would meaningfully improve it but they don't have,
 TOMORROW: <One sentence about what to prep or store now that makes tomorrow's cooking easier. Omit this line entirely if nothing applies.>
 CHIPS: [chip1] [chip2] [chip3]
 
-CHIPS rules: Always end a structured response with a CHIPS line. Choose 3 natural next steps:
-- One ingredient probe: "Do you have [specific ingredient]?" — pick one thing that would noticeably change or improve this dish
-- One tomorrow or storage angle: "What can I prep for tomorrow?" or "How do I store this?" — unless TOMORROW already fully covers it
-- One variation or substitution: "Make it spicier", "Make it vegetarian", "Make it in 15 minutes", or a way to use the MISSING ingredient if they find one
+CHIPS rules: Always end a structured response with a CHIPS line listing 3–4 specific ingredients the user hasn't mentioned that would meaningfully improve or change this dish. Just the plain ingredient names — nothing else. Examples: [parmesan] [fresh basil] [lemon] [soy sauce]. The frontend will show these as "Do you have any of these?" so the user can tap to confirm. Do not include staples they almost certainly have (salt, pepper, oil, water).
 
-For conversational follow-ups, substitutions, or tips — drop the structured format and reply conversationally. Be brief, warm, and direct. Sound like the site: calm, practical, encouraging without being cheerful. End with a CHIPS line only when it moves the conversation forward naturally (2 chips maximum in conversational mode).`;
+For conversational follow-ups, substitutions, or tips — drop the structured format and reply conversationally. Be brief, warm, and direct. Sound like the site: calm, practical, encouraging without being cheerful. If you're probing for a specific ingredient in a conversational reply, end with a CHIPS line listing 2–3 ingredient options.`;
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {

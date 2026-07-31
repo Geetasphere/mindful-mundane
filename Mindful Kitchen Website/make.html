@@ -128,9 +128,10 @@
   .msg-bubble code{ font-family:monospace; font-size:13px; background:var(--line); border-radius:4px; padding:1px 5px; }
 
   /* In-chat quick-reply chips */
-  .chat-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; padding-left:2px; }
-  .chat-chip{ font-family:'Nunito',sans-serif; font-size:13px; padding:5px 12px; border-radius:12px; border:1px solid var(--line); background:var(--white); color:var(--ink-soft); cursor:pointer; transition:all .12s; white-space:nowrap; }
-  .chat-chip:hover:not(:disabled){ border-color:var(--gold); color:var(--ink); background:var(--yellow-tint); }
+  .chat-chips-label{ font-family:'Nunito',sans-serif; font-size:12px; color:var(--ink-label); margin-top:10px; margin-bottom:5px; }
+  .chat-chips{ display:flex; flex-wrap:wrap; gap:6px; padding-left:2px; }
+  .chat-chip{ font-family:'Nunito',sans-serif; font-size:13px; padding:5px 12px; border-radius:12px; border:1px dashed var(--line); background:var(--white); color:var(--ink-soft); cursor:pointer; transition:all .12s; white-space:nowrap; }
+  .chat-chip:hover:not(:disabled){ border-color:var(--gold); border-style:solid; color:var(--ink); background:var(--yellow-tint); }
   .chat-chip:disabled{ opacity:0.4; cursor:default; }
 
   /* Typing indicator */
@@ -500,6 +501,7 @@
     div.className = 'msg ' + role;
     var inner = '<div class="msg-bubble">' + html + '</div>';
     if(chips && chips.length){
+      inner += '<div class="chat-chips-label">Do you have any of these?</div>';
       inner += '<div class="chat-chips">' + chips.map(function(c){
         return '<button class="chat-chip">' + escapeHtml(c) + '</button>';
       }).join('') + '</div>';
@@ -507,9 +509,8 @@
     div.innerHTML = inner;
     div.querySelectorAll('.chat-chip').forEach(function(btn){
       btn.addEventListener('click', function(){
-        // disable all chips in this message so it's clear which was chosen
         div.querySelectorAll('.chat-chip').forEach(function(b){ b.disabled = true; });
-        chatTextarea.value = btn.textContent;
+        chatTextarea.value = 'Yes, I have ' + btn.textContent;
         sendFollowup();
       });
     });
