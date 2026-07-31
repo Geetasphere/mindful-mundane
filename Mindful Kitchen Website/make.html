@@ -134,6 +134,41 @@
   .chat-chip:hover:not(:disabled){ border-color:var(--gold); border-style:solid; color:var(--ink); background:var(--yellow-tint); }
   .chat-chip:disabled{ opacity:0.4; cursor:default; }
 
+  /* Message action buttons (pin + rate) */
+  .msg-actions{ display:flex; gap:6px; align-items:center; margin-top:8px; padding-left:2px; }
+  .action-btn{ display:inline-flex; align-items:center; gap:4px; font-family:'Nunito',sans-serif; font-size:12px; padding:4px 10px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--ink-label); cursor:pointer; transition:all .12s; white-space:nowrap; }
+  .action-btn:hover:not([disabled]){ border-color:var(--gold); color:var(--ink); background:var(--yellow-tint); }
+  .action-btn.active-pin{ border-color:var(--gold); background:var(--yellow-tint); color:var(--ink); }
+  .action-btn.active-up{ border-color:var(--sage); background:var(--sage-tint); color:var(--ink-soft); }
+  .action-btn.active-down{ border-color:var(--clay); background:var(--peach-tint); color:var(--ink-soft); }
+
+  /* Saved panel */
+  .saved-open-btn{ display:inline-flex; align-items:center; gap:5px; font-family:'Nunito',sans-serif; font-size:13px; padding:5px 11px; border-radius:8px; border:1px solid var(--line); background:var(--white); color:var(--ink-soft); cursor:pointer; flex-shrink:0; transition:all .12s; }
+  .saved-open-btn:hover{ border-color:var(--gold); color:var(--ink); background:var(--yellow-tint); }
+  .saved-badge{ display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; border-radius:8px; background:var(--gold); color:#3a2e10; font-size:10px; font-weight:800; padding:0 3px; }
+  .saved-overlay{ position:fixed; inset:0; background:rgba(58,53,47,0.3); z-index:200; display:none; backdrop-filter:blur(2px); }
+  .saved-overlay.open{ display:block; }
+  .saved-panel{ position:fixed; top:0; right:0; bottom:0; width:min(400px,100vw); background:var(--bg); border-left:1px solid var(--line); display:flex; flex-direction:column; z-index:201; box-shadow:-4px 0 24px rgba(0,0,0,0.08); transform:translateX(100%); transition:transform .22s ease; }
+  .saved-overlay.open .saved-panel{ transform:translateX(0); }
+  .saved-panel-hd{ display:flex; align-items:center; justify-content:space-between; padding:16px 20px 14px; border-bottom:1px solid var(--line); flex-shrink:0; }
+  .saved-panel-hd h2{ font-family:'EB Garamond',Georgia,serif; font-size:20px; font-weight:500; margin:0; }
+  .saved-panel-close{ background:none; border:none; cursor:pointer; font-size:24px; color:var(--ink-label); line-height:1; padding:0 4px; }
+  .saved-panel-close:hover{ color:var(--ink); }
+  .saved-list{ flex:1; overflow-y:auto; padding:14px 18px; display:flex; flex-direction:column; gap:10px; }
+  .saved-empty{ font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink-label); text-align:center; padding:48px 0; font-style:italic; line-height:2; }
+  .saved-card{ background:var(--white); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .saved-card-hd{ display:flex; align-items:flex-start; gap:8px; padding:12px 14px; cursor:pointer; }
+  .saved-card-info{ flex:1; min-width:0; }
+  .saved-card-title{ font-family:'EB Garamond',Georgia,serif; font-size:15px; font-weight:500; margin:0 0 3px; }
+  .saved-card-meta{ font-family:'Nunito',sans-serif; font-size:11px; color:var(--ink-label); }
+  .saved-card-del{ background:none; border:none; cursor:pointer; color:var(--ink-label); font-size:20px; line-height:1; padding:0 2px; flex-shrink:0; }
+  .saved-card-del:hover{ color:#b0392b; }
+  .saved-card-body{ display:none; padding:10px 14px 12px; border-top:1px solid var(--line); font-family:'Nunito',sans-serif; font-size:13px; line-height:1.6; color:var(--ink-soft); }
+  .saved-card-body p, .saved-card-body ol{ margin:0 0 6px; }
+  .saved-card-body p:last-child, .saved-card-body ol:last-child{ margin-bottom:0; }
+  .saved-card-body ol{ padding-left:18px; }
+  .saved-card.open .saved-card-body{ display:block; }
+
   /* Typing indicator */
   .typing-dots{ display:flex; gap:4px; align-items:center; height:20px; }
   .typing-dots span{ width:7px; height:7px; border-radius:50%; background:var(--ink-label); animation:tdot 1.2s infinite; }
@@ -202,10 +237,17 @@
 <main>
 
   <!-- Page title -->
-  <div class="page-header">
-    <div class="kicker">Not a search. A conversation.</div>
-    <h1 class="title">What Can I Make?</h1>
-    <p class="sub">Tell it what you have, pick a mood and time — then ask. Or just type what's on your mind.</p>
+  <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+    <div>
+      <div class="kicker">Not a search. A conversation.</div>
+      <h1 class="title">What Can I Make?</h1>
+      <p class="sub">Tell it what you have, pick a mood and time — then ask. Or just type what's on your mind.</p>
+    </div>
+    <button class="saved-open-btn" id="savedOpenBtn" style="margin-top:4px;">
+      <svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 1.5h8v9L6 8 2 10.5z"/></svg>
+      Saved
+      <span class="saved-badge" id="savedBadge" style="display:none;"></span>
+    </button>
   </div>
 
   <!-- Selection panel -->
@@ -338,6 +380,17 @@
   <p class="affiliate-note">As an Amazon Associate, Mindful Kitchen earns from qualifying purchases made through links on this page.</p>
 
 </main>
+
+<!-- Saved recipes panel -->
+<div class="saved-overlay" id="savedOverlay">
+  <div class="saved-panel">
+    <div class="saved-panel-hd">
+      <h2>Saved Recipes</h2>
+      <button class="saved-panel-close" id="savedClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="saved-list" id="savedList"></div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -496,7 +549,69 @@
   var selSummaryText = document.getElementById('selSummaryText');
   var selEditBtn   = document.getElementById('selEditBtn');
 
-  function appendMsg(role, html, chips){
+  // ── Saved recipes ──────────────────────────────────────────────────────
+  var SAVED_KEY = 'mk_saved_recipes';
+  function getSaved(){ try{ return JSON.parse(localStorage.getItem(SAVED_KEY)||'[]'); }catch(e){ return []; } }
+  function setSaved(list){ localStorage.setItem(SAVED_KEY, JSON.stringify(list)); }
+
+  function extractTitle(text){
+    var m = text.match(/^TITLE:\s*(.+)$/m);
+    return m ? m[1].trim() : null;
+  }
+
+  function updateSavedBadge(){
+    var n = getSaved().length;
+    var el = document.getElementById('savedBadge');
+    if(n){ el.textContent = n; el.style.display = ''; }
+    else el.style.display = 'none';
+  }
+
+  function renderSavedList(){
+    var list = getSaved();
+    var el = document.getElementById('savedList');
+    if(!list.length){
+      el.innerHTML = '<p class="saved-empty">Nothing saved yet.<br>Pin a recipe from the chat to keep it here.</p>';
+      return;
+    }
+    el.innerHTML = '';
+    list.slice().reverse().forEach(function(item){
+      var card = document.createElement('div');
+      card.className = 'saved-card';
+      var ratingLabel = item.rating === 1 ? ' &middot; <span style="color:var(--sage-deep,#5a7a4a)">worked well</span>'
+                      : item.rating === -1 ? ' &middot; <span style="color:var(--clay)">didn\'t work</span>' : '';
+      var date = new Date(item.savedAt).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+      card.innerHTML =
+        '<div class="saved-card-hd">' +
+          '<div class="saved-card-info">' +
+            '<p class="saved-card-title">' + escapeHtml(item.title) + '</p>' +
+            '<div class="saved-card-meta">' + date + ratingLabel + '</div>' +
+          '</div>' +
+          '<button class="saved-card-del" data-id="' + item.id + '" aria-label="Remove">&times;</button>' +
+        '</div>' +
+        '<div class="saved-card-body">' + textToHtml(item.text) + '</div>';
+      card.querySelector('.saved-card-hd').addEventListener('click', function(e){
+        if(e.target.classList.contains('saved-card-del')) return;
+        card.classList.toggle('open');
+      });
+      card.querySelector('.saved-card-del').addEventListener('click', function(){
+        var id = Number(this.dataset.id);
+        setSaved(getSaved().filter(function(r){ return r.id !== id; }));
+        renderSavedList(); updateSavedBadge();
+      });
+      el.appendChild(card);
+    });
+  }
+
+  document.getElementById('savedOpenBtn').addEventListener('click', function(){ renderSavedList(); document.getElementById('savedOverlay').classList.add('open'); });
+  document.getElementById('savedClose').addEventListener('click', function(){ document.getElementById('savedOverlay').classList.remove('open'); });
+  document.getElementById('savedOverlay').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+  updateSavedBadge();
+
+  // ── SVG icons ──────────────────────────────────────────────────────────
+  var SVG_BOOKMARK = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 1.5h8v9L6 8 2 10.5z"/></svg>';
+  var SVG_BOOKMARK_FILLED = '<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2 1.5h8v9L6 8 2 10.5z"/></svg>';
+
+  function appendMsg(role, html, chips, recipeData){
     var div = document.createElement('div');
     div.className = 'msg ' + role;
     var inner = '<div class="msg-bubble">' + html + '</div>';
@@ -506,6 +621,13 @@
         return '<button class="chat-chip">' + escapeHtml(c) + '</button>';
       }).join('') + '</div>';
     }
+    if(role === 'claude' && recipeData){
+      inner += '<div class="msg-actions">' +
+        '<button class="action-btn" data-action="pin">' + SVG_BOOKMARK + ' Save</button>' +
+        '<button class="action-btn" data-action="up">✓ Worked</button>' +
+        '<button class="action-btn" data-action="down">✕ Didn\'t work</button>' +
+        '</div>';
+    }
     div.innerHTML = inner;
     div.querySelectorAll('.chat-chip').forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -514,6 +636,46 @@
         sendFollowup();
       });
     });
+    if(role === 'claude' && recipeData){
+      var savedId = null;
+      var msgRating = null;
+      var pinBtn = div.querySelector('[data-action="pin"]');
+      var upBtn  = div.querySelector('[data-action="up"]');
+      var downBtn= div.querySelector('[data-action="down"]');
+
+      function updateSavedRecord(){
+        if(!savedId) return;
+        var list = getSaved();
+        var rec = list.find(function(r){ return r.id === savedId; });
+        if(rec){ rec.rating = msgRating; setSaved(list); }
+      }
+
+      pinBtn.addEventListener('click', function(){
+        if(savedId){
+          setSaved(getSaved().filter(function(r){ return r.id !== savedId; }));
+          savedId = null;
+          pinBtn.classList.remove('active-pin');
+          pinBtn.innerHTML = SVG_BOOKMARK + ' Save';
+        } else {
+          savedId = Date.now();
+          var rec = { id: savedId, title: recipeData.title, text: recipeData.text, rating: msgRating, savedAt: new Date().toISOString() };
+          var list = getSaved(); list.push(rec); setSaved(list);
+          pinBtn.classList.add('active-pin');
+          pinBtn.innerHTML = SVG_BOOKMARK_FILLED + ' Saved';
+        }
+        updateSavedBadge();
+      });
+      upBtn.addEventListener('click', function(){
+        if(msgRating === 1){ msgRating = null; upBtn.classList.remove('active-up'); }
+        else { msgRating = 1; upBtn.classList.add('active-up'); downBtn.classList.remove('active-down'); }
+        updateSavedRecord();
+      });
+      downBtn.addEventListener('click', function(){
+        if(msgRating === -1){ msgRating = null; downBtn.classList.remove('active-down'); }
+        else { msgRating = -1; downBtn.classList.add('active-down'); upBtn.classList.remove('active-up'); }
+        updateSavedRecord();
+      });
+    }
     chatThread.appendChild(div);
     chatThread.scrollTop = chatThread.scrollHeight;
     return div;
@@ -593,10 +755,11 @@
 
       var reply = data.text || '';
       var parsed = parseChips(reply);
+      var recipeTitle = extractTitle(parsed.text);
       messages.push({ role: 'assistant', content: reply });
 
       typing.remove();
-      appendMsg('claude', textToHtml(parsed.text), parsed.chips);
+      appendMsg('claude', textToHtml(parsed.text), parsed.chips, recipeTitle ? { title: recipeTitle, text: parsed.text } : null);
 
       // After first response: collapse form to summary bar
       if(messages.length === 2){
