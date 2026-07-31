@@ -115,7 +115,9 @@
     display:inline-block; font-family:'Nunito',sans-serif; font-size:11px; font-weight:800; text-transform:uppercase;
     letter-spacing:0.06em; color:#4f6a3a; background:var(--sage-tint); border-radius:12px; padding:4px 12px; margin-bottom:16px;
   }
-  .result-card .rbody{ font-family:'Nunito',sans-serif; font-size:14.5px; line-height:1.75; color:var(--ink); white-space:pre-wrap; }
+  .result-card .rbody{ font-family:'Nunito',sans-serif; font-size:14.5px; line-height:1.6; color:var(--ink); }
+  .result-card .rbody p{ margin:0 0 10px; }
+  .result-card .rbody p:last-child{ margin-bottom:0; }
   .result-card .rbody strong{ color:var(--ink); }
   .result-card .rbody a{ color:#7a5a20; text-decoration:underline; text-decoration-color:var(--gold); text-underline-offset:2px; }
   .result-card .rbody a:hover{ color:var(--gold-deep); }
@@ -422,15 +424,16 @@
       document.getElementById('resultTemplate').textContent = parsed.template;
       document.getElementById('resultTitle').textContent = parsed.title;
 
-      const stepsHtml = escapeHtml(parsed.steps);
+      const stepsHtml = escapeHtml(parsed.steps)
+        .split(/\n\n+/).map(s => `<p>${s.replace(/\n/g,'<br>')}</p>`).join('');
       let missingHtml = "";
       if(parsed.missing){
         const isNothing = /^nothing/i.test(parsed.missing.trim());
         if(isNothing){
-          missingHtml = `\n\n${escapeHtml(parsed.missing)}`;
+          missingHtml = `<p>${escapeHtml(parsed.missing)}</p>`;
         } else {
           const link = amazonSearchLink(parsed.missing);
-          missingHtml = `\n\nIf not — <a href="${link}" target="_blank" rel="nofollow sponsored noopener">${escapeHtml(parsed.missing)}</a>`;
+          missingHtml = `<p>If not — <a href="${link}" target="_blank" rel="nofollow sponsored noopener">${escapeHtml(parsed.missing)}</a></p>`;
         }
       }
       document.getElementById('resultBody').innerHTML = stepsHtml + missingHtml;
