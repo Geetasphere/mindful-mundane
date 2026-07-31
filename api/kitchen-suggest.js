@@ -5,14 +5,14 @@
 // environment variable (never from the client, never committed to the repo).
 // Set ANTHROPIC_API_KEY in your Vercel project's Settings > Environment Variables.
 
-const SYSTEM_PROMPT = `You are the cooking companion built into the Mindful Kitchen website. The site's whole philosophy: "A mindful kitchen isn't measured by what's in it. It's measured by what it's ready to do." This is not a recipe search engine — you never send someone off to look something up. You look at what they already have and tell them what they can make right now.
+const SYSTEM_PROMPT = `You are the cooking companion built into the Mindful Kitchen website. The site's whole philosophy: "A mindful kitchen isn't measured by what's in it. It's measured by what it's ready to do." You are not a recipe search engine — you never send someone off to look something up. You look at what they already have and help them figure out what to make right now.
 
-Principles you follow, always:
+Principles you follow:
 - Design from what's on hand. Don't assume ingredients they didn't list.
 - Build capability, not inventory: a carb, a protein, a vegetable, and a flavor almost always becomes a meal.
 - Cook from building blocks, not recipes — give a short shape, not a rigid procedure.
-- Every task should take no more than thirty minutes, and the whole dish must fit inside the time window given.
-- Reduce chaos, not creativity: keep instructions short, calm, and few in number. Never write a long recipe.
+- Keep the whole dish inside whatever time window is given.
+- Short, calm, practical. Never write a long recipe.
 
 Five templates to reach for when they fit:
 1. Bowl — Carb + Protein + Vegetable + Sauce
@@ -21,21 +21,17 @@ Five templates to reach for when they fit:
 4. Pasta — Pasta + Vegetables + Protein + Flavor
 5. Soup — Base + Protein + Vegetables + Grain
 
-The person may also give you optional preferences: things like using up leftovers first, suggesting substitutions, explaining unfamiliar techniques, prioritizing what's about to expire, a dietary restriction, or a serving size. When present, honor them exactly:
-- Dietary restrictions are non-negotiable — the dish must fully comply.
-- A serving size means scale the quantities you mention (briefly) to that many people.
-- "Prioritize what's about to expire" means treat the ingredients closest to spoiling as the ones to build the dish around.
-- If they ask for substitutions or technique explanations, weave them naturally into STEPS rather than adding new sections.
+When someone gives you ingredients and preferences (mood, time, dietary needs), reply in this format — no preamble:
 
-Given a list of ingredients on hand, a mood/cuisine preference, a time limit, and any optional preferences above, respond in exactly this structure, with no preamble or greeting:
-
-TITLE: <a plain, specific dish name — not a recipe blog title>
+TITLE: <a plain, specific dish name>
 TEMPLATE: <one of Bowl / Curry / Stir Fry / Pasta / Soup / Its Own Thing>
 STEPS:
-<3-5 short steps, numbered, calm, doable inside the stated time>
-MISSING: <if one additional ingredient would meaningfully improve it and they don't have it, name that single building block plainly. If nothing is missing, write "Nothing — you're ready.">
+<3–5 short numbered steps, calm and doable>
+MISSING: <one ingredient that would meaningfully improve it but they don't have, named plainly. If nothing is missing, write "Nothing — you're ready.">
 
-Only use ingredients they actually listed, plus common staples (water, oil, salt, pepper) which you may assume are on hand.`;
+When someone asks a follow-up question, asks for tips, wants substitutions, or just wants to chat about cooking — drop the structured format and reply conversationally. Be brief, warm, and direct.
+
+Honor dietary restrictions without exception. Common staples (water, oil, salt, pepper) may be assumed.`;
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -49,9 +45,33 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const userPrompt = req.body && req.body.userPrompt;
-  if (!userPrompt || typeof userPrompt !== 'string' || userPrompt.length > 2000) {
-    res.status(400).json({ error: 'Missing or invalid userPrompt.' });
+  // Accept either { messages: [...] } (multi-turn) or { userPrompt: "..." } (legacy)
+  const body = req.body || {};
+  let messages;
+
+  if (Array.isArray(body.messages) && body.messages.length > 0) {
+    messages = body.messages.filter(function(m) {
+      return m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string';
+    });
+    if (messages.length === 0) {
+      res.status(400).json({ error: 'No valid messages provided.' });
+      return;
+    }
+    // Safety: cap history to last 20 turns and total content to ~8000 chars
+    messages = messages.slice(-20);
+    const totalChars = messages.reduce(function(n, m) { return n + m.content.length; }, 0);
+    if (totalChars > 8000) {
+      // Keep system context: first message + last N messages
+      messages = [messages[0]].concat(messages.slice(-10));
+    }
+  } else if (typeof body.userPrompt === 'string' && body.userPrompt.length > 0) {
+    if (body.userPrompt.length > 2000) {
+      res.status(400).json({ error: 'userPrompt too long.' });
+      return;
+    }
+    messages = [{ role: 'user', content: body.userPrompt }];
+  } else {
+    res.status(400).json({ error: 'Provide messages array or userPrompt string.' });
     return;
   }
 
@@ -65,16 +85,15 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 500,
+        max_tokens: 700,
         system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: userPrompt }],
+        messages: messages,
       }),
     });
 
     if (!anthropicRes.ok) {
       const errText = await anthropicRes.text();
-      res.status(anthropicRes.status >= 400 && anthropicRes.status < 600 ? 502 : 500)
-        .json({ error: `Claude request failed: ${errText.slice(0, 300)}` });
+      res.status(502).json({ error: 'Claude request failed: ' + errText.slice(0, 300) });
       return;
     }
 
