@@ -127,6 +127,12 @@
   .msg-bubble strong{ font-weight:700; }
   .msg-bubble code{ font-family:monospace; font-size:13px; background:var(--line); border-radius:4px; padding:1px 5px; }
 
+  /* In-chat quick-reply chips */
+  .chat-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; padding-left:2px; }
+  .chat-chip{ font-family:'Nunito',sans-serif; font-size:13px; padding:5px 12px; border-radius:12px; border:1px solid var(--line); background:var(--white); color:var(--ink-soft); cursor:pointer; transition:all .12s; white-space:nowrap; }
+  .chat-chip:hover:not(:disabled){ border-color:var(--gold); color:var(--ink); background:var(--yellow-tint); }
+  .chat-chip:disabled{ opacity:0.4; cursor:default; }
+
   /* Typing indicator */
   .typing-dots{ display:flex; gap:4px; align-items:center; height:20px; }
   .typing-dots span{ width:7px; height:7px; border-radius:50%; background:var(--ink-label); animation:tdot 1.2s infinite; }
@@ -489,13 +495,37 @@
   var selSummaryText = document.getElementById('selSummaryText');
   var selEditBtn   = document.getElementById('selEditBtn');
 
-  function appendMsg(role, html){
+  function appendMsg(role, html, chips){
     var div = document.createElement('div');
     div.className = 'msg ' + role;
-    div.innerHTML = '<div class="msg-bubble">' + html + '</div>';
+    var inner = '<div class="msg-bubble">' + html + '</div>';
+    if(chips && chips.length){
+      inner += '<div class="chat-chips">' + chips.map(function(c){
+        return '<button class="chat-chip">' + escapeHtml(c) + '</button>';
+      }).join('') + '</div>';
+    }
+    div.innerHTML = inner;
+    div.querySelectorAll('.chat-chip').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        // disable all chips in this message so it's clear which was chosen
+        div.querySelectorAll('.chat-chip').forEach(function(b){ b.disabled = true; });
+        chatTextarea.value = btn.textContent;
+        sendFollowup();
+      });
+    });
     chatThread.appendChild(div);
     chatThread.scrollTop = chatThread.scrollHeight;
     return div;
+  }
+
+  function parseChips(text){
+    var match = text.match(/^CHIPS:\s*(.+)$/m);
+    if(!match) return { text: text, chips: [] };
+    var chips = [];
+    var re = /\[([^\]]+)\]/g, m;
+    while((m = re.exec(match[1])) !== null) chips.push(m[1]);
+    var clean = text.replace(/\nCHIPS:.*$/m, '').replace(/\n+$/, '').trim();
+    return { text: clean, chips: chips };
   }
 
   function appendTyping(){
@@ -516,21 +546,28 @@
   }
 
   function textToHtml(text){
-    return text
-      .split(/\n\n+/)
-      .map(function(block){
-        var trimmed = block.trim();
-        // Numbered list block
-        if(/^\d+\.\s/.test(trimmed)){
-          var items = trimmed.split(/\n(?=\d+\.\s)/).map(function(line){
-            return '<li>' + mdToHtml(line.replace(/^\d+\.\s*/, '')) + '</li>';
+    var blocks = text.split(/\n\n+/).map(function(b){ return b.trim(); }).filter(Boolean);
+    var result = [];
+    var i = 0;
+    while(i < blocks.length){
+      if(/^\d+\.\s/.test(blocks[i])){
+        // Collect all consecutive numbered blocks into one <ol>
+        var items = [];
+        while(i < blocks.length && /^\d+\.\s/.test(blocks[i])){
+          // Also handle multi-line numbered blocks (e.g. "1. step\n2. step")
+          var lines = blocks[i].split(/\n(?=\d+\.\s)/);
+          lines.forEach(function(line){
+            items.push('<li>' + mdToHtml(line.replace(/^\d+\.\s*/, '')) + '</li>');
           });
-          return '<ol>' + items.join('') + '</ol>';
+          i++;
         }
-        // Plain paragraph (handle line breaks within)
-        return '<p>' + trimmed.split('\n').map(mdToHtml).join('<br>') + '</p>';
-      })
-      .join('');
+        result.push('<ol>' + items.join('') + '</ol>');
+      } else {
+        result.push('<p>' + blocks[i].split('\n').map(mdToHtml).join('<br>') + '</p>');
+        i++;
+      }
+    }
+    return result.join('');
   }
 
   // ── API call ───────────────────────────────────────────────────────────
@@ -554,10 +591,11 @@
       if(!res.ok) throw new Error(data.error || 'Request failed (' + res.status + ')');
 
       var reply = data.text || '';
+      var parsed = parseChips(reply);
       messages.push({ role: 'assistant', content: reply });
 
       typing.remove();
-      appendMsg('claude', textToHtml(reply));
+      appendMsg('claude', textToHtml(parsed.text), parsed.chips);
 
       // After first response: collapse form to summary bar
       if(messages.length === 2){
