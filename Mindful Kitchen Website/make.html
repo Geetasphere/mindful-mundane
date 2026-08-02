@@ -85,6 +85,13 @@
   .qp-chip{ font-family:'Nunito',sans-serif; font-size:14px; padding:4px 11px; border-radius:10px; border:1px dashed var(--line); background:transparent; color:var(--ink-label); cursor:pointer; transition:all .12s; white-space:nowrap; }
   .qp-chip:hover{ border-color:var(--gold); color:var(--ink); background:var(--yellow-tint); border-style:solid; }
   .qp-chip.added{ border-color:var(--gold); border-style:solid; background:var(--yellow-tint); color:var(--ink); }
+  .qp-wrap{ display:inline-flex; align-items:center; }
+  .qp-chip-x{ width:15px; height:15px; border-radius:50%; border:none; background:transparent; color:var(--ink-label); cursor:pointer; font-size:13px; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center; opacity:0; transition:opacity .12s, background .12s; flex-shrink:0; margin-left:1px; }
+  .qp-wrap:hover .qp-chip-x{ opacity:1; }
+  .qp-chip-x:hover{ background:var(--line); opacity:1; }
+  .qp-restore{ font-family:'Nunito',sans-serif; font-size:11px; color:var(--ink-label); background:none; border:none; cursor:pointer; padding:0 0 4px 52px; text-decoration:underline; text-underline-offset:2px; display:block; }
+  .qp-restore:hover{ color:var(--ink); }
+  @media (pointer:coarse){ .qp-chip-x{ opacity:0.5; } }
   .chip{ display:inline-flex; align-items:center; gap:3px; background:var(--yellow-tint); border:1px solid var(--gold); border-radius:12px; padding:2px 6px 2px 9px; font-size:12px; font-family:'Nunito',sans-serif; }
   .chip .x{ cursor:pointer; color:var(--ink-label); font-size:15px; line-height:1; background:none; border:none; padding:0 2px; }
   .pill-row{ display:flex; flex-wrap:wrap; gap:5px; flex:1; }
@@ -199,13 +206,10 @@
     .chat-input-bar{ padding:8px 12px 12px; }
     #selSummary{ padding:8px 14px; }
   }
-  /* On mobile the form can be taller than the screen.
-     sel-panel is a flex column: selFull scrolls, ask-btn-wrap is pinned at the bottom. */
-  .sel-panel{ display:flex; flex-direction:column; }
-  #selFull{ overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1; min-height:0; }
-  #askBtnWrap{ flex-shrink:0; padding:8px 20px 12px; background:var(--white); }
+  #askBtnWrap{ padding:8px 20px 12px; background:var(--white); }
+  /* On mobile: constrain selFull so it scrolls and the button below it stays visible */
   @media (max-width:820px){
-    .sel-panel{ max-height:calc(100vh - 220px); }
+    #selFull{ overflow-y:auto; -webkit-overflow-scrolling:touch; max-height:calc(100vh - 340px); max-height:calc(100dvh - 340px); }
   }
 </style>
 </head>
@@ -308,6 +312,7 @@
         <button class="qp-chip" data-item="tahini">tahini</button>
         <button class="qp-chip" data-item="olive oil">olive oil</button>
       </div>
+      <button class="qp-restore" id="qpRestoreBtn" style="display:none;">↺ Show all items</button>
 
       <div class="sel-section">
         <span class="sel-label">Mood</span>
@@ -366,7 +371,7 @@
 
     <!-- Ask button — outside selFull so it's always visible at the bottom of the panel -->
     <div id="askBtnWrap">
-      <button class="ask-btn" id="askBtn">What can I make? →</button>
+      <button class="ask-btn" id="askBtn">What can I make?</button>
     </div>
 
     <!-- Summary bar (shown after first ask) -->
@@ -478,6 +483,49 @@
       }
     });
   });
+
+  // ── Quick pick chip dismissal (persist hidden state) ───────────────────
+  var HIDDEN_QP_KEY = 'mk_hidden_qpchips';
+  function getHiddenQP(){ try{ return JSON.parse(localStorage.getItem(HIDDEN_QP_KEY)||'[]'); }catch(e){ return []; } }
+  function setHiddenQP(list){ localStorage.setItem(HIDDEN_QP_KEY, JSON.stringify(list)); }
+
+  function applyHiddenQP(){
+    var hidden = getHiddenQP();
+    document.querySelectorAll('.qp-wrap').forEach(function(wrap){
+      var chip = wrap.querySelector('.qp-chip');
+      if(chip) wrap.style.display = hidden.includes(chip.dataset.item) ? 'none' : '';
+    });
+    var rb = document.getElementById('qpRestoreBtn');
+    if(rb) rb.style.display = hidden.length ? '' : 'none';
+  }
+
+  // Wrap each qp-chip with a span and add a dismiss × button
+  document.querySelectorAll('.qp-chip').forEach(function(btn){
+    var wrap = document.createElement('span');
+    wrap.className = 'qp-wrap';
+    btn.parentNode.insertBefore(wrap, btn);
+    wrap.appendChild(btn);
+    var x = document.createElement('button');
+    x.className = 'qp-chip-x';
+    x.type = 'button';
+    x.setAttribute('aria-label', 'hide ' + btn.dataset.item);
+    x.textContent = '×';
+    wrap.appendChild(x);
+    x.addEventListener('click', function(e){
+      e.stopPropagation();
+      var item = btn.dataset.item;
+      var hidden = getHiddenQP();
+      if(!hidden.includes(item)){ hidden.push(item); setHiddenQP(hidden); }
+      applyHiddenQP();
+    });
+  });
+
+  document.getElementById('qpRestoreBtn').addEventListener('click', function(){
+    setHiddenQP([]);
+    applyHiddenQP();
+  });
+
+  applyHiddenQP();
 
   // ── Pill toggles ───────────────────────────────────────────────────────
   document.querySelectorAll('#moodOptions .pill').forEach(function(btn){
@@ -690,7 +738,8 @@
       });
     }
     chatThread.appendChild(div);
-    chatThread.scrollTop = chatThread.scrollHeight;
+    var msgTop = div.getBoundingClientRect().top - chatThread.getBoundingClientRect().top + chatThread.scrollTop;
+    chatThread.scrollTo({ top: msgTop, behavior: 'smooth' });
     return div;
   }
 
